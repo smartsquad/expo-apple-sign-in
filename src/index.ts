@@ -1,3 +1,4 @@
+export { generateNonce, sha256Hex } from './nonce'
 export type {
   TAppleAuthConfig,
   TAppleAuthErrorResponse,
