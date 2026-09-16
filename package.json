@@ -1,0 +1,128 @@
+{
+  "name": "expo-apple-sign-in",
+  "version": "0.1.0",
+  "description": "Universal Sign in with Apple for Expo SDK 58 / Modules 2.0. One API, configurable button, iOS + Android + Web. Clerk, Supabase, and Firebase ready.",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "react-native": "./src/index.ts",
+      "browser": "./src/index.ts",
+      "default": "./build/index.js"
+    },
+    "./supabase": {
+      "types": "./build/adapters/supabase.d.ts",
+      "react-native": "./src/adapters/supabase.ts",
+      "browser": "./src/adapters/supabase.ts",
+      "default": "./build/adapters/supabase.js"
+    },
+    "./clerk": {
+      "types": "./build/adapters/clerk.d.ts",
+      "react-native": "./src/adapters/clerk.ts",
+      "browser": "./src/adapters/clerk.ts",
+      "default": "./build/adapters/clerk.js"
+    },
+    "./firebase": {
+      "types": "./build/adapters/firebase.d.ts",
+      "react-native": "./src/adapters/firebase.ts",
+      "browser": "./src/adapters/firebase.ts",
+      "default": "./build/adapters/firebase.js"
+    },
+    "./app.plugin": "./app.plugin.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "build",
+    "ios",
+    "android",
+    "app.plugin.js",
+    "expo-module.config.json"
+  ],
+  "scripts": {
+    "build": "node internal/module_scripts/build.js",
+    "example:web": "npm run web --prefix example",
+    "clean": "node internal/module_scripts/clean.js",
+    "lint": "eslint src/",
+    "test": "jest --testEnvironment=node",
+    "typecheck": "tsc --noEmit",
+    "prepare": "node internal/module_scripts/prepare.js",
+    "open:ios": "node internal/module_scripts/open-ios.js",
+    "open:android": "node internal/module_scripts/open-android.js"
+  },
+  "keywords": [
+    "expo",
+    "expo-modules",
+    "expo-modules-2",
+    "apple",
+    "sign-in-with-apple",
+    "authentication",
+    "react-native",
+    "supabase",
+    "clerk",
+    "firebase",
+    "ios",
+    "android",
+    "web"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartsquad/expo-apple-sign-in.git"
+  },
+  "bugs": {
+    "url": "https://github.com/smartsquad/expo-apple-sign-in/issues"
+  },
+  "author": "Massimo De Luisa <massimodeluisa@me.com> (https://github.com/massimodeluisa)",
+  "license": "MIT",
+  "homepage": "https://github.com/smartsquad/expo-apple-sign-in#readme",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@types/jest": "^30.0.0",
+    "@types/react": "~19.1.1",
+    "babel-jest": "^30.0.0",
+    "babel-preset-expo": "~58.0.11",
+    "eslint": "~9.39.4",
+    "eslint-config-universe": "^15.0.3",
+    "expo": "~58.0.6",
+    "expo-modules-core": "~58.0.14",
+    "jest": "^30.0.0",
+    "jest-expo": "~58.0.8",
+    "prettier": "^3.0.0",
+    "react": "19.3.0",
+    "react-native": "0.88.0-rc.3",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "expo": ">=58.0.0",
+    "react": "*",
+    "react-native": "*"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "^react-native$": "<rootDir>/src/__tests__/mocks/react-native.ts",
+      "^expo$": "<rootDir>/src/__tests__/mocks/expo.ts"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/src/__tests__/mocks/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/build/",
+      "<rootDir>/docs/",
+      "<rootDir>/example/"
+    ]
+  },
+  "expo": {
+    "plugin": "./app.plugin.js"
+  }
+}
