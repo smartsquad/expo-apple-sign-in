@@ -1,3 +1,12 @@
+export {
+  AppleAuthError,
+  AppleAuthErrorCode,
+  EAppleAuthErrorCode,
+  isAppleAuthError,
+  isCancelledError,
+  normalizeAppleError,
+} from './errors'
+export { isCancelledResponse, isErrorResponse, isSuccessResponse } from './responses'
 export { generateNonce, sha256Hex } from './nonce'
 export type {
   TAppleAuthConfig,
