@@ -12,3 +12,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - Identity token decoding that fills the user id and email from the token claims when Apple leaves them out.
 - iOS native module on AuthenticationServices, written with `@ExpoModule` and `@JS`.
 - JavaScript binding for the `ExpoAppleSignIn` native module.
+- Web sign-in through Apple JS in popup mode.
