@@ -1,3 +1,4 @@
+export { AppleAuth } from './AppleAuth'
 export {
   AppleAuthError,
   AppleAuthErrorCode,
