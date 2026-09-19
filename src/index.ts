@@ -1,4 +1,11 @@
 export { AppleAuth } from './AppleAuth'
+export {
+  AppleButton,
+  APPLE_BUTTON_HEIGHT,
+  type IAppleButtonProps,
+  type AppleButtonProps,
+} from './AppleButton'
+export { AppleLogo } from './AppleLogo'
 export { useAppleAuth } from './useAppleAuth'
 export {
   AppleAuthError,
