@@ -13,3 +13,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - iOS native module on AuthenticationServices, written with `@ExpoModule` and `@JS`.
 - JavaScript binding for the `ExpoAppleSignIn` native module.
 - Web sign-in through Apple JS in popup mode.
+- `AppleAuth` with `configure`, `signIn`, `request`, `isAvailable`, `getCredentialState`, and `signOut`. `signIn` hashes the nonce with SHA-256 for Apple and returns the raw nonce on the credential.
