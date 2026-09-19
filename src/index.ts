@@ -1,4 +1,5 @@
 export { AppleAuth } from './AppleAuth'
+export { useAppleAuth } from './useAppleAuth'
 export {
   AppleAuthError,
   AppleAuthErrorCode,

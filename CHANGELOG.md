@@ -14,3 +14,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - JavaScript binding for the `ExpoAppleSignIn` native module.
 - Web sign-in through Apple JS in popup mode.
 - `AppleAuth` with `configure`, `signIn`, `request`, `isAvailable`, `getCredentialState`, and `signOut`. `signIn` hashes the nonce with SHA-256 for Apple and returns the raw nonce on the credential.
+- `useAppleAuth` hook that exposes `signIn`, `signOut`, `credential`, `isLoading`, `error`, and `isAvailable`.
