@@ -22,6 +22,12 @@ export {
   type SupabaseAuthLike,
 } from './adapters/supabase'
 export { signInWithClerk } from './adapters/clerk'
+export {
+  signInWithFirebase,
+  toFirebaseAppleCredential,
+  type TFirebaseAppleCredential,
+  type FirebaseAppleCredential,
+} from './adapters/firebase'
 export { generateNonce, sha256Hex } from './nonce'
 export type {
   TAppleAuthConfig,
