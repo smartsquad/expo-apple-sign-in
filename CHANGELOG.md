@@ -19,3 +19,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - Android sign-in through the Services ID web flow in its own activity, written with `@ExpoModule` and `@JS`.
 - `signInWithSupabase` adapter, exported from `expo-apple-sign-in/supabase`.
 - `signInWithClerk` adapter using the `oauth_token_apple` strategy, exported from `expo-apple-sign-in/clerk`.
+- `signInWithFirebase` and `toFirebaseAppleCredential`, exported from `expo-apple-sign-in/firebase`.
