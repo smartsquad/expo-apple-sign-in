@@ -17,3 +17,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - `useAppleAuth` hook that exposes `signIn`, `signOut`, `credential`, `isLoading`, `error`, and `isAvailable`.
 - `AppleButton` with the `black`, `white`, and `whiteOutline` styles and the `signIn`, `continue`, and `signUp` labels, plus `AppleLogo` for the Apple mark.
 - Android sign-in through the Services ID web flow in its own activity, written with `@ExpoModule` and `@JS`.
+- `signInWithSupabase` adapter, exported from `expo-apple-sign-in/supabase`.
