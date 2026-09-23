@@ -21,6 +21,7 @@ export {
   type TSupabaseAuthLike,
   type SupabaseAuthLike,
 } from './adapters/supabase'
+export { signInWithClerk } from './adapters/clerk'
 export { generateNonce, sha256Hex } from './nonce'
 export type {
   TAppleAuthConfig,
