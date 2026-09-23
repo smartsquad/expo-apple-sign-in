@@ -16,6 +16,11 @@ export {
   normalizeAppleError,
 } from './errors'
 export { isCancelledResponse, isErrorResponse, isSuccessResponse } from './responses'
+export {
+  signInWithSupabase,
+  type TSupabaseAuthLike,
+  type SupabaseAuthLike,
+} from './adapters/supabase'
 export { generateNonce, sha256Hex } from './nonce'
 export type {
   TAppleAuthConfig,
