@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Apple Sign In Example",
+    "slug": "expo-apple-sign-in-example",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "expoapplesignin",
+    "userInterfaceStyle": "dark",
+    "platforms": ["ios", "android", "web"],
+    "ios": {
+      "bundleIdentifier": "com.example.expoapplesignin",
+      "usesAppleSignIn": true
+    },
+    "android": {
+      "package": "com.example.expoapplesignin"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-apple-sign-in"]
+  }
+}
