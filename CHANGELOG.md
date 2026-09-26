@@ -21,3 +21,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - `signInWithClerk` adapter using the `oauth_token_apple` strategy, exported from `expo-apple-sign-in/clerk`.
 - `signInWithFirebase` and `toFirebaseAppleCredential`, exported from `expo-apple-sign-in/firebase`.
 - Config plugin that sets `ios.usesAppleSignIn` and adds the Sign in with Apple entitlement.
+- Example app for iOS, Android, and web.

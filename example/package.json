@@ -1,0 +1,30 @@
+{
+  "name": "expo-apple-sign-in-example",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm run build --prefix ..",
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "preweb": "npm run build --prefix ..",
+    "web": "expo start --web --port 43180 --host lan"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~58.0.13",
+    "expo": "~58.0.6",
+    "expo-apple-sign-in": "file:..",
+    "expo-modules-core": "~58.0.14",
+    "expo-status-bar": "~58.0.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0-rc.3",
+    "react-native-web": "~0.21.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@types/react": "~19.1.1",
+    "typescript": "^5.9.2"
+  }
+}
