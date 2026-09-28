@@ -22,3 +22,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - `signInWithFirebase` and `toFirebaseAppleCredential`, exported from `expo-apple-sign-in/firebase`.
 - Config plugin that sets `ios.usesAppleSignIn` and adds the Sign in with Apple entitlement.
 - Example app for iOS, Android, and web.
+- `CONVENTIONS.md`, `AGENTS.md`, and `CONTRIBUTING.md`.
