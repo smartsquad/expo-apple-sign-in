@@ -24,3 +24,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - Example app for iOS, Android, and web.
 - `CONVENTIONS.md`, `AGENTS.md`, and `CONTRIBUTING.md`.
 - GitHub Actions validation on `main` and on pull requests into `main`.
+- README with install, setup, and usage.
