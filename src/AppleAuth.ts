@@ -28,13 +28,13 @@ const EDefaultScopes: TAppleScope[] = ['name', 'email']
 
 // MARK: - Helpers
 
+const EMissingNativeModuleMessage =
+  'ExpoAppleSignIn native module is not linked. JS alone is not enough: add plugins: ["expo-apple-sign-in"], confirm ios/*.swift and android/.../*.kt exist in the package, then rebuild the development client (pod install / expo prebuild --clean + expo run:ios). Metro reload cannot load a native module.'
+
 function assertNativeModule() {
   const native = getNativeAppleModule()
   if (!native) {
-    throw new AppleAuthError(
-      EAppleAuthErrorCode.NotAvailable,
-      'expo-apple-sign-in native module is missing. Create a development build with the config plugin: plugins: ["expo-apple-sign-in"].'
-    )
+    throw new AppleAuthError(EAppleAuthErrorCode.NotAvailable, EMissingNativeModuleMessage)
   }
 
   return native
@@ -134,6 +134,10 @@ export const AppleAuth = {
     try {
       if (Platform.OS === 'android' || Platform.OS === 'web') {
         requireClientConfig(Platform.OS)
+      }
+
+      if (Platform.OS !== 'web') {
+        assertNativeModule()
       }
 
       const available = await this.isAvailable()

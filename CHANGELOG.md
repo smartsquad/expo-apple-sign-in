@@ -30,3 +30,4 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 
 - The native binding reads the Expo SDK 58 module host first and falls back to `requireOptionalNativeModule`.
+- A missing native module now raises an error that says to rebuild the development client.
