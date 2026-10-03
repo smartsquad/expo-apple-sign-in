@@ -149,6 +149,10 @@ describe('AppleAuth.request iOS', () => {
       type: 'error',
       code: EAppleAuthErrorCode.NotAvailable,
     })
+    if (response.type === 'error') {
+      expect(response.message).toMatch(/native module is not linked/i)
+      expect(response.message).toMatch(/rebuild/i)
+    }
   })
 })
 
