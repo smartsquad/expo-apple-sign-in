@@ -85,6 +85,37 @@ function parseUser(
   }
 }
 
+/**
+ * Apple's JS popup posts the auth response to `redirectURI`, then that page
+ * must hand the result back to the opener. The URI therefore has to be on the
+ * **same origin** as the Expo web app. Using the apex site while the app runs
+ * on a subdomain (e.g. `inksquad.com` vs `web.inksquad.com`) sends the user
+ * to the wrong host after a successful login.
+ */
+export function assertWebRedirectUri(redirectUri: string): void {
+  if (typeof window === 'undefined' || !window.location?.origin) {
+    return
+  }
+
+  let configured: URL
+  try {
+    configured = new URL(redirectUri)
+  } catch {
+    throw new AppleAuthError(
+      EAppleAuthErrorCode.NotConfigured,
+      `AppleAuth.configure({ redirectUri }) must be an absolute HTTPS URL. Received: ${redirectUri}`
+    )
+  }
+
+  const pageOrigin = window.location.origin
+  if (configured.origin !== pageOrigin) {
+    throw new AppleAuthError(
+      EAppleAuthErrorCode.NotConfigured,
+      `Web redirectUri origin (${configured.origin}) must match this page (${pageOrigin}). Register https://${window.location.host}/… as a Return URL on the Services ID and pass that URL to AppleAuth.configure on web — do not reuse the apex site redirect (e.g. inksquad.com) when the Expo web app is on a subdomain (e.g. web.inksquad.com).`
+    )
+  }
+}
+
 export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSignInResult> {
   if (!params.clientId) {
     throw new AppleAuthError(
@@ -99,6 +130,8 @@ export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSig
     )
   }
 
+  assertWebRedirectUri(params.redirectUri)
+
   await loadAppleScript()
   const auth = getAppleAuth()
   if (!auth) {
@@ -110,9 +143,14 @@ export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSig
     .filter((value, index, all) => all.indexOf(value) === index)
     .join(' ')
 
+  // Prefer the current page URL (same origin, already validated) so Apple's
+  // popup return lands on a document that loaded this SDK. Path must still be
+  // registered as a Return URL on the Services ID.
+  const redirectURI = resolvePopupRedirectUri(params.redirectUri)
+
   const config = {
     clientId: params.clientId,
-    redirectURI: params.redirectUri,
+    redirectURI,
     scope,
     state: params.state,
     nonce: params.nonce,
@@ -150,6 +188,34 @@ export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSig
     }
     throw error
   }
+}
+
+/**
+ * For popup mode Apple loads `redirectURI` inside the popup after auth. Prefer
+ * the configured URI when it already points at this exact page; otherwise keep
+ * the configured same-origin URI (caller registered it). Never rewrite to a
+ * different origin.
+ */
+function resolvePopupRedirectUri(configured: string): string {
+  if (typeof window === 'undefined' || !window.location?.href) {
+    return configured
+  }
+
+  try {
+    const configuredUrl = new URL(configured)
+    const pageUrl = new URL(window.location.href)
+    pageUrl.hash = ''
+    if (
+      configuredUrl.origin === pageUrl.origin &&
+      configuredUrl.pathname === pageUrl.pathname
+    ) {
+      return pageUrl.toString()
+    }
+  } catch {
+    return configured
+  }
+
+  return configured
 }
 
 export function isWebAppleAvailable(): boolean {
