@@ -2,16 +2,16 @@ import { requireOptionalNativeModule } from 'expo'
 
 import type { TExpoAppleSignInNativeModule } from './types'
 
-type TExpoV2Global = {
-  expoV2?: {
+type TExpoModulesGlobal = {
+  expo?: {
     modules?: Record<string, TExpoAppleSignInNativeModule | undefined>
   }
 }
 
 export function getNativeAppleModule(): TExpoAppleSignInNativeModule | null {
-  const fromV2 = (globalThis as TExpoV2Global).expoV2?.modules?.ExpoAppleSignIn
-  if (fromV2) {
-    return fromV2
+  const fromExpo = (globalThis as TExpoModulesGlobal).expo?.modules?.ExpoAppleSignIn
+  if (fromExpo) {
+    return fromExpo
   }
 
   return requireOptionalNativeModule<TExpoAppleSignInNativeModule>('ExpoAppleSignIn')

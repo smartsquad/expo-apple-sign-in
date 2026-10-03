@@ -14,14 +14,14 @@ const moduleStub: TExpoAppleSignInNativeModule = {
 }
 
 afterEach(() => {
-  delete (globalThis as { expoV2?: unknown }).expoV2
+  delete (globalThis as { expo?: unknown }).expo
   requireOptional.mockReset()
   requireOptional.mockReturnValue(null)
 })
 
 describe('getNativeAppleModule', () => {
   it('prefers the Expo Modules 2.0 global', () => {
-    ;(globalThis as { expoV2?: { modules?: { ExpoAppleSignIn?: TExpoAppleSignInNativeModule } } }).expoV2 =
+    ;(globalThis as { expo?: { modules?: { ExpoAppleSignIn?: TExpoAppleSignInNativeModule } } }).expo =
       {
         modules: { ExpoAppleSignIn: moduleStub },
       }
