@@ -26,3 +26,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - GitHub Actions validation on `main` and on pull requests into `main`.
 - README with install, setup, and usage.
 - Agent skill in `skills/expo-apple-sign-in`.
+
+### Changed
+
+- The native binding reads the Expo SDK 58 module host first and falls back to `requireOptionalNativeModule`.
