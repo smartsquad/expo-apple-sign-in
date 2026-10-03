@@ -13,7 +13,8 @@ export type TAppleCredentialState =
  * Configuration shared by every platform.
  *
  * - **iOS** uses the app's Apple App ID / bundle identifier. `clientId` is ignored.
- * - **Android** and **web** use a Services ID (`clientId`) plus an HTTPS `redirectUri`
+ * - **Android** and **web** use a Services ID (`clientId`) plus an HTTPS `redirectUri`.
+ *   On web, `redirectUri` must be same-origin with the Expo web page (subdomain ≠ apex).
  *   registered under that Services ID in the Apple Developer portal.
  */
 export type TAppleAuthConfig = {

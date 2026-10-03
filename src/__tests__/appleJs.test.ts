@@ -24,7 +24,10 @@ const EParams: TNativeSignInParams = {
   redirectUri: 'https://app.example.com/callback',
 }
 
-function installBrowser(auth: TAppleJsAuth | null = null): TScriptStub {
+function installBrowser(
+  auth: TAppleJsAuth | null = null,
+  pageHref = 'https://app.example.com/callback'
+): TScriptStub {
   const script: TScriptStub = {
     src: '',
     async: false,
@@ -53,7 +56,16 @@ function installBrowser(auth: TAppleJsAuth | null = null): TScriptStub {
     },
   }
 
+  const pageUrl = new URL(pageHref)
   ;(globalThis as { document?: typeof documentStub }).document = documentStub
+  ;(globalThis as { window?: { location: { href: string; origin: string; host: string } } }).window =
+    {
+      location: {
+        href: pageHref,
+        origin: pageUrl.origin,
+        host: pageUrl.host,
+      },
+    }
 
   return script
 }
@@ -66,6 +78,7 @@ function loadAppleJs(): TAppleJsModule {
 
 afterEach(() => {
   delete (globalThis as { document?: unknown }).document
+  delete (globalThis as { window?: unknown }).window
   delete (globalThis as { AppleID?: unknown }).AppleID
 })
 
@@ -99,6 +112,22 @@ describe('webSignIn', () => {
     }
   })
 
+  it('rejects a redirectUri on a different origin than the Expo web page', async () => {
+    installBrowser(null, 'https://web.inksquad.com/')
+    const { webSignIn } = loadAppleJs()
+    try {
+      await webSignIn({
+        ...EParams,
+        redirectUri: 'https://inksquad.com/auth/callback',
+      })
+      throw new Error('expected cross-origin redirectUri to fail')
+    } catch (error) {
+      expect(error).toMatchObject({ code: EAppleAuthErrorCode.NotConfigured })
+      expect(String((error as Error).message)).toMatch(/web\.inksquad\.com/)
+      expect(String((error as Error).message)).toMatch(/inksquad\.com/)
+    }
+  })
+
   it('maps fullName to name, inits Apple JS, and returns the credential', async () => {
     const auth: TAppleJsAuth = {
       init: jest.fn(),
@@ -107,14 +136,14 @@ describe('webSignIn', () => {
         user: { email: 'ada@example.com', name: { firstName: 'Ada', lastName: 'Lovelace' } },
       }),
     }
-    installBrowser(auth)
+    installBrowser(auth, 'https://app.example.com/callback')
     const { webSignIn } = loadAppleJs()
     const result = await webSignIn(EParams)
 
     expect(auth.init).toHaveBeenCalledWith(
       expect.objectContaining({
         clientId: EParams.clientId,
-        redirectURI: EParams.redirectUri,
+        redirectURI: 'https://app.example.com/callback',
         scope: 'name email',
         nonce: 'hashed-nonce',
         usePopup: true,
