@@ -4,8 +4,7 @@
     "slug": "expo-apple-sign-in-example",
     "version": "0.1.0",
     "orientation": "portrait",
-    "scheme": "expoapplesignin",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "platforms": ["ios", "android", "web"],
     "ios": {
       "bundleIdentifier": "com.example.expoapplesignin",
