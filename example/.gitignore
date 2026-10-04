@@ -1,5 +1,14 @@
+node_modules/
 .expo/
 dist/
 web-build/
-node_modules/
-npm-debug.log
+.env
+.env.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+ios/
+android/

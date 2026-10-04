@@ -4,11 +4,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "prestart": "npm run build --prefix ..",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "preweb": "npm run build --prefix ..",
     "web": "expo start --web --port 43180 --host lan"
   },
   "dependencies": {
