@@ -33,3 +33,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - A missing native module now raises an error that says to rebuild the development client.
 - On web, `redirectUri` must share the origin of the page, which catches apex and subdomain mismatches after Apple's popup returns.
 - The example app is a single screen with `AppleButton`, and its README explains that Expo Go is not supported.
+- iOS errors use the SDK 58 `Exception(name:description:code:)` initializer, so `ERR_REQUEST_CANCELED` and the other codes reach JavaScript.
