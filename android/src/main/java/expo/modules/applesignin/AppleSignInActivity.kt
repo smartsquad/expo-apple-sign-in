@@ -15,6 +15,10 @@ import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class AppleSignInActivity : AppCompatActivity() {
   private val mainHandler = Handler(Looper.getMainLooper())
@@ -102,7 +106,18 @@ class AppleSignInActivity : AppCompatActivity() {
       }
     )
 
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    WindowInsetsControllerCompat(window, root).isAppearanceLightStatusBars = true
+    ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+      val bars = insets.getInsets(
+        WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout()
+      )
+      view.setPadding(bars.left, bars.top, bars.right, view.paddingBottom)
+      WindowInsetsCompat.CONSUMED
+    }
+
     setContentView(root)
+    ViewCompat.requestApplyInsets(root)
   }
 
   override fun onBackPressed() {
