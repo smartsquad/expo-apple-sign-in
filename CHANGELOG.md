@@ -35,3 +35,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - The example app is a single screen with `AppleButton`, and its README explains that Expo Go is not supported.
 - iOS errors use the SDK 58 `Exception(name:description:code:)` initializer, so `ERR_REQUEST_CANCELED` and the other codes reach JavaScript.
 - The Android sign-in screen sits below the status bar and the display cutout on edge-to-edge devices.
+- Android registers through the Modules 2.0 generated module list, and `expo-module.config.json` no longer lists `android.modules`.
