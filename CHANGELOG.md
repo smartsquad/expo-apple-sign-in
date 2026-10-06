@@ -26,6 +26,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - GitHub Actions validation on `main` and on pull requests into `main`.
 - README with install, setup, and usage.
 - Agent skill in `skills/expo-apple-sign-in`.
+- `expo-apple-sign-in/app.plugin.js` export path.
 
 ### Changed
 
@@ -36,3 +37,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - iOS errors use the SDK 58 `Exception(name:description:code:)` initializer, so `ERR_REQUEST_CANCELED` and the other codes reach JavaScript.
 - The Android sign-in screen sits below the status bar and the display cutout on edge-to-edge devices.
 - Android registers through the Modules 2.0 generated module list, and `expo-module.config.json` no longer lists `android.modules`.
+- The config plugin loads `@expo/config-plugins` from the Expo process that requires it, so `file:` and sibling installs work.
