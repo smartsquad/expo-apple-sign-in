@@ -38,3 +38,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - The Android sign-in screen sits below the status bar and the display cutout on edge-to-edge devices.
 - Android registers through the Modules 2.0 generated module list, and `expo-module.config.json` no longer lists `android.modules`.
 - The config plugin loads `@expo/config-plugins` from the Expo process that requires it, so `file:` and sibling installs work.
+- The npm package ships `src` without tests, because the `react-native` and `browser` export conditions point at it.
