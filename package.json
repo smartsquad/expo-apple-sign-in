@@ -38,6 +38,10 @@
   },
   "files": [
     "build",
+    "src",
+    "!src/**/__tests__",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
     "ios",
     "android",
     "app.plugin.js",
