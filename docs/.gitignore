@@ -1,0 +1,6 @@
+.vitepress/cache/
+.vitepress/dist/
+.vitepress/.temp/
+node_modules/
+.next/
+out/

@@ -56,5 +56,8 @@ yarn-error.log
 # Expo
 .expo/*
 example/.expo/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+docs/.vitepress/.temp/
 *.tsbuildinfo
 agent-tools/
