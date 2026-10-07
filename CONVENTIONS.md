@@ -32,6 +32,7 @@ User-facing Apple button labels stay the official English HIG strings (`Sign in 
 | iOS | `ios/` | AuthenticationServices via `@ExpoModule` / `@JS` |
 | Android | `android/` | Services ID WebView via `@ExpoModule` / `@JS` |
 | Config plugin | `app.plugin.js` | `ios.usesAppleSignIn` plus entitlement |
+| Docs | `docs/` | VitePress site, GitHub Pages (images-in-motion pattern) |
 | Example | `example/` | Compact Expo SDK 58 app (expo/examples shape) with `AppleButton` |
 
 - Target **Expo SDK 58** and **Expo Modules 2.0** only. Do not regress to the 1.0 `ModuleDefinition` DSL.
@@ -90,6 +91,7 @@ Every commit that changes user-visible or operational behaviour updates `[Unrele
 ## C-5. Docs
 
 - All documentation is English.
+- Docs are VitePress in `docs/`, same pattern as [images-in-motion](https://iim.smartsquad.io/). Local: `npm run docs:dev` at `http://127.0.0.1:43173/`. Publish: `.github/workflows/pages.yml` to GitHub Pages at `https://smartsquad.github.io/expo-apple-sign-in/`.
 - Root policy files are `UPPERCASE.md` (`CONVENTIONS.md`, `AGENTS.md`, `CHANGELOG.md`, `README.md`).
 - No em dash (U+2014). Use commas, colons, or periods.
 - No filler: "seamless", "robust", "leverage".
@@ -103,6 +105,7 @@ Every commit that changes user-visible or operational behaviour updates `[Unrele
 npm test
 npm run typecheck
 npm run build
+npm run docs:build
 ```
 
 Do not claim "works" without running the relevant check.

@@ -14,7 +14,10 @@ Rules live in [CONVENTIONS.md](./CONVENTIONS.md). Agent entrypoint: [AGENTS.md](
 npm test
 npm run typecheck
 npm run build
+npm run docs:build
 ```
+
+Local docs: `npm run docs:dev` at `http://127.0.0.1:43173/`. VitePress in `docs/`, same GitHub Pages pattern as images-in-motion.
 
 Example (Expo SDK 58, web):
 

@@ -21,7 +21,8 @@ House style is inherited from Inksquad-platform, callingyou-ai, clickrisorse-pla
 5. Types `T`, interfaces `I`, const maps `E`. Public unprefixed aliases are allowed for Apple terminology.
 6. Commits: `type: summary`, lowercase, subject only, no body, no `Co-authored-by`.
 7. Changelog sections: `Added`, `Changed`, `Removed` only.
-8. Work on `develop`. GitHub Actions run only on `main` and on PRs into `main`.
+8. Docs are VitePress in `docs/`, published with GitHub Pages (images-in-motion pattern). Local: `npm run docs:dev` at `http://127.0.0.1:43173/`.
+9. Work on `develop`. GitHub Actions run only on `main` and on PRs into `main`.
 
 ## Commands
 
@@ -30,5 +31,7 @@ npm install
 npm test
 npm run typecheck
 npm run build
+npm run docs:dev
+npm run docs:build
 cd example && npm install && npm run web
 ```
