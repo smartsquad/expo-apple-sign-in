@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - Documentation site built with VitePress in `docs/`, with the introduction and getting started pages.
+- GitHub Pages workflow that publishes the documentation from `main`.
+
+### Changed
+
+- The validation workflow also builds the package and the documentation, and `CONVENTIONS.md`, `AGENTS.md`, and `CONTRIBUTING.md` describe the docs commands.
 
 ## [1.0.0] - 2026-10-07
 
