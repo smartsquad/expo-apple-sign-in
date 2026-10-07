@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-07
+
 ### Added
 
 - Expo module scaffold for Expo SDK 58 and Expo Modules 2.0.
@@ -39,3 +41,6 @@ All notable changes to this project are documented here. The format follows [Kee
 - Android registers through the Modules 2.0 generated module list, and `expo-module.config.json` no longer lists `android.modules`.
 - The config plugin loads `@expo/config-plugins` from the Expo process that requires it, so `file:` and sibling installs work.
 - The npm package ships `src` without tests, because the `react-native` and `browser` export conditions point at it.
+
+[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/smartsquad/expo-apple-sign-in/releases/tag/v1.0.0
