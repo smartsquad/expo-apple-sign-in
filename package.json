@@ -54,6 +54,9 @@
     "lint": "eslint src/",
     "test": "jest --testEnvironment=node",
     "typecheck": "tsc --noEmit",
+    "docs:dev": "vitepress dev docs --host 127.0.0.1 --port 43173",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --host 127.0.0.1 --port 43173",
     "prepare": "node internal/module_scripts/prepare.js",
     "open:ios": "node internal/module_scripts/open-ios.js",
     "open:android": "node internal/module_scripts/open-android.js"
@@ -82,7 +85,7 @@
   },
   "author": "Massimo De Luisa <massimodeluisa@me.com> (https://github.com/massimodeluisa)",
   "license": "MIT",
-  "homepage": "https://github.com/smartsquad/expo-apple-sign-in#readme",
+  "homepage": "https://smartsquad.github.io/expo-apple-sign-in/",
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/jest": "^30.0.0",
@@ -98,7 +101,11 @@
     "prettier": "^3.0.0",
     "react": "19.3.0",
     "react-native": "0.88.0-rc.3",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-group-icons": "^1.7.6",
+    "vitepress-plugin-llms": "^1.13.5",
+    "vue": "^3.5.42"
   },
   "peerDependencies": {
     "expo": ">=58.0.0",

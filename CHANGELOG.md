@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Documentation site built with VitePress in `docs/`, with the introduction and getting started pages.
+
 ## [1.0.0] - 2026-10-07
 
 ### Added

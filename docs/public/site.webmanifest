@@ -1,0 +1,27 @@
+{
+  "name": "Expo Apple Sign In",
+  "short_name": "Apple Sign In",
+  "description": "Sign in with Apple for Expo SDK 58 on iOS, Android and web.",
+  "start_url": "/expo-apple-sign-in/",
+  "scope": "/expo-apple-sign-in/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/expo-apple-sign-in/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/expo-apple-sign-in/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/expo-apple-sign-in/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
