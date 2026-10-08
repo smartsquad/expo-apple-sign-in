@@ -14,7 +14,7 @@ The API is the same everywhere: `AppleAuth.signIn()`, the `useAppleAuth` hook an
 
 The nonce follows one rule. You pass a raw nonce to `signIn`, or let the library generate one, and the library sends its SHA-256 hash to Apple. Apple writes that hash into the identity token's `nonce` claim, and the library returns the raw value on `credential.nonce`. Supabase and Firebase hash the raw nonce themselves and compare the result with the claim, so you pass `credential.nonce` to them unchanged and never hash it again.
 
-The adapters cover the last step. `signInWithSupabase`, `signInWithClerk` and `signInWithFirebase` run `AppleAuth.signIn()` and hand the identity token, plus the raw nonce where the provider needs it, to the provider's SDK. The provider pages for Supabase, Clerk and Firebase show each call with its dashboard setup.
+The adapters cover the last step. `signInWithSupabase`, `signInWithClerk` and `signInWithFirebase` run `AppleAuth.signIn()` and hand the identity token, plus the raw nonce where the provider needs it, to the provider's SDK. The provider pages for [Supabase](/providers/supabase), [Clerk](/providers/clerk) and [Firebase](/providers/firebase) show each call with its dashboard setup.
 
 ## How each platform signs in
 

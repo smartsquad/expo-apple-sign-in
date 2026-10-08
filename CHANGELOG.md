@@ -10,6 +10,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - GitHub Pages workflow that publishes the documentation from `main`.
 - Setup guides for the Apple Developer portal, iOS, Android, web, and the Expo config.
 - Usage, button, hook, error, and backend verification guides, with an `AppleButton` playground.
+- Supabase, Clerk, and Firebase guides.
 
 ### Changed
 

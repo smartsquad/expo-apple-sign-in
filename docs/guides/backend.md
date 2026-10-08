@@ -1,6 +1,6 @@
 # Backend verification
 
-The identity token that `AppleAuth.signIn` returns is a JWT signed by Apple, and the app only holds it. Anyone can send your server a string that looks like a token, so the server must verify the signature and the claims before it trusts the person it names. This page lists the checks, shows a Node and TypeScript implementation with `jose`, and covers the authorization code exchange, private relay emails, and token revocation for account deletion. If you use Supabase, Clerk, or Firebase, the provider performs these checks for you and you can skip the verification sample.
+The identity token that `AppleAuth.signIn` returns is a JWT signed by Apple, and the app only holds it. Anyone can send your server a string that looks like a token, so the server must verify the signature and the claims before it trusts the person it names. This page lists the checks, shows a Node and TypeScript implementation with `jose`, and covers the authorization code exchange, private relay emails, and token revocation for account deletion. If you use [Supabase](/providers/supabase), [Clerk](/providers/clerk), or [Firebase](/providers/firebase), the provider performs these checks for you and you can skip the verification sample.
 
 ::: info Apple facts on this page
 The values below (key set URL, issuer, token endpoint) come from Apple's Sign in with Apple documentation. Confirm them against Apple's current documentation before you ship.
