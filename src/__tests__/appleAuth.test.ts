@@ -82,6 +82,16 @@ describe('AppleAuth.configure', () => {
     Platform.OS = 'web'
     expect(AppleAuth.isConfigured()).toBe(true)
   })
+
+  it('keeps stored values when a field is undefined', () => {
+    AppleAuth.configure({ clientId: 'com.example.app.web', redirectUri: 'https://app.example.com/callback' })
+    AppleAuth.configure({ clientId: undefined, redirectUri: undefined, scopes: ['email'] })
+    expect(AppleAuth.getConfig()).toEqual({
+      clientId: 'com.example.app.web',
+      redirectUri: 'https://app.example.com/callback',
+      scopes: ['email'],
+    })
+  })
 })
 
 describe('AppleAuth.request iOS', () => {
