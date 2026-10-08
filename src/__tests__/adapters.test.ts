@@ -73,6 +73,43 @@ describe('signInWithClerk', () => {
     })
     expect(result.createdSessionId).toBe('sess_2')
   })
+
+  it('completes the transfer flow for an existing Apple user', async () => {
+    const signUp = {
+      create: jest.fn().mockResolvedValue({}),
+      createdSessionId: null,
+      verifications: { externalAccount: { status: 'transferable' } },
+    }
+    const signInResource: { create: jest.Mock; createdSessionId: string | null } = {
+      create: jest.fn().mockImplementation(async () => {
+        signInResource.createdSessionId = 'sess_3'
+      }),
+      createdSessionId: null,
+    }
+    const setActive = jest.fn()
+
+    const result = await signInWithClerk({ signIn: signInResource, signUp, setActive })
+
+    expect(signInResource.create).toHaveBeenCalledWith({ transfer: true })
+    expect(setActive).toHaveBeenCalledWith({ session: 'sess_3' })
+    expect(result.createdSessionId).toBe('sess_3')
+  })
+
+  it('rethrows the sign-up error when sign-in can only transfer', async () => {
+    const signUpError = new Error('sign-ups restricted')
+    const signUp = { create: jest.fn().mockRejectedValue(signUpError), createdSessionId: null }
+    const signInResource = {
+      create: jest.fn().mockResolvedValue({}),
+      createdSessionId: null,
+      firstFactorVerification: { status: 'transferable' },
+    }
+    const setActive = jest.fn()
+
+    await expect(signInWithClerk({ signIn: signInResource, signUp, setActive })).rejects.toBe(
+      signUpError
+    )
+    expect(setActive).not.toHaveBeenCalled()
+  })
 })
 
 describe('toFirebaseAppleCredential', () => {
