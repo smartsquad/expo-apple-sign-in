@@ -73,6 +73,14 @@ const ESidebar = [
     collapsed: false,
   },
   {
+    text: 'Migration',
+    items: [
+      { text: 'From expo-apple-authentication', link: '/migration/expo-apple-authentication' },
+      { text: 'From Invertase', link: '/migration/invertase' },
+    ],
+    collapsed: false,
+  },
+  {
     text: 'More',
     items: [
       { text: 'Examples', link: '/examples' },
