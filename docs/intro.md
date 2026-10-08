@@ -24,7 +24,7 @@ The adapters cover the last step. `signInWithSupabase`, `signInWithClerk` and `s
 | Android | A Kotlin activity opens Apple's authorize page in a WebView with `response_mode=form_post` and reads the identity token from the form Apple posts back. | A Services ID, passed as `clientId`, and an HTTPS `redirectUri` registered on it. |
 | Web | The library loads Apple's JavaScript SDK (Apple JS) from `appleid.apple.com` and signs in with a popup window. | The same Services ID and a `redirectUri` on the same origin as the page. |
 
-Because Android and web go through Apple's web flow, both need the Services ID and redirect URI from Apple Developer and a call to `AppleAuth.configure`. iOS uses the App ID and ignores those values. The iOS, Android and Web setup pages describe each flow in detail.
+Because Android and web go through Apple's web flow, both need the Services ID and redirect URI from [Apple Developer](/setup/apple-developer) and a call to `AppleAuth.configure`. iOS uses the App ID and ignores those values. The [iOS](/setup/ios), [Android](/setup/android) and [Web](/setup/web) setup pages describe each flow in detail.
 
 ## What the package exports
 

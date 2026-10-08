@@ -29,4 +29,4 @@ The first call to `AppleAuth.signIn()` adds a `<script>` tag for `https://applei
 
 The library calls Apple JS with `usePopup: true`, so Apple's sign-in page opens in a popup window and the result returns to the page that started it. When Apple JS rejects with an error whose message mentions a closed or canceled popup, or a user cancel, the library reports it as `ERR_REQUEST_CANCELED`, the same code a dismissed sheet produces on iOS.
 
-Before it loads Apple JS, the library checks that `redirectUri` has the same origin as the page and rejects with `ERR_NOT_CONFIGURED` if it does not. Web explains the rule and how to register the matching Return URL.
+Before it loads Apple JS, the library checks that `redirectUri` has the same origin as the page and rejects with `ERR_NOT_CONFIGURED` if it does not. [Web](/setup/web) explains the rule and how to register the matching Return URL.
