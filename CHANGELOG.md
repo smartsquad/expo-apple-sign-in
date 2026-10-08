@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Usage, button, hook, error, and backend verification guides, with an `AppleButton` playground.
 - Supabase, Clerk, and Firebase guides.
 - Example app screenshots for iOS, Android, and web.
+- Migration guides from `expo-apple-authentication` and `@invertase/react-native-apple-authentication`.
 
 ### Changed
 
