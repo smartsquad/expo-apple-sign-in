@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   button: {
-    alignSelf: 'stretch',
     maxWidth: 320,
   },
   message: {
