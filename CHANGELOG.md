@@ -15,6 +15,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The validation workflow also builds the package and the documentation, and `CONVENTIONS.md`, `AGENTS.md`, and `CONTRIBUTING.md` describe the docs commands.
 - `AppleAuth.configure` skips `undefined` values, so options left out of `useAppleAuth` no longer clear a client ID or redirect URI set earlier.
 - `signInWithClerk` completes Clerk's transfer step, so an Apple ID that already has a Clerk user gets a session.
+- The web `redirectUri` origin error explains the fix without naming specific domains.
 
 ## [1.0.0] - 2026-10-07
 
