@@ -72,6 +72,13 @@ const ESidebar = [
     ],
     collapsed: false,
   },
+  {
+    text: 'More',
+    items: [
+      { text: 'Examples', link: '/examples' },
+    ],
+    collapsed: false,
+  },
 ]
 
 export default defineConfig({
