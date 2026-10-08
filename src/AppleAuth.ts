@@ -77,7 +77,8 @@ export const AppleAuth = {
    * Services ID and an HTTPS redirect URI from the Apple Developer portal.
    */
   configure(next: TAppleAuthConfig): void {
-    config = { ...config, ...next }
+    const defined = Object.fromEntries(Object.entries(next).filter(([, value]) => value !== undefined)) as TAppleAuthConfig
+    config = { ...config, ...defined }
   },
 
   getConfig(): TAppleAuthConfig {
