@@ -52,6 +52,17 @@ const ESidebar = [
     ],
     collapsed: false,
   },
+  {
+    text: 'Guides',
+    items: [
+      { text: 'Usage', link: '/guides/usage' },
+      { text: 'Apple button', link: '/guides/button' },
+      { text: 'useAppleAuth hook', link: '/guides/hook' },
+      { text: 'Errors', link: '/guides/errors' },
+      { text: 'Backend verification', link: '/guides/backend' },
+    ],
+    collapsed: false,
+  },
 ]
 
 export default defineConfig({
