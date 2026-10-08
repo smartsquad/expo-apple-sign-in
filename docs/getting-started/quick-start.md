@@ -1,6 +1,6 @@
 # Quick start
 
-Three steps take an installed `expo-apple-sign-in` to a working sign-in on iOS, Android and web: the config plugin, one `AppleAuth.configure` call, and an `App.tsx` that renders `AppleButton` and keeps the credential it returns. It assumes you have finished [Installation](/getting-started/installation) and, for Android and web, created a Services ID and Return URL as described in Apple Developer.
+Three steps take an installed `expo-apple-sign-in` to a working sign-in on iOS, Android and web: the config plugin, one `AppleAuth.configure` call, and an `App.tsx` that renders `AppleButton` and keeps the credential it returns. It assumes you have finished [Installation](/getting-started/installation) and, for Android and web, created a Services ID and Return URL as described in [Apple Developer](/setup/apple-developer).
 
 ## 1. Add the config plugin
 
@@ -32,7 +32,7 @@ AppleAuth.configure({
 })
 ```
 
-If either value is missing on Android or web, sign-in fails with `ERR_NOT_CONFIGURED`. On web, `redirectUri` must also have the same origin as the page; Web explains why.
+If either value is missing on Android or web, sign-in fails with `ERR_NOT_CONFIGURED`. On web, `redirectUri` must also have the same origin as the page; [Web](/setup/web) explains why.
 
 ## 3. Render the button
 

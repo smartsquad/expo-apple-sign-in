@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Documentation site built with VitePress in `docs/`, with the introduction and getting started pages.
 - GitHub Pages workflow that publishes the documentation from `main`.
+- Setup guides for the Apple Developer portal, iOS, Android, web, and the Expo config.
 
 ### Changed
 

@@ -64,7 +64,7 @@ export default config
 
 :::
 
-The `bundleIdentifier` must match an App ID that has Sign in with Apple enabled in your Apple Developer account. Expo config explains what the plugin writes and how to pass the Android and web settings through environment variables.
+The `bundleIdentifier` must match an App ID that has Sign in with Apple enabled in your Apple Developer account. [Expo config](/setup/expo) explains what the plugin writes and how to pass the Android and web settings through environment variables.
 
 ## Build the native app
 
@@ -106,4 +106,4 @@ export default function App(): ReactElement {
 
 If the app shows `false` on iOS or Android, the build does not contain the native module. On iOS, and on Android once `AppleAuth.configure` has run, `AppleAuth.signIn()` then rejects with `ERR_NOT_AVAILABLE` and a message that starts with `ExpoAppleSignIn native module is not linked.` Check that the plugin is listed, then run `npx expo prebuild --clean` and build again. Troubleshooting covers the other common causes.
 
-With the module in place, continue with Apple Developer to create the identifiers, or go straight to the [Quick start](/getting-started/quick-start).
+With the module in place, continue with [Apple Developer](/setup/apple-developer) to create the identifiers, or go straight to the [Quick start](/getting-started/quick-start).

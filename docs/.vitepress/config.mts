@@ -41,6 +41,17 @@ const ESidebar = [
     ],
     collapsed: false,
   },
+  {
+    text: 'Platform setup',
+    items: [
+      { text: 'Apple Developer', link: '/setup/apple-developer' },
+      { text: 'iOS', link: '/setup/ios' },
+      { text: 'Android', link: '/setup/android' },
+      { text: 'Web', link: '/setup/web' },
+      { text: 'Expo config', link: '/setup/expo' },
+    ],
+    collapsed: false,
+  },
 ]
 
 export default defineConfig({

@@ -37,4 +37,4 @@ You need a membership in the Apple Developer Program to enable Sign in with Appl
 | Android | A Services ID with a domain and an HTTPS Return URL. | `clientId` (the Services ID) and `redirectUri` in `AppleAuth.configure`. |
 | Web | The same Services ID, with a Return URL on the same origin as your web app. | `clientId` and `redirectUri` in `AppleAuth.configure`. |
 
-Apple does not accept `localhost` or IP addresses as Services ID domains or Return URLs, so testing Android or web needs an HTTPS host that you can register. Apple Developer walks through creating the App ID setting, the Services ID and, if your server needs one, the Sign in with Apple key.
+Apple does not accept `localhost` or IP addresses as Services ID domains or Return URLs, so testing Android or web needs an HTTPS host that you can register. [Apple Developer](/setup/apple-developer) walks through creating the App ID setting, the Services ID and, if your server needs one, the Sign in with Apple key.
