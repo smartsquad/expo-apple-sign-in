@@ -89,7 +89,7 @@ function parseUser(
  * Apple's JS popup posts the auth response to `redirectURI`, then that page
  * must hand the result back to the opener. The URI therefore has to be on the
  * **same origin** as the Expo web app. Using the apex site while the app runs
- * on a subdomain (e.g. `inksquad.com` vs `web.inksquad.com`) sends the user
+ * on a subdomain (for example `example.com` and `app.example.com`) sends the user
  * to the wrong host after a successful login.
  */
 export function assertWebRedirectUri(redirectUri: string): void {
@@ -111,7 +111,7 @@ export function assertWebRedirectUri(redirectUri: string): void {
   if (configured.origin !== pageOrigin) {
     throw new AppleAuthError(
       EAppleAuthErrorCode.NotConfigured,
-      `Web redirectUri origin (${configured.origin}) must match this page (${pageOrigin}). Register https://${window.location.host}/… as a Return URL on the Services ID and pass that URL to AppleAuth.configure on web — do not reuse the apex site redirect (e.g. inksquad.com) when the Expo web app is on a subdomain (e.g. web.inksquad.com).`
+      `Web redirectUri origin (${configured.origin}) must match this page (${pageOrigin}). Register a Return URL on https://${window.location.host} for the Services ID and pass that URL to AppleAuth.configure on web. A redirect on another origin, such as the apex domain when the web app runs on a subdomain, cannot hand the result back to this page.`
     )
   }
 }

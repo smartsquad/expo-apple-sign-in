@@ -113,18 +113,18 @@ describe('webSignIn', () => {
   })
 
   it('rejects a redirectUri on a different origin than the Expo web page', async () => {
-    installBrowser(null, 'https://web.inksquad.com/')
+    installBrowser(null, 'https://app.example.com/')
     const { webSignIn } = loadAppleJs()
     try {
       await webSignIn({
         ...EParams,
-        redirectUri: 'https://inksquad.com/auth/callback',
+        redirectUri: 'https://example.com/auth/callback',
       })
       throw new Error('expected cross-origin redirectUri to fail')
     } catch (error) {
       expect(error).toMatchObject({ code: EAppleAuthErrorCode.NotConfigured })
-      expect(String((error as Error).message)).toMatch(/web\.inksquad\.com/)
-      expect(String((error as Error).message)).toMatch(/inksquad\.com/)
+      expect(String((error as Error).message)).toMatch(/\(https:\/\/example\.com\)/)
+      expect(String((error as Error).message)).toMatch(/\(https:\/\/app\.example\.com\)/)
     }
   })
 
