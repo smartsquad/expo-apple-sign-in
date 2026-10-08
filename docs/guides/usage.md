@@ -167,4 +167,4 @@ export async function signOutOfApple(): Promise<void> {
 
 ## Next steps
 
-Handle failures with the [error codes](/guides/errors#codes), verify the token on your server with [Backend verification](/guides/backend), or pass the credential to a provider through an adapter: Supabase, Clerk, or Firebase. Every signature is listed in the API reference.
+Handle failures with the [error codes](/guides/errors#codes), verify the token on your server with [Backend verification](/guides/backend), or pass the credential to a provider through an adapter: [Supabase](/providers/supabase), [Clerk](/providers/clerk), or [Firebase](/providers/firebase). Every signature is listed in the API reference.

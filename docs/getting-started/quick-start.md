@@ -99,4 +99,4 @@ Apple includes the name and email only the first time a user authorizes your app
 
 ## Next steps
 
-The credential is only useful once a backend trusts it. To sign the user in to an auth service, follow the page for Supabase, Clerk or Firebase. To verify the token on your own server, read [Backend verification](/guides/backend). For a custom button with loading and error state, use the [useAppleAuth hook](/guides/hook).
+The credential is only useful once a backend trusts it. To sign the user in to an auth service, follow the page for [Supabase](/providers/supabase), [Clerk](/providers/clerk) or [Firebase](/providers/firebase). To verify the token on your own server, read [Backend verification](/guides/backend). For a custom button with loading and error state, use the [useAppleAuth hook](/guides/hook).

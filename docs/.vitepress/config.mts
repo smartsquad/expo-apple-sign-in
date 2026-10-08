@@ -63,6 +63,15 @@ const ESidebar = [
     ],
     collapsed: false,
   },
+  {
+    text: 'Auth providers',
+    items: [
+      { text: 'Supabase', link: '/providers/supabase' },
+      { text: 'Clerk', link: '/providers/clerk' },
+      { text: 'Firebase', link: '/providers/firebase' },
+    ],
+    collapsed: false,
+  },
 ]
 
 export default defineConfig({
@@ -130,6 +139,7 @@ export default defineConfig({
     siteTitle: ESiteTitle,
     nav: [
       { text: 'Guide', link: '/intro' },
+      { text: 'Providers', link: '/providers/supabase' },
       {
         text: `v${version}`,
         items: [
