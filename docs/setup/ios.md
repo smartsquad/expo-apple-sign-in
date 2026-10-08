@@ -37,7 +37,7 @@ Native failures map to the library's error codes:
 | A second sign-in started while one was still open | `ERR_REQUEST_FAILED` |
 | Any other authorization error | `ERR_REQUEST_UNKNOWN` |
 
-Errors shows how to handle each code in your app.
+[Errors](/guides/errors) shows how to handle each code in your app.
 
 ## Test on a simulator or a device
 

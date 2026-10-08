@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-A dismissed sheet or popup calls `onCancel` instead of `onError`, so cancellation never shows up as a failure. The button defaults to the black style and the `Sign in with Apple` label; Apple button covers the other styles, labels and sizes.
+A dismissed sheet or popup calls `onCancel` instead of `onError`, so cancellation never shows up as a failure. The button defaults to the black style and the `Sign in with Apple` label; [Apple button](/guides/button) covers the other styles, labels and sizes.
 
 ## What the credential contains
 
@@ -99,4 +99,4 @@ Apple includes the name and email only the first time a user authorizes your app
 
 ## Next steps
 
-The credential is only useful once a backend trusts it. To sign the user in to an auth service, follow the page for Supabase, Clerk or Firebase. To verify the token on your own server, read Backend verification. For a custom button with loading and error state, use the useAppleAuth hook.
+The credential is only useful once a backend trusts it. To sign the user in to an auth service, follow the page for Supabase, Clerk or Firebase. To verify the token on your own server, read [Backend verification](/guides/backend). For a custom button with loading and error state, use the [useAppleAuth hook](/guides/hook).

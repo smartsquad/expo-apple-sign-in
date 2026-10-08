@@ -47,7 +47,7 @@ To create the key:
 3. Choose your primary App ID, save, then continue and register the key.
 4. Download the `.p8` file.
 
-Apple lets you download the key file only once. Store it in your server's secret storage or paste it into your provider's dashboard, and never put it in the app or commit it to the repository. The Backend verification guide shows how a server uses it.
+Apple lets you download the key file only once. Store it in your server's secret storage or paste it into your provider's dashboard, and never put it in the app or commit it to the repository. The [Backend verification](/guides/backend) guide shows how a server uses it.
 
 ## Find the Team ID and Key ID
 

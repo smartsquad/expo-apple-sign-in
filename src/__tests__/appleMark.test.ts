@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { APPLE_MARK_PATH, APPLE_MARK_VIEW_BOX, appleMarkSvg } from '../appleMark'
 
 describe('apple mark', () => {
@@ -12,5 +15,15 @@ describe('apple mark', () => {
     expect(svg).toContain(`viewBox="${APPLE_MARK_VIEW_BOX}"`)
     expect(svg).toContain(`fill="#ffffff"`)
     expect(svg).toContain(APPLE_MARK_PATH)
+  })
+
+  it('is the mark imported by the docs playground', () => {
+    const vue = readFileSync(
+      join(__dirname, '../../docs/.vitepress/theme/components/AppleButtonPlayground.vue'),
+      'utf8'
+    )
+    expect(vue).toContain("from '../../../../src/appleMark'")
+    expect(vue).toContain('APPLE_MARK_PATH')
+    expect(vue).toContain('APPLE_MARK_VIEW_BOX')
   })
 })
