@@ -7,7 +7,7 @@ const escape = (value) => value.replace(/[/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 const config = getDefaultConfig(projectRoot)
 config.watchFolders = [workspaceRoot]
-config.resolver.nodeModulesPaths = [path.resolve(projectRoot, 'node_modules')]
+config.resolver.nodeModulesPaths = [path.resolve(projectRoot, 'node_modules'), path.resolve(projectRoot, 'node_modules/react-native/node_modules')]
 config.resolver.disableHierarchicalLookup = true
 config.resolver.unstable_enablePackageExports = true
 config.resolver.extraNodeModules = {

@@ -19,6 +19,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `signInWithClerk` completes Clerk's transfer step, so an Apple ID that already has a Clerk user gets a session.
 - The web `redirectUri` origin error explains the fix without naming specific domains.
 - On iOS and Android, `generateNonce` reads its random bytes from Expo's native `uuidv4` function when `crypto.getRandomValues` is missing, and it throws instead of falling back to `Math.random`.
+- The example app's Metro config also searches `node_modules/react-native/node_modules`, so iOS and Android builds resolve `@react-native/virtualized-lists`.
 
 ## [1.0.0] - 2026-10-07
 
