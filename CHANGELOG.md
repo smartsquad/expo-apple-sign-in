@@ -21,6 +21,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - On iOS and Android, `generateNonce` reads its random bytes from Expo's native `uuidv4` function when `crypto.getRandomValues` is missing, and it throws instead of falling back to `Math.random`.
 - The example app's Metro config also searches `node_modules/react-native/node_modules`, so iOS and Android builds resolve `@react-native/virtualized-lists`.
 - The example app centers the Sign in with Apple button.
+- The Android library ships consumer R8 rules that keep `ExpoAppleSignInModule` and the Modules 2.0 runtime classes, so release builds with minification load the native module instead of reporting Sign in with Apple as unavailable.
 
 ## [1.0.0] - 2026-10-07
 
