@@ -1,3 +1,7 @@
+import { AppleAuthError, EAppleAuthErrorCode } from './errors'
+
+type TExpoGlobal = { uuidv4?: () => string }
+
 const HEX = '0123456789abcdef'
 
 function bytesToHex(bytes: Uint8Array): string {
@@ -9,21 +13,53 @@ function bytesToHex(bytes: Uint8Array): string {
   return out
 }
 
+function noSecureRandomError(): AppleAuthError {
+  return new AppleAuthError(
+    EAppleAuthErrorCode.Failed,
+    'No secure random source is available to generate a nonce. Install a crypto.getRandomValues polyfill or pass nonce and state to AppleAuth.signIn.'
+  )
+}
+
+/** Keeps the 30 random hex digits of a UUIDv4 and drops the version and variant digits. */
+function uuidRandomHex(uuid: string): string {
+  const hex = uuid.toLowerCase().replace(/-/g, '')
+  if (!/^[0-9a-f]{32}$/.test(hex)) {
+    throw noSecureRandomError()
+  }
+
+  return hex.slice(0, 12) + hex.slice(13, 16) + hex.slice(17)
+}
+
 function randomBytes(size: number): Uint8Array {
   const bytes = new Uint8Array(size)
   const cryptoObject = globalThis.crypto
   if (cryptoObject && typeof cryptoObject.getRandomValues === 'function') {
     cryptoObject.getRandomValues(bytes)
+
     return bytes
   }
-  for (let i = 0; i < size; i += 1) {
-    bytes[i] = Math.floor(Math.random() * 256)
+
+  const uuidv4 = (globalThis as unknown as { expo?: TExpoGlobal }).expo?.uuidv4
+  if (typeof uuidv4 !== 'function') {
+    throw noSecureRandomError()
   }
+
+  let hex = ''
+  while (hex.length < size * 2) {
+    hex += uuidRandomHex(uuidv4())
+  }
+  for (let i = 0; i < size; i += 1) {
+    bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16)
+  }
+
   return bytes
 }
 
 /**
- * Cryptographically strong hex nonce. 32 bytes → 64 hex chars.
+ * Hex nonce from a secure random source, 32 bytes (64 hex characters) by
+ * default. Uses crypto.getRandomValues when the runtime has it and Expo's
+ * native uuidv4 on iOS and Android otherwise. Throws an AppleAuthError with
+ * ERR_REQUEST_FAILED when neither exists.
  */
 export function generateNonce(byteLength = 32): string {
   return bytesToHex(randomBytes(byteLength))
