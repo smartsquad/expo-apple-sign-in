@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-09
+
 ### Added
 
 - Documentation site built with VitePress in `docs/`, with the introduction and getting started pages.
@@ -67,5 +69,6 @@ All notable changes to this project are documented here. The format follows [Kee
 - The config plugin loads `@expo/config-plugins` from the Expo process that requires it, so `file:` and sibling installs work.
 - The npm package ships `src` without tests, because the `react-native` and `browser` export conditions point at it.
 
-[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/smartsquad/expo-apple-sign-in/releases/tag/v1.0.0
