@@ -83,6 +83,7 @@ const ESidebar = [
   {
     text: 'More',
     items: [
+      { text: 'Comparison', link: '/comparison' },
       { text: 'Examples', link: '/examples' },
     ],
     collapsed: false,
@@ -155,6 +156,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/intro' },
       { text: 'Providers', link: '/providers/supabase' },
+      { text: 'Comparison', link: '/comparison' },
       {
         text: `v${version}`,
         items: [

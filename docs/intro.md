@@ -42,4 +42,4 @@ The package also exports its TypeScript types, such as `AppleCredential`, `Apple
 
 ## Where to go next
 
-Start with [Requirements](/getting-started/requirements) and [Installation](/getting-started/installation), then follow the [Quick start](/getting-started/quick-start) to get a first credential on screen. If you are deciding between libraries, the Comparison page sets `expo-apple-sign-in` beside `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
+Start with [Requirements](/getting-started/requirements) and [Installation](/getting-started/installation), then follow the [Quick start](/getting-started/quick-start) to get a first credential on screen. If you are deciding between libraries, the [Comparison](/comparison) page sets `expo-apple-sign-in` beside `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
