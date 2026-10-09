@@ -97,6 +97,13 @@ const ESidebar = [
     ],
     collapsed: false,
   },
+  {
+    text: 'Agents',
+    items: [
+      { text: 'Agent skill', link: '/agents/skill' },
+    ],
+    collapsed: false,
+  },
 ]
 
 export default defineConfig({
@@ -166,6 +173,7 @@ export default defineConfig({
       { text: 'Guide', link: '/intro' },
       { text: 'Providers', link: '/providers/supabase' },
       { text: 'Comparison', link: '/comparison' },
+      { text: 'Agents', link: '/agents/skill' },
       {
         text: `v${version}`,
         items: [
