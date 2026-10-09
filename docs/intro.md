@@ -38,7 +38,7 @@ Because Android and web go through Apple's web flow, both need the Services ID a
 | `signInWithSupabase`, `signInWithClerk`, `signInWithFirebase`, `toFirebaseAppleCredential` | Provider adapters. They are also published at `expo-apple-sign-in/supabase`, `expo-apple-sign-in/clerk` and `expo-apple-sign-in/firebase`. |
 | `generateNonce`, `sha256Hex` | The nonce helpers the library uses internally. |
 
-The package also exports its TypeScript types, such as `AppleCredential`, `AppleAuthConfig` and `AppleSignInOptions`. The API reference lists every export with its signature.
+The package also exports its TypeScript types, such as `AppleCredential`, `AppleAuthConfig` and `AppleSignInOptions`. The [API reference](/reference/api) lists every export with its signature.
 
 ## Where to go next
 

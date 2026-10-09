@@ -88,6 +88,15 @@ const ESidebar = [
     ],
     collapsed: false,
   },
+  {
+    text: 'Reference',
+    items: [
+      { text: 'API', link: '/reference/api' },
+      { text: 'Native modules', link: '/reference/modules' },
+      { text: 'Troubleshooting', link: '/reference/troubleshooting' },
+    ],
+    collapsed: false,
+  },
 ]
 
 export default defineConfig({

@@ -75,4 +75,4 @@ export async function signInOrExplain(): Promise<TAppleCredential | null> {
 }
 ```
 
-If you prefer not to catch exceptions, `AppleAuth.request()` returns the same information as a value. See [request and signIn](/guides/usage#request-and-signin). For fixes to the problems that cause these codes, see Troubleshooting.
+If you prefer not to catch exceptions, `AppleAuth.request()` returns the same information as a value. See [request and signIn](/guides/usage#request-and-signin). For fixes to the problems that cause these codes, see [Troubleshooting](/reference/troubleshooting).

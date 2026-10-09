@@ -19,7 +19,7 @@ AppleAuth.configure({
 `configure` merges the values you pass into the stored configuration and skips `undefined` values, so you can call it again later to change a single field. `scopes` defaults to `['name', 'email']` when you never set it. `AppleAuth.getConfig()` returns a copy of the stored configuration, and `AppleAuth.isConfigured()` returns `true` on iOS and, on Android and web, only when both `clientId` and `redirectUri` are set. The [Apple Developer](/setup/apple-developer), [Android](/setup/android), and [Web](/setup/web) setup pages explain where each value comes from.
 
 ::: warning Web redirect URI
-On web, `redirectUri` must have the same origin as the page that starts the sign-in. A different origin makes the call fail with `ERR_NOT_CONFIGURED` before Apple opens. See Troubleshooting.
+On web, `redirectUri` must have the same origin as the page that starts the sign-in. A different origin makes the call fail with `ERR_NOT_CONFIGURED` before Apple opens. See [Troubleshooting](/reference/troubleshooting#web-redirect-uri-points-at-another-origin).
 :::
 
 ## Check availability
@@ -106,7 +106,7 @@ export async function signInAndStoreName(): Promise<void> {
 
 `signIn` and `request` run the same flow. They differ only in how they report the outcome.
 
-`signIn` is built on `request`. It resolves with the credential on success. It throws `AppleAuthError` with the code `ERR_REQUEST_CANCELED` when the person dismisses the sheet, and it throws an `AppleAuthError` that carries the original `code` and `message` when the flow fails. Choose it when you want the usual `try`/`catch` shape, and when you pass the call to an adapter.
+`signIn` is built on `request`. It resolves with the credential on success. It throws `AppleAuthError` with the code `ERR_REQUEST_CANCELED` when the person dismisses the sheet, and it throws an `AppleAuthError` that carries the original `code` and `message` when the flow fails. Choose it when you want the usual `try`/`catch` shape, and when you pass the call to an [adapter](/reference/api#adapters).
 
 `request` never rejects. It catches every error, including configuration errors, and resolves with a discriminated union: `{ type: 'success', data }`, `{ type: 'cancelled' }`, or `{ type: 'error', code, message }`. Choose it when a cancel is a normal outcome that you do not want to treat as an exception. The helpers `isSuccessResponse`, `isCancelledResponse`, and `isErrorResponse` narrow the union.
 
@@ -167,4 +167,4 @@ export async function signOutOfApple(): Promise<void> {
 
 ## Next steps
 
-Handle failures with the [error codes](/guides/errors#codes), verify the token on your server with [Backend verification](/guides/backend), or pass the credential to a provider through an adapter: [Supabase](/providers/supabase), [Clerk](/providers/clerk), or [Firebase](/providers/firebase). Every signature is listed in the API reference.
+Handle failures with the [error codes](/guides/errors#codes), verify the token on your server with [Backend verification](/guides/backend), or pass the credential to a provider through an adapter: [Supabase](/providers/supabase), [Clerk](/providers/clerk), or [Firebase](/providers/firebase). Every signature is listed in the [API reference](/reference/api).
