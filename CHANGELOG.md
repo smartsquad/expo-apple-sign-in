@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Example app screenshots for iOS, Android, and web.
 - Migration guides from `expo-apple-authentication` and `@invertase/react-native-apple-authentication`.
 - Comparison with `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
+- API, native module, and troubleshooting reference.
 
 ### Changed
 

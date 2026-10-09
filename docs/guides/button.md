@@ -77,7 +77,7 @@ The type only changes the label, so pick the one that matches the screen.
 
 ## Choose between onSuccess and onPress
 
-The built-in flow fits when you want the credential and handle the rest yourself. It stops fitting when you use an adapter such as `signInWithSupabase`, `signInWithClerk`, or `signInWithFirebase`. An adapter calls `AppleAuth.signIn` itself, then exchanges the token with your provider. If you call an adapter from `onSuccess`, the person sees the Apple sheet twice.
+The built-in flow fits when you want the credential and handle the rest yourself. It stops fitting when you use an [adapter](/reference/api#adapters) such as `signInWithSupabase`, `signInWithClerk`, or `signInWithFirebase`. An adapter calls `AppleAuth.signIn` itself, then exchanges the token with your provider. If you call an adapter from `onSuccess`, the person sees the Apple sheet twice.
 
 ::: warning Adapters belong in onPress
 Pass the adapter call to `onPress` and never call it from `onSuccess`. With `onPress` set, the button leaves the sign-in to you, so it also stops tracking the busy state: use `disabled` while your call runs.

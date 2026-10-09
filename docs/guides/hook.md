@@ -93,4 +93,4 @@ Because the example passes `onPress`, the button does not run its own sign-in an
 
 - [Errors](/guides/errors) lists every code the hook can put into `error`.
 - [Usage](/guides/usage) covers the headless API the hook is built on.
-- API reference has the exact signature.
+- [API reference](/reference/api#hook) has the exact signature.
