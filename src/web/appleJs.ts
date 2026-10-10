@@ -51,11 +51,13 @@ function loadAppleScript(): Promise<void> {
     const existing = document.querySelector<HTMLScriptElement>(`script[src="${APPLE_JS_SRC}"]`)
     if (existing) {
       existing.addEventListener('load', () => resolve())
-      existing.addEventListener('error', () =>
+      existing.addEventListener('error', () => {
+        existing.remove()
+        scriptPromise = null
         reject(
           new AppleAuthError(EAppleAuthErrorCode.NotAvailable, 'Failed to load the Apple JS SDK.')
         )
-      )
+      })
       return
     }
 
@@ -64,6 +66,7 @@ function loadAppleScript(): Promise<void> {
     script.async = true
     script.onload = () => resolve()
     script.onerror = () => {
+      script.remove()
       scriptPromise = null
       reject(
         new AppleAuthError(EAppleAuthErrorCode.NotAvailable, 'Failed to load the Apple JS SDK.')
@@ -83,6 +86,21 @@ function parseUser(
     givenName: raw?.name?.firstName ?? null,
     familyName: raw?.name?.lastName ?? null,
   }
+}
+
+/** Apple JS rejects `signIn` with a plain `{ error: string }` object, not an `Error`. */
+function rejectionCode(error: unknown): string | null {
+  if (typeof error === 'object' && error !== null) {
+    const code = (error as { error?: unknown }).error
+    if (typeof code === 'string') {
+      return code
+    }
+  }
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return null
 }
 
 /**
@@ -116,6 +134,12 @@ export function assertWebRedirectUri(redirectUri: string): void {
   }
 }
 
+/**
+ * Runs Sign in with Apple through the Apple JS SDK in popup mode, loading the SDK script on first
+ * use. Requires `clientId` and a same-origin `redirectUri`. A closed or canceled popup rejects with
+ * `ERR_REQUEST_CANCELED`, a blocked popup with `ERR_REQUEST_FAILED`, and any other Apple JS
+ * rejection with `ERR_REQUEST_UNKNOWN`.
+ */
 export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSignInResult> {
   if (!params.clientId) {
     throw new AppleAuthError(
@@ -178,15 +202,33 @@ export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSig
       realUserStatus: 'unknown',
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    if (/popup.*(close|cancel)|user.*cancel/i.test(message)) {
+    if (error instanceof AppleAuthError) {
+      throw error
+    }
+    const code = rejectionCode(error)
+    if (
+      code === 'popup_closed_by_user' ||
+      code === 'user_cancelled_authorize' ||
+      (code !== null && /cancel|closed/i.test(code))
+    ) {
       throw new AppleAuthError(
         EAppleAuthErrorCode.Canceled,
         'The user canceled Apple sign-in.',
         error
       )
     }
-    throw error
+    if (code === 'popup_blocked_by_browser') {
+      throw new AppleAuthError(
+        EAppleAuthErrorCode.Failed,
+        'The browser blocked the Apple sign-in popup. Call signIn from a click handler.',
+        error
+      )
+    }
+    throw new AppleAuthError(
+      EAppleAuthErrorCode.Unknown,
+      code ? `Apple sign-in failed: ${code}` : 'Apple sign-in failed.',
+      error
+    )
   }
 }
 
@@ -205,10 +247,7 @@ function resolvePopupRedirectUri(configured: string): string {
     const configuredUrl = new URL(configured)
     const pageUrl = new URL(window.location.href)
     pageUrl.hash = ''
-    if (
-      configuredUrl.origin === pageUrl.origin &&
-      configuredUrl.pathname === pageUrl.pathname
-    ) {
+    if (configuredUrl.origin === pageUrl.origin && configuredUrl.pathname === pageUrl.pathname) {
       return pageUrl.toString()
     }
   } catch {
@@ -218,6 +257,7 @@ function resolvePopupRedirectUri(configured: string): string {
   return configured
 }
 
+/** True when a browser `document` exists. The Apple JS SDK itself loads on the first sign-in. */
 export function isWebAppleAvailable(): boolean {
   return typeof document !== 'undefined'
 }

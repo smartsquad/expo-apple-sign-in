@@ -15,6 +15,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `AppleAuth.getCredentialState` returns `unknown` on Android and web instead of guessing from the in-memory credential.
 - `AppleAuth.isAvailable` returns `true` on iOS, where the podspec already requires iOS 16.4.
 - A second `signIn` call while one is pending fails with `ERR_REQUEST_FAILED` on iOS and Android.
+- On web, a closed popup maps to `ERR_REQUEST_CANCELED`, a blocked popup to `ERR_REQUEST_FAILED`, and other Apple JS errors keep their code in the message and the original object as `cause`. A failed script load no longer blocks later attempts.
 
 ## [1.0.2] - 2026-10-10
 
