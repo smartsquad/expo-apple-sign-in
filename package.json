@@ -42,18 +42,20 @@
     "!src/**/__tests__",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
+    "plugin/build",
+    "plugin/src",
     "ios",
     "android",
     "app.plugin.js",
     "expo-module.config.json"
   ],
   "scripts": {
-    "build": "node internal/module_scripts/build.js",
+    "build": "node internal/module_scripts/build.js && node internal/module_scripts/build.js plugin",
     "example:web": "npm run web --prefix example",
-    "clean": "node internal/module_scripts/clean.js",
-    "lint": "eslint src/",
+    "clean": "node internal/module_scripts/clean.js && node internal/module_scripts/clean.js plugin",
+    "lint": "eslint src/ plugin/src/",
     "test": "jest --testEnvironment=node",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p plugin",
     "docs:dev": "vitepress dev docs --host 127.0.0.1 --port 43173",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs --host 127.0.0.1 --port 43173",
@@ -89,6 +91,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/jest": "^30.0.0",
+    "@types/node": "^22.20.3",
     "@types/react": "~19.1.1",
     "babel-jest": "^30.0.0",
     "babel-preset-expo": "~58.0.11",
@@ -139,8 +142,5 @@
       "<rootDir>/docs/",
       "<rootDir>/example/"
     ]
-  },
-  "expo": {
-    "plugin": "./app.plugin.js"
   }
 }

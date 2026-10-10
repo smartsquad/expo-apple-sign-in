@@ -31,7 +31,7 @@ User-facing Apple button labels stay the official English HIG strings (`Sign in 
 | Web | `src/web/` | Apple JS SDK (`usePopup: true`) |
 | iOS | `ios/` | AuthenticationServices via `@ExpoModule` / `@JS` |
 | Android | `android/` | Services ID WebView via `@ExpoModule` / `@JS` |
-| Config plugin | `app.plugin.js` | `ios.usesAppleSignIn` plus entitlement |
+| Config plugin | `plugin/src/withExpoAppleSignIn.ts`, built to `plugin/build` and loaded by `app.plugin.js` | the Sign in with Apple entitlement and `CFBundleAllowMixedLocalizations` |
 | Docs | `docs/` | VitePress site, GitHub Pages (images-in-motion pattern) |
 | Example | `example/` | Compact Expo SDK 58 app (expo/examples shape) with `AppleButton` |
 

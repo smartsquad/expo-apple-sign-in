@@ -22,4 +22,8 @@ if (SUBTARGETS.includes(target)) {
 // One-shot by default. Pass --watch (or `npm run build -- --watch`) to rebuild on change.
 
 const result = spawnSyncWithAutoShell('tsc', tscArgs, { stdio: 'inherit' });
-process.exit(result.status ?? 0);
+if (result.error) {
+  console.error(`tsc could not start: ${result.error.message}`);
+  process.exit(1);
+}
+process.exit(result.status ?? 1);

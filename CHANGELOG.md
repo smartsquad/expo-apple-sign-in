@@ -21,6 +21,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - The example app shows a message when Apple revokes the credential and carries test ids.
 - iOS maps every `ASAuthorizationError` code the installed SDK defines, including `matchedExcludedCredential`, the credential import and export codes, `preferSignInWithApple`, and `deviceNotConfiguredForPasskeyCreation`, and keeps `ERR_REQUEST_UNKNOWN` for codes added by future SDKs.
 - Android matches the redirect URI exactly, passes form fields as JSON, handles the back gesture through `OnBackPressedDispatcher`, keeps the WebView across configuration changes, and cancels a pending request when the activity is destroyed.
+- The config plugin is TypeScript in `plugin/src`, wrapped with `createRunOncePlugin`, sets `CFBundleAllowMixedLocalizations` so the Apple sheet follows the device language, and no longer sets `ios.usesAppleSignIn`, so `expo prebuild` stops asking to install `expo-apple-authentication`.
+- The module build script fails when `tsc` cannot start instead of exiting with status 0.
 
 ## [1.0.2] - 2026-10-10
 

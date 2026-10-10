@@ -60,4 +60,5 @@ docs/.vitepress/cache/
 docs/.vitepress/dist/
 docs/.vitepress/.temp/
 *.tsbuildinfo
+plugin/build/
 agent-tools/
