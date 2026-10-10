@@ -17,11 +17,19 @@ export default function App() {
     void AppleAuth.isAvailable().then(setAvailable)
   }, [])
 
+  useEffect(() => {
+    const subscription = AppleAuth.addRevokeListener(() =>
+      setMessage('Apple revoked the credential')
+    )
+
+    return () => subscription.remove()
+  }, [])
+
   const onSuccess = (credential: AppleCredential) => {
     setMessage(
       [
-        `user: ${credential.user.id ?? '—'}`,
-        `email: ${credential.user.email ?? '—'}`,
+        `user: ${credential.user.id ?? 'none'}`,
+        `email: ${credential.user.email ?? 'none'}`,
         `token: ${credential.identityToken.slice(0, 24)}…`,
       ].join('\n')
     )
@@ -30,11 +38,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>expo-apple-sign-in</Text>
-      <Text style={styles.meta}>
+      <Text style={styles.meta} testID="platform-meta">
         {Platform.OS} · available: {available == null ? '…' : available ? 'yes' : 'no'}
       </Text>
 
       <AppleButton
+        testID="sign-in-button"
         buttonStyle="black"
         buttonType="signIn"
         style={styles.button}
@@ -43,7 +52,9 @@ export default function App() {
         onError={(error) => setMessage(error.message)}
       />
 
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.message} testID="status-message">
+        {message}
+      </Text>
       <StatusBar style="auto" />
     </View>
   )
