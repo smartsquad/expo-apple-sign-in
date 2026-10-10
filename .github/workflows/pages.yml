@@ -27,13 +27,6 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Cache VitePress
-        uses: actions/cache@v6
-        with:
-          path: docs/.vitepress/cache
-          key: ${{ runner.os }}-vitepress-${{ hashFiles('docs/**', 'package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vitepress-
       # actions/configure-pages fails when Pages is disabled, so probe the Pages API first.
       - name: Check whether GitHub Pages is enabled
         id: pages
