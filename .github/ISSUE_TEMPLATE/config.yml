@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://smartsquad.github.io/expo-apple-sign-in/
+    about: Read the guides and the API reference.
+  - name: Troubleshooting
+    url: https://smartsquad.github.io/expo-apple-sign-in/reference/troubleshooting.html
+    about: Look up a known error with its cause and fix.

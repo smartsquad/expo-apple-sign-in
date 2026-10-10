@@ -1,0 +1,23 @@
+name: Feature request
+description: Propose a change or an addition to expo-apple-sign-in.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe what you are trying to do and what blocks you.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the API or behaviour you want.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: List the other approaches you considered, including workarounds you use today.

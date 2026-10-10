@@ -1,0 +1,63 @@
+name: Bug report
+description: Report a problem with expo-apple-sign-in.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Redact identity tokens, authorization codes, and nonces from everything you paste into this form.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - iOS
+        - Android
+        - Web
+    validations:
+      required: true
+  - type: input
+    id: expo-sdk
+    attributes:
+      label: Expo SDK version
+      placeholder: '58'
+    validations:
+      required: true
+  - type: input
+    id: library-version
+    attributes:
+      label: expo-apple-sign-in version
+    validations:
+      required: true
+  - type: dropdown
+    id: build-type
+    attributes:
+      label: Build type
+      options:
+        - Development build
+        - EAS build
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste the relevant output, including the error code.
+      render: shell

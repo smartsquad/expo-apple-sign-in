@@ -10,6 +10,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `credential.user` carries `middleName`, `namePrefix`, `nameSuffix`, and `nickname`, filled on iOS.
 - `TUseAppleAuthResult` names the object returned by `useAppleAuth`.
 - `AppleButton` accepts the remaining `Pressable` props, `accessibilityHint`, and reports `accessibilityState`.
+- Security policy, support guide, code of conduct, issue forms, and a pull request template.
 
 ### Changed
 
