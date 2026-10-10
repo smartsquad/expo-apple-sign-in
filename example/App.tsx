@@ -30,7 +30,7 @@ export default function App() {
       [
         `user: ${credential.user.id ?? 'none'}`,
         `email: ${credential.user.email ?? 'none'}`,
-        `token: ${credential.identityToken.slice(0, 24)}…`,
+        `token: ${credential.identityToken.length} characters`,
       ].join('\n')
     )
   }
