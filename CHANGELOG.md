@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- Pointed the docs and README to react-native-nitro-google-signin for Google Sign-In and to Invertase for apps not on Expo SDK 58.
+
 ## [1.1.0] - 2026-10-10
 
 ### Added

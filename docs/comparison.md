@@ -86,6 +86,16 @@ The sums count each package once for the target it serves. The native figure for
 - A web-only React app. `react-apple-signin-auth` needs `react` and `react-dom` as its only peer dependencies, adds 2,620 bytes gzipped in the web bundle, and loads Apple's script from Apple's CDN.
 - An iOS-only app that already works. If it hashes its own nonce and uses the system button, a move adds no platform coverage. The [migration page](/migration/expo-apple-authentication) lists what changes.
 
+## Google Sign-In, and Apple without Expo 58
+
+This package already signs in with Apple on Android. A Kotlin activity opens Apple's authorize page in a WebView. It does not sign in with Google, and it does not run on Expo SDK 57 or on React Native without Expo.
+
+Two other libraries cover those jobs, and both are good.
+
+[`react-native-nitro-google-signin`](https://react-native-nitro-google-sign-in.github.io/) is Google Sign-In on Nitro Modules. Version 2.3.0 is MIT licensed. Android uses Credential Manager, and iOS uses the Google Sign-In SDK. It is the Google library to install next to this one.
+
+[`@invertase/react-native-apple-authentication`](https://github.com/invertase/react-native-apple-authentication) is Sign in with Apple for React Native, including a separate Android module, `appleAuthAndroid`. Version 2.5.1 is Apache-2.0, copyright Invertase Limited. Use it when the app cannot take Expo SDK 58. The [migration page](/migration/invertase) is for apps that are leaving it.
+
 ## How we measured
 
 The measurements run on the packed tarball of each package, extracted into separate directories. No script from `expo-apple-authentication`, Invertase, `react-apple-signin-auth`, or the helper packages was executed.

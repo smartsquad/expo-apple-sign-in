@@ -42,4 +42,6 @@ The package also exports its TypeScript types, such as `AppleCredential`, `Apple
 
 ## Where to go next
 
-Start with [Requirements](/getting-started/requirements) and [Installation](/getting-started/installation), then follow the [Quick start](/getting-started/quick-start) to get a first credential on screen. If you are deciding between libraries, the [Comparison](/comparison) page sets `expo-apple-sign-in` beside `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
+Start with [Requirements](/getting-started/requirements) and [Installation](/getting-started/installation), then follow the [Quick start](/getting-started/quick-start) to get a first credential on screen. If you are deciding between Sign in with Apple libraries, the [Comparison](/comparison) page sets `expo-apple-sign-in` beside `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
+
+Google Sign-In is a different package. The comparison page names [`react-native-nitro-google-signin`](/comparison#google-sign-in-and-apple-without-expo-58) for that, and names Invertase's Apple library for apps that are not on Expo SDK 58. Both are good libraries.
