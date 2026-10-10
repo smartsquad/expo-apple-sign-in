@@ -25,6 +25,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The config plugin is TypeScript in `plugin/src`, wrapped with `createRunOncePlugin`, sets `CFBundleAllowMixedLocalizations` so the Apple sheet follows the device language, and no longer sets `ios.usesAppleSignIn`, so `expo prebuild` stops asking to install `expo-apple-authentication`.
 - The module build script fails when `tsc` cannot start instead of exiting with status 0.
 - The validation workflow runs ESLint with zero warnings allowed, `npm run lint` joins the documented checks, and the Pages workflow skips deployment with a warning while GitHub Pages is disabled.
+- `AppleAuth.request` returns the wrapped error as `cause` on its error response, and the `AppleAuthError` thrown by `AppleAuth.signIn` carries the same `cause`.
 
 ## [1.0.2] - 2026-10-10
 

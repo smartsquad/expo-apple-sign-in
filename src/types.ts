@@ -120,11 +120,15 @@ export type TAppleAuthCancelledResponse = {
   type: 'cancelled'
 }
 
-/** `AppleAuth.request` result when sign-in fails. `code` is an `ERR_*` string. */
+/**
+ * `AppleAuth.request` result when sign-in fails. `code` is an `ERR_*` string and `cause` is the
+ * error the library wrapped, when there was one.
+ */
 export type TAppleAuthErrorResponse = {
   type: 'error'
   code: string
   message: string
+  cause?: unknown
 }
 
 /** Result of `AppleAuth.request`, which never throws for cancel or failure. */

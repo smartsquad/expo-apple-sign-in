@@ -23,6 +23,17 @@ describe('normalizeAppleError', () => {
     expect(error.message).toBe('missing client id')
   })
 
+  it('keeps the code and the cause of an Expo Modules 2.0 rejection', () => {
+    const native = Object.assign(
+      new Error('A Sign in with Apple request is already in progress.'),
+      { code: 'ERR_REQUEST_FAILED' }
+    )
+    const error = normalizeAppleError(native)
+    expect(error.code).toBe(EAppleAuthErrorCode.Failed)
+    expect(error.message).toBe('A Sign in with Apple request is already in progress.')
+    expect(error.cause).toBe(native)
+  })
+
   it('maps iOS 1001 and ERR_CANCELED codes', () => {
     expect(isCancelledError({ code: '1001' })).toBe(true)
     expect(isCancelledError({ code: 'ERR_CANCELED' })).toBe(true)
