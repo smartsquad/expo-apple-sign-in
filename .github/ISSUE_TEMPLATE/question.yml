@@ -1,0 +1,16 @@
+name: Question
+description: Ask how to use expo-apple-sign-in.
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Include the Expo SDK version, the expo-apple-sign-in version, the platform, whether you use a development build, and the error code if there is one.
+    validations:
+      required: true
+  - type: input
+    id: docs-checked
+    attributes:
+      label: Where in the docs did you look
+      description: Name the page or section you read.
