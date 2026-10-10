@@ -1,29 +1,34 @@
 # Comparison
 
-This page compares `expo-apple-sign-in` 1.0.1 with three packages that React Native and React web apps use for Sign in with Apple: `expo-apple-authentication` 58.0.2, `@invertase/react-native-apple-authentication` 2.5.1, and `react-apple-signin-auth` 1.2.1. It covers platform support, native layers, nonce handling, the JavaScript each package adds to an app bundle, and what an app has to install to reach iOS, Android, and web. Every statement comes from the published package files or from a measurement described in [How we measured](#how-we-measured). The page also lists the cases where another package fits better.
+This page compares `expo-apple-sign-in` 1.1.0 with three packages that React Native and React web apps use for Sign in with Apple: `expo-apple-authentication` 58.0.2, `@invertase/react-native-apple-authentication` 2.5.1, and `react-apple-signin-auth` 1.2.1. It covers platform support, native layers, nonce handling, the JavaScript each package adds to an app bundle, and what an app has to install to reach iOS, Android, and web. Every statement comes from the published package files or from a measurement described in [How we measured](#how-we-measured). The page also lists the cases where another package fits better.
 
 ::: info Versions
-All figures come from the package versions named above. `expo-apple-sign-in` 1.0.1 was built and packed from this repository because the package is not on npm yet. `expo-apple-authentication` 58.0.2 is the version bundled with Expo SDK 58.
+All figures come from the package versions named above, including the `expo-apple-sign-in` size figures, which were measured on 1.1.0. `expo-apple-sign-in` 1.1.0 was built and packed from this repository because the package is not on npm yet. `expo-apple-authentication` 58.0.2 is the version bundled with Expo SDK 58.
 :::
 
 ## At a glance
 
-| | expo-apple-sign-in 1.0.1 | expo-apple-authentication 58.0.2 | @invertase/react-native-apple-authentication 2.5.1 | react-apple-signin-auth 1.2.1 |
+| | expo-apple-sign-in 1.1.0 | expo-apple-authentication 58.0.2 | @invertase/react-native-apple-authentication 2.5.1 | react-apple-signin-auth 1.2.1 |
 |---|---|---|---|---|
 | Platforms | iOS, Android, web (the podspec also lists tvOS 16.4) | iOS | iOS, Android (the podspec also lists macOS 10.15 and visionOS 1.0, and the README describes macOS through `react-native-macos`) | web |
 | Native layer | Expo Modules 2.0 macros (`@ExpoModule`, `@JS`) in Swift and Kotlin | Expo Modules `ModuleDefinition` DSL in Swift | Objective-C on iOS, Java and Kotlin on Android, on the React Native bridge | None, browser JavaScript |
 | Android sign-in | In-app WebView activity | Not supported | WebView `DialogFragment` | Not supported |
-| Config plugin | Yes, sets `ios.usesAppleSignIn` and the entitlement | Yes, sets the entitlement and `CFBundleAllowMixedLocalizations` | No, the README asks you to add the entitlement to `app.json` by hand | No |
+| Config plugin | Yes, sets the entitlement and `CFBundleAllowMixedLocalizations` | Yes, sets the entitlement and `CFBundleAllowMixedLocalizations` | No, the README asks you to add the entitlement to `app.json` by hand | No |
 | Button | JavaScript component on iOS, Android, and web | Native `ASAuthorizationAppleIDButton` on iOS | Native button on iOS, JavaScript `TouchableOpacity` button on Android | JavaScript button on web |
 | Nonce sent to Apple | SHA-256 hash of the raw nonce, generated when missing | The value you pass, unchanged | SHA-256 hash of the raw nonce on iOS and Android, generated when missing | The value you pass, unchanged |
 | Nonce on the credential | Raw nonce | None | Raw nonce | None |
-| Credential state API | `AppleAuth.getCredentialState` | `getCredentialStateAsync` | `getCredentialStateForUser` | None |
-| Credential revoked event | None | `addRevokeListener` | `onCredentialRevoked` | None |
+| Credential state API | `AppleAuth.getCredentialState` on iOS, `'unknown'` on Android and web | `getCredentialStateAsync` on iOS, throws `UnavailabilityError` elsewhere | `getCredentialStateForUser` on iOS, throws on Android | None |
+| Credential revoked event | `AppleAuth.addRevokeListener` on iOS, a subscription that never fires on Android and web | `addRevokeListener` | `onCredentialRevoked` on iOS, returns an unsubscribe function | None |
+| Full name components | All six on iOS, `givenName` and `familyName` on Android and web | All six | All six on iOS, `firstName` and `lastName` on Android | `firstName` and `lastName` |
+| Concurrent sign-in | A second call on iOS or Android rejects with `ERR_REQUEST_FAILED` | No check | No check | No check |
+| Web popup errors | Mapped to `ERR_REQUEST_CANCELED`, `ERR_REQUEST_FAILED`, or `ERR_REQUEST_UNKNOWN` | Not supported | Not supported | Passed to `onError` unchanged, or to `console.error`, and the call resolves `null` |
 | Auth provider adapters | Supabase, Clerk, Firebase | None | None | None |
 | React hook | `useAppleAuth` | None | None | `useScript`, which loads Apple's script and does not sign in |
 | TypeScript types in the package | Yes | Yes | Yes | Yes |
 | License | MIT | MIT | Apache-2.0 | MIT |
 | Last npm publish | Not on npm yet | 2026-09-29 | 2026-01-09 | 2026-06-02 |
+
+The six name components are `namePrefix`, `givenName`, `middleName`, `familyName`, `nameSuffix`, and `nickname`. Apple sends them only on the first authorization.
 
 The migration pages cover moving an existing app: [From expo-apple-authentication](/migration/expo-apple-authentication) and [From Invertase](/migration/invertase).
 
@@ -44,14 +49,14 @@ The table lists the JavaScript each package adds when its entry is bundled, plus
 
 | Package | Native minified (bytes) | Native gzip (bytes) | Web minified (bytes) | Web gzip (bytes) | Unpacked size (bytes) | Files | Runtime dependencies |
 |---|---|---|---|---|---|---|---|
-| expo-apple-sign-in 1.0.1 | 16,370 | 7,194 | 16,370 | 7,194 | 227,007 | 101 | 0 |
+| expo-apple-sign-in 1.1.0 | 17,350 | 7,537 | 17,350 | 7,537 | 291,077 | 109 | 0 |
 | expo-apple-authentication 58.0.2 | 2,961 | 1,046 | not supported | not supported | 97,227 | 55 | 0 |
 | @invertase/react-native-apple-authentication 2.5.1 | 4,365 | 1,879 | not supported | not supported | 131,661 | 40 | 0 |
 | react-apple-signin-auth 1.2.1 | not supported | not supported | 5,806 | 2,620 | 42,713 | 20 | 0 |
 
-The `expo-apple-sign-in` bundle is the whole entry point: `AppleAuth`, `useAppleAuth`, `AppleButton`, `AppleLogo`, the error helpers, the nonce helpers with the JavaScript SHA-256, and the Supabase, Clerk, and Firebase adapters. The other bundles contain only what their entries export. The Invertase figure does not include `prop-types`, which `lib/AppleButton.ios.js` imports without declaring it in `package.json`. On Android, the Invertase entry resolves to a different button file and measures 4,526 bytes minified and 1,961 bytes gzipped. Every export of each entry is kept in these bundles, so an app that imports a single export may ship less.
+The `expo-apple-sign-in` bundle is the whole entry point: `AppleAuth`, `useAppleAuth`, `AppleButton`, `AppleLogo`, the error and response helpers, the nonce helpers with the JavaScript SHA-256, and the Supabase, Clerk, and Firebase adapters. The other bundles contain only what their entries export. The Invertase figure does not include `prop-types`, which `lib/AppleButton.ios.js` imports without declaring it in `package.json`. On Android, the Invertase entry resolves to a different button file and measures 4,526 bytes minified and 1,961 bytes gzipped. Every export of each entry is kept in these bundles, so an app that imports a single export may ship less.
 
-The unpacked size and file count of `expo-apple-sign-in` cover both the compiled `build` directory and the TypeScript `src` directory, together with the iOS and Android native sources, as listed by `npm pack`.
+The unpacked size and file count of `expo-apple-sign-in` cover the compiled `build` directory, the TypeScript `src` directory, the config plugin in `plugin/src` and `plugin/build`, and the iOS and Android native sources, as listed by `npm pack`.
 
 ## Covering iOS, Android, and web
 
@@ -59,7 +64,7 @@ An app that signs in with Apple on all three platforms can use one package or co
 
 | Option | Packages | Runtime dependencies | Native gzip (bytes) | Web gzip (bytes) | iOS | Android | Web |
 |---|---|---|---|---|---|---|---|
-| a. expo-apple-sign-in | 1 | 0 | 7,194 | 7,194 | Yes | Yes | Yes |
+| a. expo-apple-sign-in | 1 | 0 | 7,537 | 7,537 | Yes | Yes | Yes |
 | b. expo-apple-authentication and react-apple-signin-auth | 2 | 0 | 1,046 | 2,620 | Yes | No | Yes |
 | c. Invertase, react-apple-signin-auth, uuid, and react-native-get-random-values | 4 | 1 | 3,487 | 2,620 | Yes | Yes | Yes |
 
@@ -77,7 +82,7 @@ The sums count each package once for the target it serves. The native figure for
 - React Native without Expo. The `expo` peer dependency is required. `@invertase/react-native-apple-authentication` declares no peer dependencies and works through the React Native bridge.
 - An app that targets iOS below 16.4. The `expo-apple-sign-in` podspec sets iOS 16.4 as the minimum. The Invertase podspec sets iOS 9.0, and its JavaScript module reports that Apple authentication works on devices running iOS 13 or later (`lib/AppleAuthModule.js:23-24`).
 - macOS or visionOS. The Invertase podspec lists both, and its README documents macOS 10.15 and later through `react-native-macos`. `expo-apple-sign-in` documents iOS, Android, and web, and its podspec adds only tvOS.
-- The system Apple button or credential events. `expo-apple-authentication` renders the system `ASAuthorizationAppleIDButton`, which Apple localizes. `expo-apple-sign-in` draws its button in JavaScript. `expo-apple-authentication` also offers `addRevokeListener`, `refreshAsync`, `signOutAsync`, and `formatFullName`, and `@invertase/react-native-apple-authentication` offers `onCredentialRevoked`. `expo-apple-sign-in` has none of these, and its `signOut` clears the in-memory credential only.
+- The system Apple button, a credential refresh, or a name formatter. `expo-apple-authentication` renders the system `ASAuthorizationAppleIDButton`, which Apple localizes. `expo-apple-sign-in` draws its button in JavaScript. `expo-apple-authentication` also offers `refreshAsync`, `signOutAsync`, and `formatFullName`. `expo-apple-sign-in` has none of these, and its `signOut` clears the in-memory credential only.
 - A web-only React app. `react-apple-signin-auth` needs `react` and `react-dom` as its only peer dependencies, adds 2,620 bytes gzipped in the web bundle, and loads Apple's script from Apple's CDN.
 - An iOS-only app that already works. If it hashes its own nonce and uses the system button, a move adds no platform coverage. The [migration page](/migration/expo-apple-authentication) lists what changes.
 
@@ -87,7 +92,7 @@ The measurements run on the packed tarball of each package, extracted into separ
 
 | Package | Version | Source |
 |---|---|---|
-| expo-apple-sign-in | 1.0.1 | `npm run build` and `npm pack` in this repository |
+| expo-apple-sign-in | 1.1.0 | `npm run build` and `npm pack` in this repository |
 | expo-apple-authentication | 58.0.2 | npm tarball |
 | @invertase/react-native-apple-authentication | 2.5.1 | npm tarball |
 | react-apple-signin-auth | 1.2.1 | npm tarball |

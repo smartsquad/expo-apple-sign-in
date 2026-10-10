@@ -1,10 +1,14 @@
 # useAppleAuth hook
 
-`useAppleAuth` wraps `AppleAuth` in React state. It tracks the loading flag, the last credential, the last error, and whether Sign in with Apple is available on the device, so a custom control can render each state without extra bookkeeping. Use it when the stock [Apple button](/guides/button) does not fit your layout, or when you want the sign-in state in a component.
+`useAppleAuth` wraps `AppleAuth` in React state. It tracks the loading flag, the last credential, the last error, and whether Sign in with Apple is available on the device, so a custom control can render each state without extra bookkeeping. On iOS it also clears the credential when Apple reports that the person revoked access. Use it when the stock [Apple button](/guides/button) does not fit your layout, or when you want the sign-in state in a component.
 
 ## Options
 
-`useAppleAuth(options?)` accepts the same fields as [`AppleAuth.configure`](/guides/usage#configure) plus one hook-only flag.
+```ts
+function useAppleAuth(options?: TUseAppleAuthOptions): TUseAppleAuthResult
+```
+
+The `options` object accepts the same fields as [`AppleAuth.configure`](/guides/usage#configure) plus one hook-only flag.
 
 | Option | Type | Default | Description |
 |---|---|---|---|
@@ -13,21 +17,23 @@
 | `scopes` | `AppleScope[]` | `['name', 'email']` | Default scopes for sign-ins started by the hook. |
 | `treatCancelAsError` | `boolean` | `false` | When `true`, a cancel is stored in `error` and thrown like any other failure. |
 
-When any of `clientId`, `redirectUri`, or `scopes` is set, an effect passes the three options to `AppleAuth.configure`. `configure` skips `undefined` values, so an option you leave out of the hook keeps the value from an earlier `configure` call. The effect depends on the option values, so declare an array of `scopes` outside the component to avoid a call on every render.
+When any of `clientId`, `redirectUri`, or `scopes` is set, an effect passes the three options to `AppleAuth.configure`. `configure` skips `undefined` values, so an option you leave out of the hook keeps the value from an earlier `configure` call. The effect compares `scopes` by value, so an inline array such as `scopes: ['name', 'email']` does not trigger a new `configure` call on every render.
 
 ## Returned values
 
+`useAppleAuth` returns a `TUseAppleAuthResult` object, also exported as `UseAppleAuthResult`, with the fields below.
+
 | Field | Type | Description |
 |---|---|---|
-| `signIn` | `() => Promise<AppleCredential \| null>` | Starts the flow. Takes no arguments. Resolves with the credential, or with `null` when the person cancels. |
+| `signIn` | `(options?: AppleSignInOptions) => Promise<AppleCredential \| null>` | Starts the flow and passes `options` to `AppleAuth.signIn`. Resolves with the credential, or with `null` when the person cancels. |
 | `signOut` | `() => Promise<void>` | Clears the in-memory credential and the error. Apple has no sign-out API, so end your own session as well. |
 | `credential` | `AppleCredential \| null` | Last successful credential. Starts from `AppleAuth.getCurrentCredential()`. |
 | `isLoading` | `boolean` | `true` while a sign-in runs. |
 | `error` | `AppleAuthError \| null` | Last failure. Reset to `null` when the next sign-in starts. |
-| `isAvailable` | `boolean` | Result of `AppleAuth.isAvailable()`. It is `false` until the check resolves after the first render. |
-| `isConfigured` | `boolean` | Result of `AppleAuth.isConfigured()` on every render. |
+| `isAvailable` | `boolean` | Result of `AppleAuth.isAvailable()`. It is `false` until the check resolves after the first render, and stays `false` when the check fails. |
+| `isConfigured` | `boolean` | Result of `AppleAuth.isConfigured()`, kept current across `AppleAuth.configure` calls made by this hook or anywhere else in the app. |
 
-The hook's `signIn` takes no options. To pass a custom `nonce`, `state`, or per-call `scopes`, call [`AppleAuth.signIn`](/guides/usage#sign-in) directly.
+The hook's `signIn` accepts the per-call options of [`AppleAuth.signIn`](/guides/usage#sign-in): `nonce`, `state`, and `scopes`. For example, `signIn({ nonce })` sends a raw nonce that your server issued, and the library hashes it as usual.
 
 ## Cancel behavior
 
@@ -36,6 +42,10 @@ A dismissed Apple sheet is a normal outcome, so by default `signIn` resolves wit
 Every other failure is normalized into an [`AppleAuthError`](/guides/errors), stored in `error`, and thrown. Catch it at the call site or read it from state.
 
 Set `treatCancelAsError: true` when a cancel must follow the same path as a failure. The hook then stores the cancel error (`ERR_REQUEST_CANCELED`) in `error` and throws it.
+
+## Revocation
+
+While the component is mounted, the hook subscribes to [`AppleAuth.addRevokeListener`](/guides/usage#listen-for-revocation). When Apple reports on iOS that the person revoked Sign in with Apple for your app, the hook calls `AppleAuth.signOut()` and sets `credential` to `null`. It does not end your own session, so react to `credential` becoming `null`, or add your own listener, to sign out of your backend too. On Android and web the event never fires.
 
 ## Complete example
 

@@ -1,6 +1,6 @@
 # Usage
 
-`AppleAuth` is the headless entry point of `expo-apple-sign-in`. It runs the Sign in with Apple flow on iOS, Android, and web through one set of calls and hands your code a credential with the identity token and the raw nonce, so you can render any interface and send the token to any backend. This page walks through the whole lifecycle in order: configure, check availability, sign in, read the credential, check its state, and sign out. If you want a ready-made interface instead, see the [Apple button](/guides/button) and the [useAppleAuth hook](/guides/hook).
+`AppleAuth` is the headless entry point of `expo-apple-sign-in`. It runs the Sign in with Apple flow on iOS, Android, and web through one set of calls and hands your code a credential with the identity token and the raw nonce, so you can render any interface and send the token to any backend. This page walks through the whole lifecycle in order: configure, check availability, sign in, read the credential, check its state, listen for revocation, and sign out. If you want a ready-made interface instead, see the [Apple button](/guides/button) and the [useAppleAuth hook](/guides/hook).
 
 ## Configure
 
@@ -24,7 +24,7 @@ On web, `redirectUri` must have the same origin as the page that starts the sign
 
 ## Check availability
 
-`AppleAuth.isAvailable()` returns a `Promise<boolean>`. On web it is `true` when a browser document exists. On iOS and Android it is `true` when the native module is linked, and `false` when it is missing, for example in Expo Go.
+`AppleAuth.isAvailable()` returns a `Promise<boolean>`. On web it is `true` when a browser document exists. On iOS and Android it is `true` when the native module is linked, and `false` when the module is missing, for example in Expo Go, or when the native call throws.
 
 ```ts [lib/apple-available.ts]
 import { AppleAuth } from 'expo-apple-sign-in'
@@ -65,6 +65,8 @@ All three options are optional.
 
 When you omit `nonce`, the library generates one with `generateNonce()` (32 bytes from a secure random source, as 64 hex characters) and still returns it on the credential. Pass your own nonce when your server issues it and wants to check it later. The Android flow compares the returned `state` with the one it sent and fails with `ERR_INVALID_RESPONSE` when they differ.
 
+On iOS and Android only one sign-in runs at a time. A call made while another one is pending rejects with `ERR_REQUEST_FAILED`, and its message says that a Sign in with Apple request is already in progress. On web, call `signIn` from a click or press handler. Browsers block popups that no user gesture opened, and a blocked Apple popup rejects with `ERR_REQUEST_FAILED` and a message that asks for a click handler.
+
 ### What the credential contains
 
 | Field | Type | Meaning |
@@ -77,12 +79,16 @@ When you omit `nonce`, the library generates one with `generateNonce()` (32 byte
 | `user.email` | `string \| null` | Email address, possibly a private relay address. |
 | `user.givenName` | `string \| null` | First name. |
 | `user.familyName` | `string \| null` | Last name. |
+| `user.middleName` | `string \| null` | Middle name. iOS only. |
+| `user.namePrefix` | `string \| null` | Name prefix, such as a title. iOS only. |
+| `user.nameSuffix` | `string \| null` | Name suffix. iOS only. |
+| `user.nickname` | `string \| null` | Nickname. iOS only. |
 | `realUserStatus` | `'unknown' \| 'likelyReal' \| 'unsupported'` | Apple's signal that the account belongs to a real person. Only iOS reports it. Android and web return `'unknown'`. |
 
-The library reads `user.id` and `user.email` from the identity token when the platform did not return them, so both are usually filled. That decoding does not verify the signature. Your backend still has to verify the token, as described in [Backend verification](/guides/backend).
+On iOS, `middleName`, `namePrefix`, `nameSuffix`, and `nickname` come from the full name Apple returns on the first authorization, and each one is `null` when Apple leaves that part empty. Android and web always return `null` for them, because Apple's web flow sends only the first and last name. The library reads `user.id` and `user.email` from the identity token when the platform did not return them, so both are usually filled. That decoding does not verify the signature. Your backend still has to verify the token, as described in [Backend verification](/guides/backend).
 
 ::: warning Name and email arrive once
-Apple returns the name and the email only the first time a person authorizes your app. Later sign-ins return `null` for `givenName` and `familyName`, and the library fills `user.email` from the identity token. The name never appears inside the identity token. Store it the moment you receive it. To receive it again while testing, remove the app under Apple ID settings, Sign in with Apple, and sign in again.
+Apple returns the name and the email only the first time a person authorizes your app. Later sign-ins return `null` for `givenName`, `familyName`, and the other name fields, and the library fills `user.email` from the identity token. The name never appears inside the identity token. Store it the moment you receive it. To receive it again while testing, remove the app from your Apple Account (on iPhone: Settings, your name, Sign in with Apple, select the app, then Delete; on other platforms: account.apple.com, Sign-In & Security, Sign in with Apple), then sign in again.
 :::
 
 ```ts [lib/store-profile.ts]
@@ -108,7 +114,7 @@ export async function signInAndStoreName(): Promise<void> {
 
 `signIn` is built on `request`. It resolves with the credential on success. It throws `AppleAuthError` with the code `ERR_REQUEST_CANCELED` when the person dismisses the sheet, and it throws an `AppleAuthError` that carries the original `code` and `message` when the flow fails. Choose it when you want the usual `try`/`catch` shape, and when you pass the call to an [adapter](/reference/api#adapters).
 
-`request` never rejects. It catches every error, including configuration errors, and resolves with a discriminated union: `{ type: 'success', data }`, `{ type: 'cancelled' }`, or `{ type: 'error', code, message }`. Choose it when a cancel is a normal outcome that you do not want to treat as an exception. The helpers `isSuccessResponse`, `isCancelledResponse`, and `isErrorResponse` narrow the union.
+`request` never rejects. It catches every error, including configuration errors, and resolves with a discriminated union: `{ type: 'success', data }`, `{ type: 'cancelled' }`, or `{ type: 'error', code, message, cause }`. Choose it when a cancel is a normal outcome that you do not want to treat as an exception. `cause` holds the original error when the library wrapped one. The helpers `isSuccessResponse`, `isCancelledResponse`, and `isErrorResponse` narrow the union.
 
 ```ts [lib/request.ts]
 import { AppleAuth, isCancelledResponse, isErrorResponse, isSuccessResponse } from 'expo-apple-sign-in'
@@ -141,17 +147,47 @@ export async function requestAppleCredential(): Promise<TAppleCredential | null>
 
 `AppleAuth.getCredentialState(userId)` returns one of `'authorized'`, `'revoked'`, `'notFound'`, `'transferred'`, or `'unknown'`.
 
-On iOS the call asks the system. On Android and web there is no such API, so the library answers `'authorized'` when `userId` matches the user of the last credential in memory and `'unknown'` otherwise. Run the check at startup, with the Apple user id you stored, to find out whether the person revoked access.
+On iOS the call asks Apple about `userId`. Android and web have no such API, so the call always resolves `'unknown'` there, and iOS does the same when the native module is missing. Run the check at iOS startup, with the Apple user id you stored, to find out whether the person revoked access.
+
+The example treats `'revoked'` and `'notFound'` as a reason to sign the person out. Any other state, including `'unknown'`, keeps the session, so the same code is safe to run on Android and web.
 
 ```ts [lib/credential-state.ts]
 import { AppleAuth } from 'expo-apple-sign-in'
 
-export async function isAppleSessionStillValid(appleUserId: string): Promise<boolean> {
+export async function needsAppleSignInAgain(appleUserId: string): Promise<boolean> {
   const state = await AppleAuth.getCredentialState(appleUserId)
 
-  return state === 'authorized'
+  return state === 'revoked' || state === 'notFound'
 }
 ```
+
+## Listen for revocation
+
+On iOS, Apple notifies a running app when the person stops using Sign in with Apple with it, for example from the Apple Account settings. `AppleAuth.addRevokeListener(listener)` calls `listener` when that notification arrives and returns a subscription with a `remove()` method. Call `remove()` when you no longer need the listener. On Android and web the listener never fires, and `remove()` does nothing.
+
+```tsx [components/AppleRevokeWatcher.tsx]
+import { useEffect } from 'react'
+import { AppleAuth } from 'expo-apple-sign-in'
+
+type TAppleRevokeWatcherProps = {
+  onRevoked: () => void
+}
+
+export function AppleRevokeWatcher({ onRevoked }: TAppleRevokeWatcherProps) {
+  useEffect(() => {
+    const subscription = AppleAuth.addRevokeListener(() => {
+      void AppleAuth.signOut()
+      onRevoked()
+    })
+
+    return () => subscription.remove()
+  }, [onRevoked])
+
+  return null
+}
+```
+
+Pass a stable `onRevoked`, for example one wrapped in `useCallback`, so the effect does not subscribe again on every render. The listener only runs while the app is running and subscribed, so keep the startup check with `getCredentialState` as well. The [useAppleAuth hook](/guides/hook) subscribes on its own and clears its `credential` when the event fires.
 
 ## Sign out
 

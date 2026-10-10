@@ -1,14 +1,15 @@
 # Examples
 
-The repository includes an example app in the `example` folder. It is a single-screen Expo SDK 58 app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in.
+The repository includes an example app in the `example` folder. It is a single-screen Expo SDK 58 app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
 
 ## What the example shows
 
-On launch, the app configures the library from two environment variables when both are set, then checks availability. Pressing the button runs `AppleAuth.signIn()` through `AppleButton`:
+On launch, the app configures the library from two environment variables when both are set, checks availability, and subscribes to revocation with `AppleAuth.addRevokeListener`. The status line starts as `Tap Sign in with Apple`. Pressing the button runs `AppleAuth.signIn()` through `AppleButton`:
 
 - A successful sign-in shows the user id, the email and the first characters of the identity token.
 - A dismissed sheet or popup shows `Canceled`, through `onCancel`.
 - Any other failure shows the error message, through `onError`.
+- On iOS, when Apple revokes the credential while the app runs, the status line shows `Apple revoked the credential`.
 
 The app uses the black button style, the `signIn` label, and a button that stretches across the screen up to a width of 320.
 

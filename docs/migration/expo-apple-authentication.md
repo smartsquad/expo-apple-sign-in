@@ -8,7 +8,7 @@ This page moves an app from `expo-apple-authentication` to `expo-apple-sign-in`.
 - `expo-apple-authentication` passes the `nonce` option to Apple unchanged. Anything that compares the token's nonce claim with a raw value, such as Supabase or Firebase, needs the SHA-256 hash to go to Apple and the raw value to go to the provider, so the app computes the hash itself, usually with `expo-crypto`. `expo-apple-sign-in` hashes the nonce before Apple sees it and returns the raw value on the credential.
 - `expo-apple-sign-in` includes `signInWithSupabase`, `signInWithClerk`, `signInWithFirebase`, and `toFirebaseAppleCredential`. See the [Supabase](/providers/supabase), [Clerk](/providers/clerk), and [Firebase](/providers/firebase) pages.
 
-Two differences work against the move. `AppleButton` draws the Apple mark and the official label in JavaScript, while `AppleAuthenticationButton` renders the system `ASAuthorizationAppleIDButton`. The calls `refreshAsync`, `signOutAsync`, `formatFullName`, and `addRevokeListener` have no counterpart, as the table below shows. Check both before you commit to the migration.
+Two differences work against the move. `AppleButton` draws the Apple mark and the official label in JavaScript, while `AppleAuthenticationButton` renders the system `ASAuthorizationAppleIDButton`. The calls `refreshAsync`, `signOutAsync`, and `formatFullName` have no counterpart, as the table below shows. Check both before you commit to the migration.
 
 ## Steps
 
@@ -38,7 +38,7 @@ bun remove expo-apple-authentication && bunx expo install expo-apple-sign-in
 
 ### Replace the config plugin
 
-Both packages ship a config plugin that adds the `com.apple.developer.applesignin` entitlement with the value `Default`. Change the entry in your Expo config.
+Both packages ship a config plugin that adds the `com.apple.developer.applesignin` entitlement with the value `Default` and sets `CFBundleAllowMixedLocalizations` to `true` unless the app already defines it. Change the entry in your Expo config.
 
 ```json [app.json]
 {
@@ -47,6 +47,8 @@ Both packages ship a config plugin that adds the `com.apple.developer.applesigni
   }
 }
 ```
+
+If your Expo config sets `ios.usesAppleSignIn`, remove that key as well. The only reader of the key is the fallback plugin that `@expo/prebuild-config` registers for `expo-apple-authentication`, and once that package is uninstalled, prebuild prints `ios.usesAppleSignIn: Install expo-apple-authentication to enable this feature`. The `expo-apple-sign-in` plugin writes the entitlement without the key. [Troubleshooting](/reference/troubleshooting#prebuild-warns-about-expo-apple-authentication) shows the full warning.
 
 The [Expo config](/setup/expo) page lists the Android and web fields.
 
@@ -65,7 +67,7 @@ The table maps each `expo-apple-authentication` export to its replacement.
 | `requestedScopes: [AppleAuthenticationScope.FULL_NAME, AppleAuthenticationScope.EMAIL]` | `scopes: ['name', 'email']` | `'fullName'` is accepted as a synonym of `'name'`. Defaults to `['name', 'email']`. |
 | `nonce` | `nonce` | Pass the raw value. The library hashes it. |
 | `state` | `state` | A random value is generated when omitted. |
-| `getCredentialStateAsync(user)` | `AppleAuth.getCredentialState(userId)` | Returns `'revoked'`, `'authorized'`, `'notFound'`, `'transferred'`, or `'unknown'` instead of `AppleAuthenticationCredentialState`. |
+| `getCredentialStateAsync(user)` | `AppleAuth.getCredentialState(userId)` | Returns `'revoked'`, `'authorized'`, `'notFound'`, `'transferred'`, or `'unknown'` instead of `AppleAuthenticationCredentialState`. Android and web always return `'unknown'`. |
 | `AppleAuthenticationButton` | `AppleButton` | See the button props below. |
 | `credential.user` | `credential.user.id` | A `string \| null` instead of a `string`. |
 | `credential.fullName.givenName` | `credential.user.givenName` | |
@@ -74,9 +76,10 @@ The table maps each `expo-apple-authentication` export to its replacement.
 | `credential.realUserStatus` | `credential.realUserStatus` | `UNSUPPORTED`, `UNKNOWN`, `LIKELY_REAL` become `'unsupported'`, `'unknown'`, `'likelyReal'`. |
 | `credential.identityToken` | `credential.identityToken` | A `string` instead of `string \| null`. A missing token rejects with `ERR_MISSING_IDENTITY_TOKEN`. |
 | `credential.authorizationCode` | `credential.authorizationCode` | Still `string \| null`. |
-| `refreshAsync`, `formatFullName`, `addRevokeListener` | none | |
+| `addRevokeListener(listener)` | `AppleAuth.addRevokeListener(listener)` | Both return a subscription with `remove()`. On Android and web the listener never runs. |
+| `refreshAsync`, `formatFullName` | none | |
 | `signOutAsync` | none | `AppleAuth.signOut()` clears only the in-memory credential, so it is not a replacement. |
-| `fullName.namePrefix`, `middleName`, `nameSuffix`, `nickname` | none | Only `givenName` and `familyName` are returned. |
+| `credential.fullName.namePrefix`, `middleName`, `nameSuffix`, `nickname` | `credential.user.namePrefix`, `middleName`, `nameSuffix`, `nickname` | Filled on iOS at the first authorization. Always `null` on Android and web. |
 | `error.code === 'ERR_REQUEST_CANCELED'` | `isCancelledError(error)` | Also matches `ERR_CANCELED` and `1001`. |
 
 The button props map as follows.

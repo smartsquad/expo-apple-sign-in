@@ -8,8 +8,7 @@ import { version } from '../../package.json'
 
 const ERepoRoot = fileURLToPath(new URL('../..', import.meta.url))
 
-const ESiteOrigin =
-  process.env.DOCS_ORIGIN ?? 'https://smartsquad.github.io/expo-apple-sign-in'
+const ESiteOrigin = process.env.DOCS_ORIGIN ?? 'https://smartsquad.github.io/expo-apple-sign-in'
 const EBase = process.env.DOCS_BASE ?? (process.env.GITHUB_ACTIONS ? '/expo-apple-sign-in/' : '/')
 const ELlmsDomain = EBase === '/' ? undefined : new URL(ESiteOrigin).origin
 const ESiteTitle = 'Expo Apple Sign In'
@@ -17,7 +16,8 @@ const ESiteDescription =
   'Sign in with Apple for Expo SDK 58 on iOS, Android and web, with one API, an Apple-style button and adapters for Supabase, Clerk and Firebase.'
 const ERepo = 'https://github.com/smartsquad/expo-apple-sign-in'
 const EOgImage = `${ESiteOrigin}/og.jpg`
-const EOgImageAlt = 'Expo Apple Sign In: Sign in with Apple for Expo SDK 58 on iOS, Android and web.'
+const EOgImageAlt =
+  'Expo Apple Sign In: Sign in with Apple for Expo SDK 58 on iOS, Android and web.'
 
 function publicAsset(file: string): string {
   return `${EBase}${file.replace(/^\//, '')}`
@@ -99,9 +99,7 @@ const ESidebar = [
   },
   {
     text: 'Agents',
-    items: [
-      { text: 'Agent skill', link: '/agents/skill' },
-    ],
+    items: [{ text: 'Agent skill', link: '/agents/skill' }],
     collapsed: false,
   },
 ]
@@ -125,16 +123,38 @@ export default defineConfig({
     pageData.frontmatter.head ??= []
     pageData.frontmatter.head.push(
       ['link', { rel: 'canonical', href: url }],
-      ['meta', { property: 'og:url', content: url }],
+      ['meta', { property: 'og:url', content: url }]
     )
   },
   head: [
     ['link', { rel: 'icon', href: publicAsset('favicon.ico'), sizes: 'any' }],
-    ['link', { rel: 'icon', href: publicAsset('favicon-32x32.png'), type: 'image/png', sizes: '32x32' }],
+    [
+      'link',
+      { rel: 'icon', href: publicAsset('favicon-32x32.png'), type: 'image/png', sizes: '32x32' },
+    ],
     ['link', { rel: 'icon', href: publicAsset('favicon.svg'), type: 'image/svg+xml' }],
-    ['link', { rel: 'icon', href: publicAsset('favicon-light.svg'), type: 'image/svg+xml', media: '(prefers-color-scheme: light)' }],
-    ['link', { rel: 'icon', href: publicAsset('favicon-dark.svg'), type: 'image/svg+xml', media: '(prefers-color-scheme: dark)' }],
-    ['link', { rel: 'apple-touch-icon', href: publicAsset('apple-touch-icon.png'), sizes: '180x180' }],
+    [
+      'link',
+      {
+        rel: 'icon',
+        href: publicAsset('favicon-light.svg'),
+        type: 'image/svg+xml',
+        media: '(prefers-color-scheme: light)',
+      },
+    ],
+    [
+      'link',
+      {
+        rel: 'icon',
+        href: publicAsset('favicon-dark.svg'),
+        type: 'image/svg+xml',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+    [
+      'link',
+      { rel: 'apple-touch-icon', href: publicAsset('apple-touch-icon.png'), sizes: '180x180' },
+    ],
     ['link', { rel: 'manifest', href: publicAsset('site.webmanifest') }],
     ['meta', { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' }],
     ['meta', { name: 'theme-color', content: '#000000', media: '(prefers-color-scheme: dark)' }],
@@ -178,6 +198,9 @@ export default defineConfig({
         text: `v${version}`,
         items: [
           { text: 'Changelog', link: `${ERepo}/blob/main/CHANGELOG.md` },
+          { text: 'Contributing', link: `${ERepo}/blob/main/CONTRIBUTING.md` },
+          { text: 'Security', link: `${ERepo}/blob/main/SECURITY.md` },
+          { text: 'Support', link: `${ERepo}/blob/main/SUPPORT.md` },
           { text: 'npm', link: 'https://www.npmjs.com/package/expo-apple-sign-in' },
         ],
       },

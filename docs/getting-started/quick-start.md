@@ -92,7 +92,8 @@ A dismissed sheet or popup calls `onCancel` instead of `onError`, so cancellatio
 | `state` | `string` or `null` | The state value Apple sent back. |
 | `user.id` | `string` or `null` | Apple's stable identifier for the user, the `sub` claim of the identity token. |
 | `user.email` | `string` or `null` | The user's email, which can be a private relay address. |
-| `user.givenName`, `user.familyName` | `string` or `null` | The user's name. |
+| `user.givenName`, `user.familyName` | `string` or `null` | The user's given name and family name. |
+| `user.middleName`, `user.namePrefix`, `user.nameSuffix`, `user.nickname` | `string` or `null` | The other parts of the name. Only iOS fills them, and Android and web return `null`. |
 | `realUserStatus` | `'unknown'`, `'likelyReal'` or `'unsupported'` | Apple's estimate of whether the user is a real person. Android and web always report `'unknown'`. |
 
 Apple includes the name and email only the first time a user authorizes your app, so save them on that first sign-in. When Apple leaves out the user id or email, the library reads them from the identity token's claims.

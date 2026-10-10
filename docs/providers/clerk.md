@@ -109,7 +109,7 @@ export function AppleSignIn(): ReactElement {
 
 ## How an existing Apple user gets a session
 
-The adapter first calls `signUp.create({ strategy: 'oauth_token_apple', token, firstName, lastName })`, passing the name Apple returned on the first authorization. When the Apple ID already belongs to a Clerk user, that call succeeds but leaves the external account marked `transferable` and creates no session. The adapter then calls `signIn.create({ transfer: true })` and uses the session of that sign-in, which is the same step Clerk's `useSignInWithApple` performs. Without it, returning users would receive `createdSessionId: null`.
+The adapter first calls `signUp.create({ strategy: 'oauth_token_apple', token, firstName, lastName })`, passing the name Apple returned on the first authorization. When the Apple Account already belongs to a Clerk user, that call succeeds but leaves the external account marked `transferable` and creates no session. The adapter then calls `signIn.create({ transfer: true })` and uses the session of that sign-in, which is the same step Clerk's `useSignInWithApple` performs. Without it, returning users would receive `createdSessionId: null`.
 
 If `signUp.create` throws (for example because the instance restricts sign-ups), the adapter calls `signIn.create({ strategy: 'oauth_token_apple', token })` and returns that session. When that sign-in is itself only `transferable`, the adapter rethrows the original sign-up error so your handler sees the reason sign-up failed.
 

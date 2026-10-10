@@ -10,7 +10,7 @@ This page moves an app from `@invertase/react-native-apple-authentication` to `e
 
 The nonce does not change behavior. Invertase already hashes the nonce with SHA-256 before it reaches Apple and returns the raw value, on iOS (it hashes in `RNAppleAuthModule.m` and returns the raw nonce in the response) and on Android (`AppleAuthenticationAndroidModule.java`). `expo-apple-sign-in` does the same, so you keep passing the raw value to your provider. The web example in the Invertase README is different, because it hashes the nonce itself before calling `react-apple-signin-auth`.
 
-Check one difference before you move. `appleAuth.onCredentialRevoked` has no counterpart in `expo-apple-sign-in`, as the table below explains.
+Check two differences before you move. `AppleAuth.signIn` always starts a login, so the `IMPLICIT`, `REFRESH`, and `LOGOUT` operations have no counterpart, and the credential has no `authorizedScopes` field. The table below lists both.
 
 ## Steps
 
@@ -40,7 +40,7 @@ bun remove @invertase/react-native-apple-authentication && bunx expo install exp
 
 ### Replace the entitlement with the config plugin
 
-Delete the `com.apple.developer.applesignin` entry from `ios.entitlements` in your Expo config and add the plugin, which sets the same `Default` value.
+Delete the `com.apple.developer.applesignin` entry from `ios.entitlements` in your Expo config and add the plugin, which sets the same `Default` value. The plugin also sets `CFBundleAllowMixedLocalizations` to `true` unless your config already defines it, so the Apple sheet follows the device language.
 
 ```json [app.json]
 {
@@ -58,7 +58,7 @@ The Invertase Android example imports `react-native-get-random-values` and `uuid
 
 ### Replace the web package
 
-On web, remove `react-apple-signin-auth`. `AppleAuth.signIn()` loads Apple JS in popup mode and returns the same credential as on native. Set `clientId` and `redirectUri` through `AppleAuth.configure`, and keep `redirectUri` on the same origin as the page. See [Web](/setup/web). Delete the manual `sha256` call on the nonce, because the library hashes it.
+On web, remove `react-apple-signin-auth`. `AppleAuth.signIn()` loads Apple JS in popup mode and returns the same credential as on native. Set `clientId` and `redirectUri` through `AppleAuth.configure`, and keep `redirectUri` on the same origin as the page. See [Web](/setup/web). Delete the manual `sha256` call on the nonce, because the library hashes it. Call `AppleAuth.signIn()` from a click or press handler, because browsers block a popup that no user gesture opened.
 
 ### Rename the calls
 
@@ -79,6 +79,7 @@ The table maps each Invertase export to its replacement.
 | `appleAuthAndroid.signIn()` | `AppleAuth.signIn()` | |
 | `response.user` (iOS, a string) | `credential.user.id` | A `string \| null`. |
 | `response.fullName.givenName`, `familyName` | `credential.user.givenName`, `credential.user.familyName` | |
+| `response.fullName.namePrefix`, `middleName`, `nameSuffix`, `nickname` (iOS) | `credential.user.namePrefix`, `middleName`, `nameSuffix`, `nickname` | Filled on iOS at the first authorization. Always `null` on Android and web. |
 | `response.user.name.firstName`, `lastName` (Android) | `credential.user.givenName`, `credential.user.familyName` | |
 | `response.email`, `response.user.email` (Android) | `credential.user.email` | |
 | `response.identityToken`, `response.id_token` (Android) | `credential.identityToken` | A `string` that is never null. A missing token rejects with `ERR_MISSING_IDENTITY_TOKEN`. |
@@ -86,8 +87,8 @@ The table maps each Invertase export to its replacement.
 | `response.nonce` | `credential.nonce` | Raw value. |
 | `response.realUserStatus` | `credential.realUserStatus` | `UNSUPPORTED`, `UNKNOWN`, `LIKELY_REAL` become `'unsupported'`, `'unknown'`, `'likelyReal'`. |
 | `response.authorizedScopes` | none | |
-| `appleAuth.getCredentialStateForUser(user)` | `AppleAuth.getCredentialState(userId)` | Returns `'revoked'`, `'authorized'`, `'notFound'`, `'transferred'`, or `'unknown'` instead of `appleAuth.State`. |
-| `appleAuth.onCredentialRevoked(listener)` | none | No event replaces it. Call `AppleAuth.getCredentialState` when you need to confirm the state, which is what Invertase's own documentation asks you to do on the event. |
+| `appleAuth.getCredentialStateForUser(user)` | `AppleAuth.getCredentialState(userId)` | Returns `'revoked'`, `'authorized'`, `'notFound'`, `'transferred'`, or `'unknown'` instead of `appleAuth.State`. Invertase throws on Android, while `AppleAuth.getCredentialState` returns `'unknown'` on Android and web. |
+| `appleAuth.onCredentialRevoked(listener)` | `AppleAuth.addRevokeListener(listener)` | Invertase returns an unsubscribe function. `addRevokeListener` returns a subscription, so call `subscription.remove()` instead. On Android and web the listener never runs. |
 | `appleAuth.Error.CANCELED`, `appleAuthAndroid.Error.SIGNIN_CANCELLED` | `isCancelledError(error)` | `isCancelledError` also matches `1001`, the value of `appleAuth.Error.CANCELED`. |
 | `appleAuth.Operation.LOGOUT` | `AppleAuth.signOut()` | Not equivalent. `signOut` clears only the in-memory credential. Invertase's README says its own `LOGOUT` operation does not work as expected and recommends clearing your stored user data. |
 
@@ -102,7 +103,7 @@ The button props map as follows.
 | `buttonText` (Android only) | `label` |
 | `textStyle` (Android only) | `textStyle` |
 | `leftView` (Android only) | `children`, which replaces the whole button content |
-| `testID` | none |
+| `testID` | `testID`, passed to the underlying `Pressable` |
 | `onPress` | `onPress`, or leave it out and use `onSuccess`, `onError`, and `onCancel` |
 
 The default `buttonStyle` differs. Invertase defaults to white and `AppleButton` defaults to black, so set `buttonStyle="white"` if you rely on the old default. The Invertase README also requires an explicit width and height in `style`, while `AppleButton` has defaults for both.

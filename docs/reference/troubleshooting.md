@@ -22,7 +22,7 @@ Web in a browser does not need a native module.
 
 Symptom: Sign in fails on iOS after you added the plugin, or the Sign in with Apple capability is absent from the generated Xcode project.
 
-Cause: The config plugin sets `ios.usesAppleSignIn` and the entitlement `com.apple.developer.applesignin` with the value `Default`. A native project generated earlier does not contain them.
+Cause: The config plugin writes the entitlement `com.apple.developer.applesignin` with the value `Default`. A native project generated before you added the plugin does not contain it.
 
 Fix: Regenerate the native projects so that the plugin runs again, then rebuild.
 
@@ -32,6 +32,18 @@ npx expo run:ios
 ```
 
 Also enable the capability on the App ID, as described in [Apple Developer](/setup/apple-developer).
+
+### Prebuild warns about expo-apple-authentication
+
+Symptom: `npx expo prebuild` prints this warning:
+
+```text
+» ios: ios.usesAppleSignIn: Install expo-apple-authentication to enable this feature https://docs.expo.dev/versions/latest/sdk/apple-authentication/#eas-build
+```
+
+Cause: The Expo config sets `ios.usesAppleSignIn`. `@expo/prebuild-config` reads that key only in the fallback plugin it registers for `expo-apple-authentication`. When that package is not installed, the fallback prints this warning and changes nothing else. `expo-apple-sign-in` does not read the key, and its own config plugin writes the entitlement.
+
+Fix: Delete `ios.usesAppleSignIn` from `app.json` or `app.config.ts`, keep `"expo-apple-sign-in"` in `plugins`, and run prebuild again.
 
 ### ERR_NOT_CONFIGURED on Android or web
 
@@ -48,13 +60,13 @@ AppleAuth.configure({
 })
 ```
 
-`clientId` is the Services ID. `redirectUri` is an HTTPS URL registered for it. Check `AppleAuth.isConfigured()` to see whether both are set. See [Android](/setup/android) and [Web](/setup/web).
+`clientId` is the Services ID. `redirectUri` is an HTTPS URL registered for it. On Android and web, `AppleAuth.isConfigured()` returns `true` once both are set. On iOS it always returns `true`. See [Android](/setup/android) and [Web](/setup/web).
 
 ### Apple shows invalid_client or a redirect mismatch
 
 Symptom: The Apple page in the Android WebView or the web popup reports `invalid_client`, or an error about the redirect URL, instead of the sign-in form.
 
-Cause: On Android the library sends `clientId` as `client_id` and `redirectUri` as `redirect_uri` to `https://appleid.apple.com/auth/authorize`, unchanged. Apple compares them with the Services ID and the Return URLs registered in the Developer portal. A `clientId` that is not a registered Services ID, or a `redirectUri` that is not registered as a Return URL on that Services ID, fails this comparison.
+Cause: On Android the library sends `clientId` as `client_id` and `redirectUri` as `redirect_uri` to `https://appleid.apple.com/auth/authorize`, unchanged. Apple compares them with the Services ID and the Return URLs registered in the Developer portal. On web the library passes `redirectUri` to Apple JS, or the current page URL without its hash when `redirectUri` has the same origin and path as the page. A `clientId` that is not a registered Services ID, or a redirect URL that is not registered as a Return URL on that Services ID, fails this comparison.
 
 Fix: Open the Services ID in the Apple Developer portal, open its Sign in with Apple configuration, and register the exact domain and Return URL that you pass as `redirectUri`. The values must match character by character, including the scheme and the path. Then compare the `clientId` in your code with the Services ID. See [Apple Developer](/setup/apple-developer).
 
@@ -62,7 +74,7 @@ Fix: Open the Services ID in the Apple Developer portal, open its Sign in with A
 
 Symptom: On web, sign-in fails before Apple opens with `ERR_NOT_CONFIGURED` and a message that the web `redirectUri` origin must match the page, or the popup lands on a different host than your app.
 
-Cause: In popup mode, Apple posts the result to `redirectUri`, and that page must hand the result back to the page that opened the popup. The library checks that the origin of `redirectUri` equals the origin of the current page. An address on the main site, such as `example.com`, does not match an app served from a subdomain, such as `web.example.com`.
+Cause: In popup mode, Apple posts the result to the redirect URL, and that page must hand the result back to the page that opened the popup. The library checks that the origin of `redirectUri` equals the origin of the current page. An address on the main site, such as `example.com`, does not match an app served from a subdomain, such as `web.example.com`.
 
 Fix:
 
@@ -85,9 +97,9 @@ AppleAuth.configure({
 
 ### Name or email is null after the first sign-in
 
-Cause: Apple sends the name and the email only the first time a person authorizes your app. Later sign-ins return `null` for `givenName` and `familyName`. The name is never inside the identity token. The library fills `user.id` and `user.email` from the token when it can, so the email usually remains.
+Cause: Apple sends the name and the email only the first time a person authorizes your app. Later sign-ins return `null` for every name field: `givenName`, `familyName`, `middleName`, `namePrefix`, `nameSuffix`, and `nickname`. The name is never inside the identity token. The library fills `user.id` and `user.email` from the token when it can, so the email usually remains.
 
-Fix: Store the name in the first response, as shown in [Usage](/guides/usage#what-the-credential-contains). To test the first-time flow again, open Settings on the device, then Apple ID, then Sign in with Apple, choose your app, and stop using Apple ID with it. The next sign-in counts as a first authorization.
+Fix: Store the name in the first response, as shown in [Usage](/guides/usage#what-the-credential-contains). To test the first-time flow again, open Settings on the device, tap your name, tap Sign in with Apple, select your app, then tap Delete. On Android or web, open account.apple.com, select Sign-In & Security, then Sign in with Apple, and remove the app there. The next sign-in counts as a first authorization.
 
 ### Supabase rejects the nonce
 
@@ -122,12 +134,28 @@ export async function signInToSupabase(): Promise<void> {
 
 Symptom: The Apple sheet fails to complete on the iOS Simulator, usually as `ERR_REQUEST_FAILED`.
 
-Cause: The system can report `failed`, `notHandled`, or `notInteractive` for a sign-in that cannot proceed, and the library maps all three to `ERR_REQUEST_FAILED`. A simulator without an Apple ID signed in cannot complete the flow.
+Cause: The system can report `failed`, `notHandled`, or `notInteractive` for a sign-in that cannot proceed, and the library maps all three to `ERR_REQUEST_FAILED`. A simulator without an Apple Account signed in cannot complete the flow.
 
-Fix: Sign in to an Apple ID in the Settings app of the simulator, or test on a physical device.
+Fix: Sign in with an Apple Account in the Settings app of the simulator, or test on a physical device.
+
+### A second sign-in rejects with ERR_REQUEST_FAILED
+
+Symptom: On iOS or Android, `AppleAuth.signIn()` rejects with `ERR_REQUEST_FAILED` and a message that contains `A Sign in with Apple request is already in progress`.
+
+Cause: The native module runs one sign-in at a time. A call made while the Apple sheet or the Android sign-in screen is still open rejects at once, and the first request continues.
+
+Fix: Start a new sign-in only after the previous one settles. `AppleButton` ignores presses while its own sign-in runs, but it does not track a custom `onPress` handler, so set `disabled` while your handler runs. With `useAppleAuth`, disable your control while `isLoading` is `true`.
 
 ### ERR_NOT_AVAILABLE on web
 
 Cause: The page has no browser document, or the Apple JS SDK did not load or did not initialize. A content blocker or a Content Security Policy that blocks `appleid.apple.com` prevents the script from loading.
 
-Fix: Allow scripts from `appleid.apple.com` and check the network tab for the SDK request.
+Fix: Allow scripts from `appleid.apple.com` and check the network tab for the SDK request. After a failed load the library removes the script tag, so the next call to `AppleAuth.signIn()` requests Apple JS again.
+
+### The browser blocks the Apple popup
+
+Symptom: On web, `AppleAuth.signIn()` rejects with `ERR_REQUEST_FAILED` and the message `The browser blocked the Apple sign-in popup. Call signIn from a click handler.`
+
+Cause: Browsers open a popup only in response to a user gesture such as a click. When `signIn` runs from an effect or a timer, the browser blocks the window and Apple JS rejects with `popup_blocked_by_browser`.
+
+Fix: Call `AppleAuth.signIn()`, or the `signIn` function from `useAppleAuth`, inside the press or click handler. Without an `onPress` prop, `AppleButton` calls `AppleAuth.signIn()` from its own press handler.
