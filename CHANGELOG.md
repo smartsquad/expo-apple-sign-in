@@ -19,6 +19,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - On web, a closed popup maps to `ERR_REQUEST_CANCELED`, a blocked popup to `ERR_REQUEST_FAILED`, and other Apple JS errors keep their code in the message and the original object as `cause`. A failed script load no longer blocks later attempts.
 - `useAppleAuth` tracks `scopes` by value, keeps `isConfigured` current across `AppleAuth.configure` calls, passes options to `signIn`, and clears the credential when Apple revokes it.
 - The example app shows a message when Apple revokes the credential and carries test ids.
+- iOS maps every `ASAuthorizationError` code the installed SDK defines, including `matchedExcludedCredential`, the credential import and export codes, `preferSignInWithApple`, and `deviceNotConfiguredForPasskeyCreation`, and keeps `ERR_REQUEST_UNKNOWN` for codes added by future SDKs.
 
 ## [1.0.2] - 2026-10-10
 
