@@ -16,8 +16,14 @@ export type TSupabaseAuthLike = {
   }
 }
 
+/** Alias of {@link TSupabaseAuthLike}. */
 export type SupabaseAuthLike = TSupabaseAuthLike
 
+/**
+ * Signs in with Apple, then calls `client.auth.signInWithIdToken({ provider: 'apple', token,
+ * nonce })` with the identity token and the raw nonce. Returns the Apple credential and Supabase's
+ * response as `data`. Throws `ERR_MISSING_IDENTITY_TOKEN` when there is no identity token.
+ */
 export async function signInWithSupabase(
   client: TSupabaseAuthLike,
   options?: TAppleSignInOptions

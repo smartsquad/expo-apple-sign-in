@@ -9,6 +9,10 @@ interface IAppleLogoProps {
   style?: StyleProp<ImageStyle>
 }
 
+/**
+ * Apple mark drawn in `color`: an inline SVG on web and a tinted PNG on iOS and Android. `size`
+ * defaults to 18.
+ */
 export function AppleLogo({ color, size = 18, style }: IAppleLogoProps): ReactElement {
   if (Platform.OS === 'web') {
     return createElement(
