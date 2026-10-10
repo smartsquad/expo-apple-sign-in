@@ -8,6 +8,7 @@ type TExpoModulesGlobal = {
   }
 }
 
+/** Returns the `ExpoAppleSignIn` native module, or null when the binary lacks it, as on web. */
 export function getNativeAppleModule(): TExpoAppleSignInNativeModule | null {
   const fromExpo = (globalThis as TExpoModulesGlobal).expo?.modules?.ExpoAppleSignIn
   if (fromExpo) {

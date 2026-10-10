@@ -15,7 +15,7 @@ describe('sha256Hex', () => {
   })
 
   it('matches Node crypto for a longer Unicode string', () => {
-    const input = 'Sign in with Apple — Massimo 🍎'
+    const input = 'Sign in with Apple € Massimo 🍎'
     expect(sha256Hex(input)).toBe(createHash('sha256').update(input, 'utf8').digest('hex'))
   })
 })
@@ -48,7 +48,11 @@ describe('generateNonce without crypto.getRandomValues', () => {
   beforeEach(() => {
     cryptoDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'crypto')
     expoDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'expo')
-    Object.defineProperty(globalThis, 'crypto', { value: undefined, configurable: true, writable: true })
+    Object.defineProperty(globalThis, 'crypto', {
+      value: undefined,
+      configurable: true,
+      writable: true,
+    })
   })
 
   afterEach(() => {
@@ -66,7 +70,11 @@ describe('generateNonce without crypto.getRandomValues', () => {
   })
 
   function installUuid(uuidv4: () => string): void {
-    Object.defineProperty(globalThis, 'expo', { value: { uuidv4 }, configurable: true, writable: true })
+    Object.defineProperty(globalThis, 'expo', {
+      value: { uuidv4 },
+      configurable: true,
+      writable: true,
+    })
   }
 
   it('builds bytes from consecutive uuidv4 calls', () => {

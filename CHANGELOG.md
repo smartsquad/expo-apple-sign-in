@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `AppleAuth.addRevokeListener` subscribes to Apple's credential revoked notification on iOS and returns a no-op subscription elsewhere.
+- `credential.user` carries `middleName`, `namePrefix`, `nameSuffix`, and `nickname`, filled on iOS.
+- `TUseAppleAuthResult` names the object returned by `useAppleAuth`.
+
+### Changed
+
+- `AppleAuth.getCredentialState` returns `unknown` on Android and web instead of guessing from the in-memory credential.
+- `AppleAuth.isAvailable` returns `true` on iOS, where the podspec already requires iOS 16.4.
+- A second `signIn` call while one is pending fails with `ERR_REQUEST_FAILED` on iOS and Android.
+
 ## [1.0.2] - 2026-10-10
 
 ### Changed

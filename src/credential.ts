@@ -11,6 +11,7 @@ function asString(value: string | null | undefined): string | null {
     return null
   }
   const trimmed = value.trim()
+
   return trimmed.length > 0 ? trimmed : null
 }
 
@@ -27,6 +28,11 @@ function realUserStatus(value: string | null | undefined): TAppleRealUserStatus 
   }
 }
 
+/**
+ * Normalizes a native or web sign-in result into a {@link TAppleCredential}. Missing or blank
+ * strings become null, and `rawNonce` is returned as `nonce`. Throws `ERR_MISSING_IDENTITY_TOKEN`
+ * when the result has no identity token.
+ */
 export function toAppleCredential(result: TNativeSignInResult, rawNonce: string): TAppleCredential {
   const identityToken = asString(result.identityToken)
   if (!identityToken) {
@@ -41,6 +47,10 @@ export function toAppleCredential(result: TNativeSignInResult, rawNonce: string)
     email: asString(result.email),
     givenName: asString(result.givenName),
     familyName: asString(result.familyName),
+    middleName: asString(result.middleName),
+    namePrefix: asString(result.namePrefix),
+    nameSuffix: asString(result.nameSuffix),
+    nickname: asString(result.nickname),
   }
 
   return {
@@ -53,6 +63,7 @@ export function toAppleCredential(result: TNativeSignInResult, rawNonce: string)
   }
 }
 
+/** Decodes a JWT payload without verifying the signature. Returns null for a malformed token. */
 export function decodeJwtPayload(token: string): Record<string, unknown> | null {
   const parts = token.split('.')
   if (parts.length < 2) {
@@ -83,6 +94,10 @@ function decodeBase64(value: string): string {
   throw new Error('No base64 decoder available')
 }
 
+/**
+ * Fills a missing `user.id` from the identity token's `sub` claim and a missing `user.email` from
+ * its `email` claim. Every other user field is kept as is.
+ */
 export function enrichUserFromToken(credential: TAppleCredential): TAppleCredential {
   if (credential.user.email && credential.user.id) {
     return credential
@@ -94,10 +109,9 @@ export function enrichUserFromToken(credential: TAppleCredential): TAppleCredent
   return {
     ...credential,
     user: {
+      ...credential.user,
       id: credential.user.id ?? (typeof payload.sub === 'string' ? payload.sub : null),
       email: credential.user.email ?? (typeof payload.email === 'string' ? payload.email : null),
-      givenName: credential.user.givenName,
-      familyName: credential.user.familyName,
     },
   }
 }

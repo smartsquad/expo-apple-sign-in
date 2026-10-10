@@ -14,6 +14,7 @@ import type {
   TAppleAuthResponse,
   TAppleCredential,
   TAppleCredentialState,
+  TAppleEventSubscription,
   TAppleScope,
   TAppleSignInOptions,
 } from './types'
@@ -23,6 +24,7 @@ import { isWebAppleAvailable, webSignIn } from './web/appleJs'
 
 let config: TAppleAuthConfig = {}
 let lastCredential: TAppleCredential | null = null
+const configListeners = new Set<() => void>()
 
 const EDefaultScopes: TAppleScope[] = ['name', 'email']
 
@@ -69,22 +71,45 @@ async function performNativeSignIn(params: {
   })
 }
 
+/** Subscribes to `AppleAuth.configure` calls. Used by `useAppleAuth`; not part of the public API. */
+export function subscribeToConfig(listener: () => void): () => void {
+  configListeners.add(listener)
+
+  return () => {
+    configListeners.delete(listener)
+  }
+}
+
 // MARK: - Public API
 
+/**
+ * Sign in with Apple on iOS, Android, and web through one API. iOS uses
+ * `AuthenticationServices`, Android opens Apple's web flow in a WebView, and web
+ * loads Apple's JS SDK. Every platform returns the same credential shape. The
+ * library SHA-256-hashes the nonce it sends to Apple and returns the raw nonce
+ * on the credential, so callers must not hash it again.
+ */
 export const AppleAuth = {
   /**
    * Call once at app start. iOS works without this. Android and web need a
    * Services ID and an HTTPS redirect URI from the Apple Developer portal.
    */
   configure(next: TAppleAuthConfig): void {
-    const defined = Object.fromEntries(Object.entries(next).filter(([, value]) => value !== undefined)) as TAppleAuthConfig
+    const defined = Object.fromEntries(
+      Object.entries(next).filter(([, value]) => value !== undefined)
+    ) as TAppleAuthConfig
     config = { ...config, ...defined }
+    for (const listener of configListeners) {
+      listener()
+    }
   },
 
+  /** Returns a copy of the current configuration. */
   getConfig(): TAppleAuthConfig {
     return { ...config }
   },
 
+  /** Always true on iOS. On Android and web, true once `clientId` and `redirectUri` are set. */
   isConfigured(): boolean {
     if (Platform.OS === 'ios') {
       return true
@@ -93,6 +118,10 @@ export const AppleAuth = {
     return Boolean(config.clientId && config.redirectUri)
   },
 
+  /**
+   * Resolves whether Sign in with Apple can start. Web needs a browser document. iOS and Android
+   * ask the native module and resolve false when it is missing or throws.
+   */
   async isAvailable(): Promise<boolean> {
     if (Platform.OS === 'web') {
       return isWebAppleAvailable()
@@ -114,6 +143,7 @@ export const AppleAuth = {
    *
    * Rejects with {@link AppleAuthError} whose `code` is `ERR_REQUEST_CANCELED`
    * when the user dismisses the sheet. The same code Clerk already handles.
+   * {@link AppleAuth.request} returns a response object instead of throwing.
    */
   async signIn(options: TAppleSignInOptions = {}): Promise<TAppleCredential> {
     const response = await this.request(options)
@@ -128,8 +158,8 @@ export const AppleAuth = {
   },
 
   /**
-   * Same flow as {@link signIn}, but never throws for cancel / failure.
-   * Mirrors the nitro-google-sign-in response helpers.
+   * Same flow as {@link AppleAuth.signIn}, but resolves with a `success`, `cancelled`, or `error`
+   * response instead of throwing. Mirrors the nitro-google-sign-in response helpers.
    */
   async request(options: TAppleSignInOptions = {}): Promise<TAppleAuthResponse> {
     try {
@@ -179,13 +209,18 @@ export const AppleAuth = {
     }
   },
 
+  /** Returns the credential from the last successful sign-in, kept in memory only, or null. */
   getCurrentCredential(): TAppleCredential | null {
     return lastCredential
   },
 
+  /**
+   * Resolves Apple's credential state for `userId` through the iOS native module. Android and web
+   * always resolve `'unknown'`, as does iOS when the native module is missing.
+   */
   async getCredentialState(userId: string): Promise<TAppleCredentialState> {
     if (Platform.OS !== 'ios') {
-      return lastCredential?.user.id === userId ? 'authorized' : 'unknown'
+      return 'unknown'
     }
     const native = getNativeAppleModule()
     if (!native) {
@@ -211,7 +246,20 @@ export const AppleAuth = {
   },
 
   /**
-   * Clears the in-memory credential. Apple has no real sign-out on iOS.
+   * Subscribes to Apple's credential revoked notification. iOS only; Android and web return a
+   * subscription whose `remove` does nothing. Call `remove()` on unmount.
+   */
+  addRevokeListener(listener: () => void): TAppleEventSubscription {
+    const native = getNativeAppleModule()
+    if (native && typeof native.addListener === 'function') {
+      return native.addListener('credentialRevoked', listener)
+    }
+
+    return { remove() {} }
+  },
+
+  /**
+   * Only clears the in-memory credential, because Apple has no client-side sign-out.
    * Delete your own session (Supabase / Clerk / Firebase) as well.
    */
   async signOut(): Promise<void> {

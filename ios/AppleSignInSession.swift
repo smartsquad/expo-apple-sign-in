@@ -2,6 +2,10 @@ import AuthenticationServices
 import ExpoModulesCore
 import UIKit
 
+/// Runs one Sign in with Apple request at a time and resolves it with the credential or a typed exception.
+///
+/// A second `signIn` call while a request is pending throws `RequestInProgressException`, which surfaces in JavaScript as `ERR_REQUEST_FAILED`.
+/// Failures from the system map through `exceptionForAuthorizationError`.
 final class AppleSignInSession: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
   static let shared = AppleSignInSession()
 
@@ -12,7 +16,7 @@ final class AppleSignInSession: NSObject, ASAuthorizationControllerDelegate, ASA
   func signIn(options: SignInOptions) async throws -> AppleCredentialRecord {
     try await withCheckedThrowingContinuation { continuation in
       if self.continuation != nil {
-        continuation.resume(throwing: RequestFailedException())
+        continuation.resume(throwing: RequestInProgressException())
         return
       }
       self.continuation = continuation
@@ -53,6 +57,10 @@ final class AppleSignInSession: NSObject, ASAuthorizationControllerDelegate, ASA
     record.email = credential.email
     record.givenName = credential.fullName?.givenName
     record.familyName = credential.fullName?.familyName
+    record.middleName = credential.fullName?.middleName
+    record.namePrefix = credential.fullName?.namePrefix
+    record.nameSuffix = credential.fullName?.nameSuffix
+    record.nickname = credential.fullName?.nickname
     record.state = credential.state
     record.realUserStatus = realUserStatus(credential.realUserStatus)
     finish(value: record)
