@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type PressableProps,
   type StyleProp,
   type TextStyle,
   type ViewStyle,
@@ -16,21 +17,39 @@ import { AppleLogo } from './AppleLogo'
 import { isCancelledError, normalizeAppleError, type AppleAuthError } from './errors'
 import type { TAppleButtonStyle, TAppleButtonType, TAppleCredential } from './types'
 
-export interface IAppleButtonProps {
+/**
+ * Props for {@link AppleButton}. Other `Pressable` props, such as `testID`, pass through to the
+ * underlying `Pressable`. `accessibilityLabel` defaults to the visible label.
+ */
+export interface IAppleButtonProps extends Omit<
+  PressableProps,
+  'onPress' | 'style' | 'disabled' | 'children'
+> {
   /** Custom press handler. When set, the button does not call `AppleAuth.signIn()`. */
   onPress?: () => void
+  /** Called with the credential after a successful sign-in. */
   onSuccess?: (credential: TAppleCredential) => void
+  /** Called with the normalized error when sign-in fails. Not called on cancel. */
   onError?: (error: AppleAuthError) => void
+  /** Called when the user cancels sign-in. */
   onCancel?: () => void
+  /** Button colors. Default: `'black'`. */
   buttonStyle?: TAppleButtonStyle
+  /** Selects the HIG label. Default: `'signIn'`. */
   buttonType?: TAppleButtonType
   /** Overrides the HIG label derived from `buttonType`. */
   label?: string
+  /** Default: `8`. */
   cornerRadius?: number
+  /** Default: {@link APPLE_BUTTON_HEIGHT}. */
   height?: number
+  /** Default: `'100%'`. */
   width?: number | `${number}%`
+  /** Disables and dims the button. Default: `false`. */
   disabled?: boolean
+  /** Applied after the built-in button styles. */
   style?: StyleProp<ViewStyle>
+  /** Applied after the built-in label styles. */
   textStyle?: StyleProp<TextStyle>
   /**
    * Fully custom content. The official mark + label are skipped.
@@ -39,6 +58,7 @@ export interface IAppleButtonProps {
   children?: ReactNode
 }
 
+/** Alias of {@link IAppleButtonProps}. */
 export type AppleButtonProps = IAppleButtonProps
 
 const ELabels: Record<TAppleButtonType, string> = {
@@ -47,8 +67,14 @@ const ELabels: Record<TAppleButtonType, string> = {
   signUp: 'Sign up with Apple',
 }
 
+/** Default {@link AppleButton} height. */
 export const APPLE_BUTTON_HEIGHT = 48
 
+/**
+ * Sign in with Apple button with the HIG labels and colors on iOS, Android, and web. Pressing it
+ * runs `AppleAuth.signIn()`, shows a spinner while it runs, and reports the outcome through
+ * `onSuccess`, `onCancel`, or `onError`. Passing `onPress` replaces the built-in sign-in.
+ */
 export function AppleButton({
   onPress,
   onSuccess,
@@ -64,6 +90,9 @@ export function AppleButton({
   style,
   textStyle,
   children,
+  accessibilityLabel,
+  accessibilityHint,
+  ...rest
 }: IAppleButtonProps) {
   const [busy, setBusy] = useState(false)
   const palette = useMemo(() => paletteFor(buttonStyle), [buttonStyle])
@@ -95,8 +124,11 @@ export function AppleButton({
 
   return (
     <Pressable
+      {...rest}
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: disabled || busy, busy }}
       disabled={disabled || busy}
       onPress={handlePress}
       style={({ pressed }) => [
