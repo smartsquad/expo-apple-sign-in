@@ -1,0 +1,47 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Install example
+        run: npm ci --prefix example
+      - name: Build
+        run: npm run build
+      - name: Install browser
+        run: npx @e2e-dev/web install chromium --with-deps
+      - name: End-to-end tests
+        run: npm run test:e2e
+        env:
+          CI: 1
+      - name: Upload e2e output
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-output
+          path: .e2e/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7

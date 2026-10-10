@@ -35,4 +35,5 @@ npm run build
 npm run docs:dev
 npm run docs:build
 cd example && npm install && npm run web
+npm run test:e2e
 ```
