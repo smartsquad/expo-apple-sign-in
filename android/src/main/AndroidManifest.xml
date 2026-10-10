@@ -2,7 +2,9 @@
   <application>
     <activity
       android:name=".AppleSignInActivity"
+      android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|uiMode"
       android:exported="false"
-      android:theme="@style/Theme.ExpoAppleSignIn" />
+      android:theme="@style/Theme.ExpoAppleSignIn"
+      android:windowSoftInputMode="adjustResize" />
   </application>
 </manifest>

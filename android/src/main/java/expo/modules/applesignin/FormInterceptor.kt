@@ -1,19 +1,42 @@
 package expo.modules.applesignin
 
 import android.webkit.JavascriptInterface
+import org.json.JSONException
 import org.json.JSONObject
 
+/**
+ * JavaScript bridge registered on the WebView as [NAME]. It receives the form fields Apple posts to the
+ * redirect URI and reports an [AppleCredentialRecord] through [callback].
+ *
+ * Reports `ERR_INVALID_RESPONSE` when the payload is unreadable or its OAuth state differs from
+ * [expectedState], and `ERR_REQUEST_CANCELED` when the fields carry no credential.
+ */
 internal class FormInterceptor(
   private val expectedState: String,
   private val callback: (Result<AppleCredentialRecord>) -> Unit,
 ) {
+  /**
+   * Converts [formData], a JSON object of form field names and values built by [JS_TO_INJECT], into a
+   * credential. The WebView calls this on a background thread, and the callback runs exactly once.
+   *
+   * Produces `ERR_INVALID_RESPONSE` for an unreadable payload or a state mismatch, and
+   * `ERR_REQUEST_CANCELED` when `state` is missing or none of `id_token`, `code`, and `user` is present.
+   */
   @JavascriptInterface
   fun processFormData(formData: String) {
-    val values = formData.split(FORM_DATA_SEPARATOR)
-    val token = valueOf(values, "id_token")
-    val code = valueOf(values, "code")
-    val state = valueOf(values, "state")
-    val userRaw = valueOf(values, "user")
+    val json = try {
+      JSONObject(formData)
+    } catch (_: JSONException) {
+      callback(
+        Result.failure(AppleAuthNativeError("ERR_INVALID_RESPONSE", "Apple returned an unreadable form response."))
+      )
+      return
+    }
+
+    val token = stringOrNull(json, "id_token")
+    val code = stringOrNull(json, "code")
+    val state = stringOrNull(json, "state")
+    val userRaw = stringOrNull(json, "user")
 
     if (state != null && (token != null || code != null || userRaw != null)) {
       if (state != expectedState) {
@@ -64,28 +87,28 @@ internal class FormInterceptor(
     }
   }
 
-  private fun valueOf(values: List<String>, key: String): String? {
-    val prefix = "$key$KEY_VALUE_SEPARATOR"
-    return values.firstOrNull { it.startsWith(prefix) }?.substringAfter(KEY_VALUE_SEPARATOR)?.ifBlank { null }
+  private fun stringOrNull(json: JSONObject, key: String): String? {
+    return if (json.has(key)) json.getString(key).ifBlank { null } else null
   }
 
   companion object {
     const val NAME = "FormInterceptorInterface"
-    private const val FORM_DATA_SEPARATOR = "|"
-    private const val KEY_VALUE_SEPARATOR = "="
 
+    /** Script that collects every named form element on the page into one object and passes it as JSON to [NAME]. */
     val JS_TO_INJECT =
       """
-      function parseForm(form){
-        var values = '';
-        for (var i = 0; i < form.elements.length; i++) {
-          values += form.elements[i].name + '$KEY_VALUE_SEPARATOR' + form.elements[i].value + '$FORM_DATA_SEPARATOR';
+      (function () {
+        var data = {};
+        for (var i = 0; i < document.forms.length; i++) {
+          var elements = document.forms[i].elements;
+          for (var j = 0; j < elements.length; j++) {
+            if (elements[j].name) {
+              data[elements[j].name] = elements[j].value;
+            }
+          }
         }
-        $NAME.processFormData(values);
-      }
-      for (var i = 0; i < document.forms.length; i++) {
-        parseForm(document.forms[i]);
-      }
+        window.$NAME.processFormData(JSON.stringify(data));
+      })();
       """.trimIndent()
   }
 }

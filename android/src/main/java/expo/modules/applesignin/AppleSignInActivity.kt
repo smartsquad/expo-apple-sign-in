@@ -14,17 +14,28 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
+/**
+ * Full-screen activity that loads the Apple authorize page in a WebView, intercepts the `form_post`
+ * redirect, and reports the outcome to [AppleSignInCoordinator].
+ *
+ * Fails with `ERR_NOT_CONFIGURED` when the Services ID or redirect URI extra is missing, and passes on
+ * the `ERR_INVALID_RESPONSE` and `ERR_REQUEST_CANCELED` results of [FormInterceptor]. Cancels with
+ * `ERR_REQUEST_CANCELED` when the user taps the close button, presses back, or the activity is destroyed
+ * before a result arrives.
+ */
 class AppleSignInActivity : AppCompatActivity() {
   private val mainHandler = Handler(Looper.getMainLooper())
   private var finished = false
-  private lateinit var redirectUri: String
+  private lateinit var redirectUri: Uri
   private lateinit var expectedState: String
+  private lateinit var webView: WebView
 
   @SuppressLint("SetJavaScriptEnabled")
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +52,7 @@ class AppleSignInActivity : AppCompatActivity() {
       return
     }
 
-    redirectUri = redirect
+    redirectUri = Uri.parse(redirect)
     expectedState = state
 
     val authorize = Uri.parse("https://appleid.apple.com/auth/authorize").buildUpon().apply {
@@ -56,7 +67,7 @@ class AppleSignInActivity : AppCompatActivity() {
       }
     }.build()
 
-    val webView = WebView(this).apply {
+    webView = WebView(this).apply {
       settings.javaScriptEnabled = true
       settings.javaScriptCanOpenWindowsAutomatically = true
       settings.domStorageEnabled = true
@@ -74,7 +85,7 @@ class AppleSignInActivity : AppCompatActivity() {
     webView.addJavascriptInterface(interceptor, FormInterceptor.NAME)
     webView.webViewClient = object : WebViewClient() {
       override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-        if (request?.method == "POST" && request.url.toString().contains(redirectUri)) {
+        if (request?.method == "POST" && isRedirect(request.url)) {
           mainHandler.post {
             view?.stopLoading()
             view?.evaluateJavascript(FormInterceptor.JS_TO_INJECT, null)
@@ -118,10 +129,27 @@ class AppleSignInActivity : AppCompatActivity() {
 
     setContentView(root)
     ViewCompat.requestApplyInsets(root)
+
+    onBackPressedDispatcher.addCallback(
+      this,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          finishCanceled()
+        }
+      }
+    )
   }
 
-  override fun onBackPressed() {
-    finishCanceled()
+  override fun onDestroy() {
+    if (!finished) {
+      finished = true
+      AppleSignInCoordinator.cancel()
+    }
+    if (::webView.isInitialized) {
+      (webView.parent as? ViewGroup)?.removeView(webView)
+      webView.destroy()
+    }
+    super.onDestroy()
   }
 
   private fun finishWithSuccess(record: AppleCredentialRecord) {
@@ -143,6 +171,17 @@ class AppleSignInActivity : AppCompatActivity() {
     finished = true
     AppleSignInCoordinator.cancel()
     finish()
+  }
+
+  /**
+   * True when [url] has the configured redirect's scheme, host, port, and path.
+   * Trailing slashes, the query, and the fragment are ignored.
+   */
+  private fun isRedirect(url: Uri): Boolean {
+    return url.scheme == redirectUri.scheme &&
+      url.host == redirectUri.host &&
+      url.port == redirectUri.port &&
+      (url.path?.trimEnd('/') ?: "") == (redirectUri.path?.trimEnd('/') ?: "")
   }
 
   private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
