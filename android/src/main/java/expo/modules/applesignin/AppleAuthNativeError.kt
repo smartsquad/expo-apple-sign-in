@@ -1,7 +1,10 @@
 package expo.modules.applesignin
 
+import io.github.expo.modules.v2.JavaScriptThrowable
+
 /**
- * Failure with a stable error [code]. The message has the form `CODE: message`, which the JavaScript
- * layer parses back into the matching `AppleAuthError` code, so the format must not change.
+ * Failure with a stable `ERR_*` [code]. Expo Modules 2.0 copies [code] and the message onto the
+ * JavaScript rejection, so `normalizeAppleError` receives both without parsing the message.
  */
-class AppleAuthNativeError(val code: String, message: String) : Exception("$code: $message")
+class AppleAuthNativeError(override val code: String, message: String) :
+  JavaScriptThrowable(message)

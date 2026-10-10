@@ -26,6 +26,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The module build script fails when `tsc` cannot start instead of exiting with status 0.
 - The validation workflow runs ESLint with zero warnings allowed, `npm run lint` joins the documented checks, and the Pages workflow skips deployment with a warning while GitHub Pages is disabled.
 - `AppleAuth.request` returns the wrapped error as `cause` on its error response, and the `AppleAuthError` thrown by `AppleAuth.signIn` carries the same `cause`.
+- Android errors extend the Expo Modules 2.0 `JavaScriptThrowable`, so the rejection carries the `ERR_*` code itself instead of a `CODE: message` prefix that JavaScript had to parse.
 
 ## [1.0.2] - 2026-10-10
 
