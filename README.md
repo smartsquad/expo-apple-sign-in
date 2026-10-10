@@ -42,7 +42,7 @@
 npx expo install expo-apple-sign-in
 ```
 
-Add the config plugin to `app.json`, then build a development client. The plugin enables the Sign in with Apple entitlement for iOS.
+Add the config plugin to `app.json`, then build a development client. The plugin enables the Sign in with Apple entitlement for iOS and sets `CFBundleAllowMixedLocalizations` to `true` unless your app already defines it, so the Apple sheet follows the device language.
 
 ```json
 {
@@ -96,7 +96,7 @@ export default function App(): ReactElement {
 Each adapter runs Sign in with Apple and hands the result to your auth service in one call:
 
 - [Supabase](https://smartsquad.github.io/expo-apple-sign-in/providers/supabase.html): `signInWithSupabase(supabase)` from `expo-apple-sign-in/supabase` calls `signInWithIdToken` with the identity token and the raw nonce.
-- [Clerk](https://smartsquad.github.io/expo-apple-sign-in/providers/clerk.html): `signInWithClerk({ signIn, signUp, setActive })` from `expo-apple-sign-in/clerk` sends the identity token with the `oauth_token_apple` strategy and follows Clerk's transfer step when the Apple ID already has a Clerk user.
+- [Clerk](https://smartsquad.github.io/expo-apple-sign-in/providers/clerk.html): `signInWithClerk({ signIn, signUp, setActive })` from `expo-apple-sign-in/clerk` sends the identity token with the `oauth_token_apple` strategy and follows Clerk's transfer step when the Apple Account already has a Clerk user.
 - [Firebase](https://smartsquad.github.io/expo-apple-sign-in/providers/firebase.html): `signInWithFirebase(signInWithCredential)` from `expo-apple-sign-in/firebase` passes the identity token and the raw nonce to your Firebase sign-in function.
 
 ## Why this package
@@ -106,6 +106,20 @@ Sign in with Apple works differently on each platform: iOS shows a native sheet,
 ## Documentation
 
 The [documentation site](https://smartsquad.github.io/expo-apple-sign-in/) covers [requirements](https://smartsquad.github.io/expo-apple-sign-in/getting-started/requirements.html), the [Apple Developer setup](https://smartsquad.github.io/expo-apple-sign-in/setup/apple-developer.html) for each platform, [usage](https://smartsquad.github.io/expo-apple-sign-in/guides/usage.html), [backend verification](https://smartsquad.github.io/expo-apple-sign-in/guides/backend.html), the [API reference](https://smartsquad.github.io/expo-apple-sign-in/reference/api.html) and [troubleshooting](https://smartsquad.github.io/expo-apple-sign-in/reference/troubleshooting.html). The `example` folder contains a single-screen app that runs on all three platforms.
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) describes the change workflow. Run these checks before you open a pull request, because CI runs the same five on every pull request into `main`:
+
+```bash
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run docs:build
+```
+
+CI runs ESLint with `--max-warnings 0`, so a single warning fails the pull request. For questions, read [SUPPORT.md](SUPPORT.md). Report a vulnerability by email as [SECURITY.md](SECURITY.md) describes, never in a public issue. Everyone who takes part in the project follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 

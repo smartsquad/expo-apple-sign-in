@@ -11,9 +11,11 @@
 | Expo Go | No | Expo Go cannot load the library's native module, `ExpoAppleSignIn`. |
 | Development builds | Yes | Build with `npx expo run:ios` or `npx expo run:android` after adding the config plugin. |
 | EAS Build | Yes | EAS runs the config plugin when it generates the native projects. |
-| iOS | Yes | iOS 16.4 or later, and an App ID with Sign in with Apple enabled. No `AppleAuth.configure` call is needed. |
+| iOS | Yes | iOS 16.4 or later, and an App ID with Sign in with Apple enabled. No `AppleAuth.configure` call is needed, and `AppleAuth.isConfigured()` always returns `true`. |
 | Android | Yes | A Services ID as `clientId` and an HTTPS `redirectUri` registered on it. Sign-in runs in an in-app WebView screen. |
-| Web | Yes | The same Services ID and a `redirectUri` on the same origin as the page. Sign-in runs in an Apple JS popup. |
+| Web | Yes | The same Services ID and a `redirectUri` on the same origin as the page. Sign-in runs in an Apple JS popup, which must open from a click or press handler. |
+
+Some behavior differs by platform. Only iOS reports a credential state and revocation: on Android and web, `AppleAuth.getCredentialState` always returns `'unknown'`, and `AppleAuth.addRevokeListener` returns a subscription whose listener never runs. Only iOS fills `middleName`, `namePrefix`, `nameSuffix`, and `nickname`, and the other platforms return `null` for them. iOS and Android run one sign-in at a time, so a second `signIn` call while the first is open rejects with `ERR_REQUEST_FAILED`.
 
 ## Why only SDK 58
 
@@ -25,8 +27,10 @@ On web the library has no native module. It drives Apple's JavaScript SDK in the
 
 `AppleAuth.isAvailable()` returns `true` whenever the code runs with a browser `document`, and `false` where there is none, such as in Node. It does not check that Apple's script can load, so a `true` result does not guarantee that sign-in will start.
 
-The first call to `AppleAuth.signIn()` adds a `<script>` tag for `https://appleid.apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js` to the page, or waits for that tag if the page already includes it. If the script fails to load, sign-in rejects with `ERR_NOT_AVAILABLE` and the message `Failed to load the Apple JS SDK.` A site that sends a Content Security Policy must allow scripts from `https://appleid.apple.com`.
+The first call to `AppleAuth.signIn()` adds a `<script>` tag for `https://appleid.apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js` to the page, or waits for that tag if the page already includes it. If the script fails to load, sign-in rejects with `ERR_NOT_AVAILABLE` and the message `Failed to load the Apple JS SDK.`, and the library removes the tag so the next call tries to load the script again. A site that sends a Content Security Policy must allow scripts from `https://appleid.apple.com`.
 
-The library calls Apple JS with `usePopup: true`, so Apple's sign-in page opens in a popup window and the result returns to the page that started it. When Apple JS rejects with an error whose message mentions a closed or canceled popup, or a user cancel, the library reports it as `ERR_REQUEST_CANCELED`, the same code a dismissed sheet produces on iOS.
+The library calls Apple JS with `usePopup: true`, so Apple's sign-in page opens in a popup window and the result returns to the page that started it. Browsers block a popup that no user gesture opened, so call `AppleAuth.signIn()` from a click or press handler.
+
+When Apple JS rejects, the library maps its error code. `popup_closed_by_user`, `user_cancelled_authorize`, and any other code that contains `cancel` or `closed` become `ERR_REQUEST_CANCELED`, the same code a dismissed sheet produces on iOS. `popup_blocked_by_browser` becomes `ERR_REQUEST_FAILED`, and any other code becomes `ERR_REQUEST_UNKNOWN` with the message `Apple sign-in failed: <code>`.
 
 Before it loads Apple JS, the library checks that `redirectUri` has the same origin as the page and rejects with `ERR_NOT_CONFIGURED` if it does not. [Web](/setup/web) explains the rule and how to register the matching Return URL.

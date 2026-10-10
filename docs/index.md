@@ -19,7 +19,7 @@ hero:
 
 features:
   - title: One API on three platforms
-    details: AppleAuth.signIn(), the useAppleAuth hook and AppleButton behave the same on iOS, Android and web, and every platform returns the same credential shape.
+    details: AppleAuth.signIn(), the useAppleAuth hook and AppleButton have the same API on iOS, Android and web, and every platform returns the same credential shape.
   - title: The nonce is hashed for you
     details: Apple receives the SHA-256 hash of the nonce, and the credential carries the raw value that Supabase and Firebase check against the identity token.
   - title: Apple-style button on every platform

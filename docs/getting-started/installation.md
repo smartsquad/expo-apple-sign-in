@@ -30,7 +30,7 @@ bunx expo install expo-apple-sign-in
 
 ## Add the config plugin
 
-Add `"expo-apple-sign-in"` to the `plugins` array of your Expo config. The plugin sets `ios.usesAppleSignIn` to `true` and writes the `com.apple.developer.applesignin` entitlement into the iOS project. It changes nothing for Android or web.
+Add `"expo-apple-sign-in"` to the `plugins` array of your Expo config. The plugin writes the `com.apple.developer.applesignin` entitlement into the iOS project and sets `CFBundleAllowMixedLocalizations` to `true` in `Info.plist` unless your app already defines it, so the Apple sheet follows the device language. It changes nothing for Android or web. Apps that move from `expo-apple-authentication` have one more key to remove, described in [Replace the config plugin](/migration/expo-apple-authentication#replace-the-config-plugin).
 
 ::: code-group
 
@@ -82,7 +82,7 @@ EAS Build works too. When EAS generates the native projects during a build, it r
 
 ## Confirm the module loaded
 
-`AppleAuth.isAvailable()` resolves `true` when the native module is linked on iOS and Android, and when the code runs in a browser page on web. Render its result once after the build finishes:
+`AppleAuth.isAvailable()` resolves `true` when the native module is linked on iOS and Android, and when the code runs in a browser page on web. It resolves `false` when the native module is missing or its check throws. Render its result once after the build finishes:
 
 ```tsx [App.tsx]
 import { useEffect, useState, type ReactElement } from 'react'

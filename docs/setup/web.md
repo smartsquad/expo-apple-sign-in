@@ -45,24 +45,32 @@ The first call to `AppleAuth.signIn()` on a page adds a `<script>` tag for Apple
 https://appleid.apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js
 ```
 
+If the script fails to load, the library removes the tag and forgets the failed attempt, so the next call adds a fresh tag and tries again.
+
 The library then calls `AppleID.auth.init` and `AppleID.auth.signIn` with your `clientId`, the redirect URI, the scopes (`fullName` is sent as `name`), the state, the SHA-256 hash of the nonce and `usePopup: true`. Apple's sign-in page opens in a popup window, and the promise from Apple JS resolves in the page that opened it.
+
+Browsers block a popup that no user gesture opened, so call `AppleAuth.signIn()` from a click or press handler, such as the `onPress` of a button. Without an `onPress` prop, `AppleButton` calls `AppleAuth.signIn()` from its own press handler.
 
 The redirect URI that the library passes to Apple JS depends on the current page. When `redirectUri` has the same origin and path as the current page, the library passes the current page URL without its hash, so Apple's popup returns to a document that loaded the SDK. Otherwise it passes `redirectUri` unchanged. In both cases the URL must be registered as a Return URL on the Services ID.
 
-Apple JS returns the identity token, the authorization code, the state and, on the first authorization only, the user's name and email. It does not return the user identifier, so the library takes `user.id` from the token's `sub` claim. `realUserStatus` is always `'unknown'` on web.
+Apple JS returns the identity token, the authorization code, the state and, on the first authorization only, the user's first name, last name, and email. It does not return the user identifier, so the library takes `user.id` from the token's `sub` claim. `middleName`, `namePrefix`, `nameSuffix`, and `nickname` are always `null` on web, and `realUserStatus` is always `'unknown'`.
 
 ## Errors on web
 
 | Situation | Code |
 | --- | --- |
 | `clientId` or `redirectUri` is missing, not an absolute URL, or on another origin | `ERR_NOT_CONFIGURED` |
-| Apple JS failed to load (`Failed to load the Apple JS SDK.`) | `ERR_NOT_AVAILABLE` |
+| Apple JS failed to load (`Failed to load the Apple JS SDK.`). The next call tries to load it again. | `ERR_NOT_AVAILABLE` |
 | Apple JS loaded but `AppleID.auth` is missing (`Apple JS SDK did not initialize.`) | `ERR_NOT_AVAILABLE` |
 | The code runs without a browser `document` | `ERR_NOT_AVAILABLE` |
 | Apple JS returned no identity token | `ERR_MISSING_IDENTITY_TOKEN` |
-| Apple JS rejected with a message about a closed or canceled popup, or a user cancel | `ERR_REQUEST_CANCELED` |
+| Apple JS rejected with `popup_closed_by_user`, `user_cancelled_authorize`, or another code that contains `cancel` or `closed` | `ERR_REQUEST_CANCELED` |
+| Apple JS rejected with `popup_blocked_by_browser` (`The browser blocked the Apple sign-in popup. Call signIn from a click handler.`) | `ERR_REQUEST_FAILED` |
+| Apple JS rejected with any other code (`Apple sign-in failed: <code>`) or without one (`Apple sign-in failed.`) | `ERR_REQUEST_UNKNOWN` |
 
-`AppleAuth.isAvailable()` only checks for a browser `document`, so it returns `true` even when a network policy will block Apple JS.
+Apple JS rejects with a plain object such as `{ error: 'popup_closed_by_user' }`. The library reads its `error` field to pick the code above.
+
+`AppleAuth.isAvailable()` only checks for a browser `document`, so it returns `true` even when a network policy will block Apple JS. `AppleAuth.getCredentialState` always returns `'unknown'` on web, and `AppleAuth.addRevokeListener` never calls its listener and returns a subscription whose `remove()` does nothing.
 
 ## Content Security Policy
 

@@ -52,8 +52,12 @@ A dismissed sheet calls `onCancel` and never `onError`. Configure Android and we
 | `style` | `StyleProp<ViewStyle>` | none | Extra styles applied after the defaults, so they win. |
 | `textStyle` | `StyleProp<TextStyle>` | none | Extra styles for the label text. |
 | `children` | `ReactNode` | none | Replaces the Apple mark and the label with your own content. |
+| `accessibilityLabel` | `string` | the label text | Text that screen readers announce for the button. |
+| `accessibilityHint` | `string` | none | Extra description that screen readers announce after the label. |
 
-The button also sets a minimum width of 200 points, horizontal padding of 16 points, and a pressed opacity of 0.86. It exposes the `button` accessibility role and uses the label as its accessibility label.
+`AppleButton` also accepts every other `Pressable` prop, such as `testID` or `onLongPress`, and passes it to the underlying `Pressable`. The button sets `accessibilityRole` to `'button'` and reports `accessibilityState` with `disabled` and `busy`, so `busy` is `true` while its own sign-in runs. It replaces any `accessibilityRole` or `accessibilityState` you pass.
+
+The button also sets a minimum width of 200 points, horizontal padding of 16 points, and a pressed opacity of 0.86.
 
 ## Styles and types
 
@@ -125,7 +129,7 @@ export function CustomLabelButton(): ReactElement {
 }
 ```
 
-`children` replaces the mark and the label completely. The button keeps its shape, press handling, and accessibility role, but it no longer shows its own spinner, and the accessibility label is still the one for `buttonType` unless you set `label`. Use it for layouts the props cannot express. When the appearance is far from the default, a custom control built on the [useAppleAuth hook](/guides/hook) gives you more control.
+`children` replaces the mark and the label completely. The button keeps its shape, press handling, and accessibility role, but it no longer shows its own spinner, and the accessibility label is still the one for `buttonType` unless you set `label` or `accessibilityLabel`. Use it for layouts the props cannot express. When the appearance is far from the default, a custom control built on the [useAppleAuth hook](/guides/hook) gives you more control.
 
 ```tsx [CustomContentButton.tsx]
 import { AppleButton, AppleLogo } from 'expo-apple-sign-in'
@@ -134,10 +138,10 @@ import { Text, View } from 'react-native'
 
 export function CustomContentButton(): ReactElement {
   return (
-    <AppleButton buttonStyle="white" label="Use my Apple ID">
+    <AppleButton buttonStyle="white" label="Use my Apple Account">
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         <AppleLogo color="#000000" size={20} />
-        <Text style={{ color: '#000000', fontWeight: '600' }}>Use my Apple ID</Text>
+        <Text style={{ color: '#000000', fontWeight: '600' }}>Use my Apple Account</Text>
       </View>
     </AppleButton>
   )

@@ -27,6 +27,7 @@ AppleAuth.signIn(options?: TAppleSignInOptions): Promise<TAppleCredential>
 AppleAuth.request(options?: TAppleSignInOptions): Promise<TAppleAuthResponse>
 AppleAuth.getCurrentCredential(): TAppleCredential | null
 AppleAuth.getCredentialState(userId: string): Promise<TAppleCredentialState>
+AppleAuth.addRevokeListener(listener: () => void): TAppleEventSubscription
 AppleAuth.signOut(): Promise<void>
 ```
 
@@ -35,18 +36,21 @@ AppleAuth.signOut(): Promise<void>
 | `configure` | Merges `next` into the stored configuration and skips `undefined` values. Call once at startup. Required on Android and web. |
 | `getConfig` | Returns a copy of the stored configuration. |
 | `isConfigured` | `true` on iOS. On Android and web, `true` when `clientId` and `redirectUri` are both set. |
-| `isAvailable` | `true` when the native module is linked (iOS, Android) or a browser document exists (web). |
-| `signIn` | Runs the flow. Resolves with the credential. Rejects with `AppleAuthError`, using `ERR_REQUEST_CANCELED` for a cancel. |
+| `isAvailable` | On iOS and Android, asks the native module, which answers `true` whenever it is linked, and resolves `false` when the module is missing or the call throws. On web, resolves `true` when a browser document exists. |
+| `signIn` | Runs the flow. Resolves with the credential. Rejects with `AppleAuthError`, using `ERR_REQUEST_CANCELED` for a cancel. On iOS and Android, a call made while another sign-in is pending rejects with `ERR_REQUEST_FAILED`. |
 | `request` | Runs the same flow and never rejects. Resolves with a `TAppleAuthResponse`. |
 | `getCurrentCredential` | Returns the credential of the last successful sign-in from memory, or `null`. |
-| `getCredentialState` | On iOS, asks the system. Elsewhere returns `'authorized'` when `userId` matches the last credential and `'unknown'` otherwise. |
+| `getCredentialState` | On iOS, asks Apple and resolves `'authorized'`, `'revoked'`, `'notFound'`, `'transferred'`, or `'unknown'`. Resolves `'unknown'` on Android and web, and on iOS when the native module is missing. |
+| `addRevokeListener` | Calls `listener` when the person revokes Sign in with Apple for your app. iOS only. On Android and web it returns a subscription whose `remove` does nothing. Call `remove()` on unmount. |
 | `signOut` | Clears the in-memory credential. Apple has no sign-out API. |
 
 ## Hook
 
 ```ts
-function useAppleAuth(options?: TUseAppleAuthOptions): {
-  signIn: () => Promise<TAppleCredential | null>
+function useAppleAuth(options?: TUseAppleAuthOptions): TUseAppleAuthResult
+
+type TUseAppleAuthResult = {
+  signIn: (options?: TAppleSignInOptions) => Promise<TAppleCredential | null>
   signOut: () => Promise<void>
   credential: TAppleCredential | null
   isLoading: boolean
@@ -56,7 +60,7 @@ function useAppleAuth(options?: TUseAppleAuthOptions): {
 }
 ```
 
-`signIn` resolves with `null` when the person cancels, unless `options.treatCancelAsError` is `true`. See [useAppleAuth hook](/guides/hook).
+`signIn` passes its `options` to `AppleAuth.signIn` and resolves with `null` when the person cancels, unless the hook's `treatCancelAsError` option is `true`. On iOS the hook also clears `credential` when Apple revokes it. See [useAppleAuth hook](/guides/hook).
 
 ## Components
 
@@ -69,7 +73,8 @@ const APPLE_BUTTON_HEIGHT: 48
 `AppleButton` props are listed in [Apple button](/guides/button#props). `AppleLogo` is described in [AppleLogo](/guides/button#applelogo), with `size` defaulting to `18`.
 
 ```ts
-interface IAppleButtonProps {
+interface IAppleButtonProps
+  extends Omit<PressableProps, 'onPress' | 'style' | 'disabled' | 'children'> {
   onPress?: () => void
   onSuccess?: (credential: TAppleCredential) => void
   onError?: (error: AppleAuthError) => void
@@ -88,6 +93,8 @@ interface IAppleButtonProps {
 
 type AppleButtonProps = IAppleButtonProps
 ```
+
+Every other `Pressable` prop, such as `testID`, `accessibilityHint`, or `onLongPress`, is passed through to the underlying `Pressable`. `accessibilityLabel` defaults to the label text. The button always sets `accessibilityRole` to `'button'` and builds `accessibilityState` from `disabled` and its own busy flag, so values you pass for those two props are replaced.
 
 ## Nonce helpers
 
@@ -130,9 +137,12 @@ const EAppleAuthErrorCode: {
 }
 
 const AppleAuthErrorCode: typeof EAppleAuthErrorCode
+
+type TAppleAuthErrorCodeValue = (typeof EAppleAuthErrorCode)[keyof typeof EAppleAuthErrorCode]
+type AppleAuthErrorCodeValue = TAppleAuthErrorCodeValue
 ```
 
-The meaning and typical causes of each code are in the [Errors guide](/guides/errors#codes).
+`TAppleAuthErrorCodeValue` is the union of the seven code strings. `AppleAuthError.code` stays typed as `string`, so compare it against `EAppleAuthErrorCode` members. The meaning and typical causes of each code are in the [Errors guide](/guides/errors#codes).
 
 ## Adapters
 
@@ -221,6 +231,10 @@ type TAppleUser = {
   email: string | null
   givenName: string | null
   familyName: string | null
+  middleName: string | null
+  namePrefix: string | null
+  nameSuffix: string | null
+  nickname: string | null
 }
 
 type TAppleCredential = {
@@ -245,6 +259,7 @@ type TAppleAuthErrorResponse = {
   type: 'error'
   code: string
   message: string
+  cause?: unknown
 }
 
 type TAppleAuthResponse =
@@ -252,6 +267,38 @@ type TAppleAuthResponse =
 
 type TUseAppleAuthOptions = TAppleAuthConfig & {
   treatCancelAsError?: boolean
+}
+
+type TAppleEventSubscription = { remove(): void }
+
+type TNativeSignInParams = {
+  nonce: string
+  state: string
+  scopes: string[]
+  clientId?: string
+  redirectUri?: string
+}
+
+type TNativeSignInResult = {
+  identityToken?: string | null
+  authorizationCode?: string | null
+  user?: string | null
+  email?: string | null
+  givenName?: string | null
+  familyName?: string | null
+  middleName?: string | null
+  namePrefix?: string | null
+  nameSuffix?: string | null
+  nickname?: string | null
+  state?: string | null
+  realUserStatus?: string | null
+}
+
+type TExpoAppleSignInNativeModule = {
+  isAvailable: () => boolean
+  signIn: (params: TNativeSignInParams) => Promise<TNativeSignInResult>
+  getCredentialState: (userId: string) => Promise<string> | string
+  addListener?: (eventName: 'credentialRevoked', listener: () => void) => TAppleEventSubscription
 }
 ```
 
@@ -271,6 +318,12 @@ type TUseAppleAuthOptions = TAppleAuthConfig & {
 | `AppleAuthErrorResponse` | `TAppleAuthErrorResponse` |
 | `AppleAuthResponse` | `TAppleAuthResponse` |
 | `UseAppleAuthOptions` | `TUseAppleAuthOptions` |
+| `UseAppleAuthResult` | `TUseAppleAuthResult` |
+| `AppleEventSubscription` | `TAppleEventSubscription` |
+| `NativeSignInParams` | `TNativeSignInParams` |
+| `NativeSignInResult` | `TNativeSignInResult` |
+| `ExpoAppleSignInNativeModule` | `TExpoAppleSignInNativeModule` |
+| `AppleAuthErrorCodeValue` | `TAppleAuthErrorCodeValue` |
 | `AppleButtonProps` | `IAppleButtonProps` |
 | `SupabaseAuthLike` | `TSupabaseAuthLike` |
 | `FirebaseAppleCredential` | `TFirebaseAppleCredential` |
@@ -280,4 +333,8 @@ Field notes:
 - `clientId` is the Services ID. `redirectUri` is an HTTPS URL registered for it. Both are ignored on iOS.
 - `nonce` on `TAppleSignInOptions` is raw. The library hashes it and returns the raw value on `TAppleCredential.nonce`.
 - `TAppleUser.id` is a stable identifier shared by the apps of one team.
+- Apple sends name fields on the first authorization only. `middleName`, `namePrefix`, `nameSuffix`, and `nickname` come from iOS alone. Android and web return `null` for them because Apple's web flow sends only the first and last name.
+- `cause` on `TAppleAuthErrorResponse` is the error the library wrapped, when there was one.
+- `TNativeSignInParams`, `TNativeSignInResult`, and `TExpoAppleSignInNativeModule` describe the contract between `AppleAuth` and the native module. `TNativeSignInParams.nonce` is already hashed. The web adapter uses the same params and result types. `AppleAuth` calls the native module for you.
+- `addListener` on `TExpoAppleSignInNativeModule` is optional because older native builds may lack it. Only the iOS module emits `credentialRevoked`.
 - `TUseAppleAuthOptions.treatCancelAsError` defaults to `false`.

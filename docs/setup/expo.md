@@ -38,12 +38,16 @@ export default config
 
 ## What the plugin writes
 
-The plugin makes two changes to the iOS side of the config and nothing else:
+The plugin makes two changes to the iOS project and nothing else:
 
-1. It sets `ios.usesAppleSignIn` to `true`, so you do not need to add that key yourself.
-2. It writes the `com.apple.developer.applesignin` entitlement with the value `["Default"]` into the app's entitlements file.
+1. It writes the `com.apple.developer.applesignin` entitlement with the value `["Default"]` into the app's entitlements file.
+2. It sets `CFBundleAllowMixedLocalizations` to `true` in `Info.plist`, unless the app already defines that key, so the system Sign in with Apple sheet follows the device language.
+
+The plugin adds no other key to the Expo config. If prebuild prints a warning that asks you to install `expo-apple-authentication`, see [Troubleshooting](/reference/troubleshooting#prebuild-warns-about-expo-apple-authentication).
 
 Android and web need no native configuration. The Android sign-in activity is declared in the library's own manifest and merges into your app at build time, and web loads Apple JS at runtime.
+
+The plugin's source is `plugin/src/withExpoAppleSignIn.ts`. The package ships it compiled in `plugin/build`, and `app.plugin.js` at the package root loads it from there. It is wrapped in `createRunOncePlugin` under the package name, so it runs once per prebuild even when the config lists it twice.
 
 The plugin only runs when Expo generates the native projects. After you add it, or after any change to the iOS part of the config, regenerate the projects:
 
@@ -51,7 +55,7 @@ The plugin only runs when Expo generates the native projects. After you add it, 
 npx expo prebuild --clean
 ```
 
-If your project commits its `ios` folder instead of generating it, config plugins do not run on build. In that case, add the Sign in with Apple capability to the target in Xcode.
+If your project commits its `ios` folder instead of generating it, config plugins do not run on build. In that case, add the Sign in with Apple capability to the target in Xcode, and add the Boolean key `CFBundleAllowMixedLocalizations` with the value `YES` to `Info.plist` so the sheet follows the device language.
 
 ## Pass the Services ID through environment variables
 

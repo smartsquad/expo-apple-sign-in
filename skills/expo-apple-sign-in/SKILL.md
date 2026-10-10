@@ -26,12 +26,17 @@ AppleAuth.configure({
 const { identityToken, nonce } = await AppleAuth.signIn()
 ```
 
-- iOS: native `AuthenticationServices`. No Services ID.
-- Android / web: Services ID + HTTPS redirect URI.
+- iOS uses the native `AuthenticationServices` framework and needs no Services ID.
+- Android and web need a Services ID and an HTTPS redirect URI.
 - The library SHA-256-hashes the nonce for Apple and returns the **raw** nonce.
-- `ERR_REQUEST_CANCELED` is thrown (or returned from `request()`) when the user dismisses the sheet.
+- When the user dismisses the sheet, `AppleAuth.signIn()` throws `ERR_REQUEST_CANCELED` and `AppleAuth.request()` resolves `{ type: 'cancelled' }`.
 - `AppleAuth.isAvailable()` returns `Promise<boolean>`.
 - `toFirebaseAppleCredential` returns `{ providerId: 'apple.com', token, rawNonce }`.
+- `AppleAuth.getCredentialState(userId)` resolves `'authorized'`, `'revoked'`, `'notFound'`, `'transferred'`, or `'unknown'` on iOS, and always `'unknown'` on Android and web.
+- `AppleAuth.addRevokeListener(listener)` returns `{ remove() }`. Only iOS calls the listener. Call `remove()` on unmount.
+- iOS and Android run one sign-in at a time. A second `signIn` while one is pending rejects with `ERR_REQUEST_FAILED`.
+- Web opens Apple's popup, so call `signIn` from a click or press handler. A blocked popup rejects with `ERR_REQUEST_FAILED`.
+- On the first authorization, iOS also fills `middleName`, `namePrefix`, `nameSuffix`, and `nickname` on `credential.user`. Android and web return `null` for them.
 
 ## Supabase
 
@@ -47,10 +52,10 @@ That is `AppleAuth.signIn()` plus `supabase.auth.signInWithIdToken({ provider: '
 await signInWithClerk({ signIn, signUp, setActive })
 ```
 
-Strategy: `oauth_token_apple`.
+`signInWithClerk` uses the `oauth_token_apple` strategy.
 
 ## Custom UI
 
-Use `useAppleAuth()` and render anything. Use `<AppleButton />` for the HIG black/white button. Pass `onPress` to take over the press, or `children` to replace the label.
+Use `useAppleAuth()` and render anything. It returns `signIn(options?)`, `signOut()`, `credential`, `isLoading`, `error`, `isAvailable`, and `isConfigured`, and clears `credential` when Apple revokes it on iOS. Use `<AppleButton />` for the HIG black/white button. Pass `onPress` to take over the press, or `children` to replace the Apple mark and the label. Other `Pressable` props, such as `testID`, pass through.
 
 Do **not** add `expo-crypto` or `expo-apple-authentication` for this flow.

@@ -20,7 +20,7 @@ The adapters cover the last step. `signInWithSupabase`, `signInWithClerk` and `s
 
 | Platform | How the library reaches Apple | What you set up |
 | --- | --- | --- |
-| iOS | A Swift module calls Apple's AuthenticationServices framework, and the system shows Apple's native sign-in sheet. | An App ID with Sign in with Apple enabled. The config plugin adds the entitlement. |
+| iOS | A Swift module calls Apple's AuthenticationServices framework, and the system shows Apple's native sign-in sheet. | An App ID with Sign in with Apple enabled. The config plugin adds the entitlement and lets the sheet follow the device language. |
 | Android | A Kotlin activity opens Apple's authorize page in a WebView with `response_mode=form_post` and reads the identity token from the form Apple posts back. | A Services ID, passed as `clientId`, and an HTTPS `redirectUri` registered on it. |
 | Web | The library loads Apple's JavaScript SDK (Apple JS) from `appleid.apple.com` and signs in with a popup window. | The same Services ID and a `redirectUri` on the same origin as the page. |
 
@@ -30,9 +30,9 @@ Because Android and web go through Apple's web flow, both need the Services ID a
 
 | Export | Purpose |
 | --- | --- |
-| `AppleAuth` | Configures the library and runs sign-in: `configure`, `getConfig`, `isConfigured`, `isAvailable`, `signIn`, `request`, `getCurrentCredential`, `getCredentialState` and `signOut`. |
+| `AppleAuth` | Configures the library and runs sign-in: `configure`, `getConfig`, `isConfigured`, `isAvailable`, `signIn`, `request`, `getCurrentCredential`, `getCredentialState`, `addRevokeListener` and `signOut`. |
 | `AppleButton`, `AppleLogo`, `APPLE_BUTTON_HEIGHT` | The Apple-style button with the official labels, the Apple mark it draws, and its default height of 48. |
-| `useAppleAuth` | A React hook that wraps `AppleAuth.signIn()` and exposes `credential`, `isLoading`, `error`, `isAvailable` and `isConfigured`. |
+| `useAppleAuth` | A React hook that returns `signIn(options)` and `signOut()`, exposes `credential`, `isLoading`, `error`, `isAvailable` and `isConfigured`, and clears `credential` when Apple revokes it on iOS. |
 | `AppleAuthError`, `EAppleAuthErrorCode`, `isAppleAuthError`, `isCancelledError`, `normalizeAppleError` | Typed errors with stable codes such as `ERR_REQUEST_CANCELED` and `ERR_NOT_CONFIGURED`. |
 | `isSuccessResponse`, `isErrorResponse`, `isCancelledResponse` | Guards for the result of `AppleAuth.request()`, which returns a result object instead of throwing. |
 | `signInWithSupabase`, `signInWithClerk`, `signInWithFirebase`, `toFirebaseAppleCredential` | Provider adapters. They are also published at `expo-apple-sign-in/supabase`, `expo-apple-sign-in/clerk` and `expo-apple-sign-in/firebase`. |
