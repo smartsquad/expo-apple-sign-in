@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `AppleAuth.addRevokeListener` subscribes to Apple's credential revoked notification on iOS and returns a no-op subscription elsewhere.
 - `credential.user` carries `middleName`, `namePrefix`, `nameSuffix`, and `nickname`, filled on iOS.
 - `TUseAppleAuthResult` names the object returned by `useAppleAuth`.
+- `AppleButton` accepts the remaining `Pressable` props, `accessibilityHint`, and reports `accessibilityState`.
 
 ### Changed
 
