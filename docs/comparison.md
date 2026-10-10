@@ -49,7 +49,7 @@ The table lists the JavaScript each package adds when its entry is bundled, plus
 
 | Package | Native minified (bytes) | Native gzip (bytes) | Web minified (bytes) | Web gzip (bytes) | Unpacked size (bytes) | Files | Runtime dependencies |
 |---|---|---|---|---|---|---|---|
-| expo-apple-sign-in 1.1.0 | 17,350 | 7,537 | 17,350 | 7,537 | 291,077 | 109 | 0 |
+| expo-apple-sign-in 1.1.0 | 17,350 | 7,537 | 17,350 | 7,537 | 293,100 | 109 | 0 |
 | expo-apple-authentication 58.0.2 | 2,961 | 1,046 | not supported | not supported | 97,227 | 55 | 0 |
 | @invertase/react-native-apple-authentication 2.5.1 | 4,365 | 1,879 | not supported | not supported | 131,661 | 40 | 0 |
 | react-apple-signin-auth 1.2.1 | not supported | not supported | 5,806 | 2,620 | 42,713 | 20 | 0 |

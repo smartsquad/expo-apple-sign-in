@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-10
+
 ### Added
 
 - `AppleAuth.addRevokeListener` subscribes to Apple's credential revoked notification on iOS and returns a no-op subscription elsewhere.
@@ -101,7 +103,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - The config plugin loads `@expo/config-plugins` from the Expo process that requires it, so `file:` and sibling installs work.
 - The npm package ships `src` without tests, because the `react-native` and `browser` export conditions point at it.
 
-[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/smartsquad/expo-apple-sign-in/releases/tag/v1.0.0
