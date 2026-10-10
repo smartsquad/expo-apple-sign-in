@@ -20,10 +20,10 @@
 </p>
 
 <p align="center">
-  <a href="https://smartsquad.github.io/expo-apple-sign-in/">Documentation</a> ·
-  <a href="https://smartsquad.github.io/expo-apple-sign-in/getting-started/quick-start.html">Quick start</a> ·
-  <a href="https://smartsquad.github.io/expo-apple-sign-in/providers/supabase.html">Providers</a> ·
-  <a href="https://smartsquad.github.io/expo-apple-sign-in/comparison.html">Comparison</a> ·
+  <a href="https://exsi.smartsquad.io/">Documentation</a> ·
+  <a href="https://exsi.smartsquad.io/getting-started/quick-start.html">Quick start</a> ·
+  <a href="https://exsi.smartsquad.io/providers/supabase.html">Providers</a> ·
+  <a href="https://exsi.smartsquad.io/comparison.html">Comparison</a> ·
   <a href="https://github.com/smartsquad/expo-apple-sign-in/blob/main/CHANGELOG.md">Changelog</a>
 </p>
 
@@ -95,19 +95,19 @@ export default function App(): ReactElement {
 
 Each adapter runs Sign in with Apple and hands the result to your auth service in one call:
 
-- [Supabase](https://smartsquad.github.io/expo-apple-sign-in/providers/supabase.html): `signInWithSupabase(supabase)` from `expo-apple-sign-in/supabase` calls `signInWithIdToken` with the identity token and the raw nonce.
-- [Clerk](https://smartsquad.github.io/expo-apple-sign-in/providers/clerk.html): `signInWithClerk({ signIn, signUp, setActive })` from `expo-apple-sign-in/clerk` sends the identity token with the `oauth_token_apple` strategy and follows Clerk's transfer step when the Apple Account already has a Clerk user.
-- [Firebase](https://smartsquad.github.io/expo-apple-sign-in/providers/firebase.html): `signInWithFirebase(signInWithCredential)` from `expo-apple-sign-in/firebase` passes the identity token and the raw nonce to your Firebase sign-in function.
+- [Supabase](https://exsi.smartsquad.io/providers/supabase.html): `signInWithSupabase(supabase)` from `expo-apple-sign-in/supabase` calls `signInWithIdToken` with the identity token and the raw nonce.
+- [Clerk](https://exsi.smartsquad.io/providers/clerk.html): `signInWithClerk({ signIn, signUp, setActive })` from `expo-apple-sign-in/clerk` sends the identity token with the `oauth_token_apple` strategy and follows Clerk's transfer step when the Apple Account already has a Clerk user.
+- [Firebase](https://exsi.smartsquad.io/providers/firebase.html): `signInWithFirebase(signInWithCredential)` from `expo-apple-sign-in/firebase` passes the identity token and the raw nonce to your Firebase sign-in function.
 
 ## Why this package
 
-Sign in with Apple works differently on each platform: iOS shows a native sheet, while Android and web have to go through Apple's web flow with a Services ID. This package puts those paths behind one call and one credential shape, so the code that talks to your backend is the same on iOS, Android and web. It also handles the nonce for you and ships adapters for the three common auth providers. The [comparison](https://smartsquad.github.io/expo-apple-sign-in/comparison.html) shows how it relates to other Sign in with Apple packages for React Native and Expo.
+Sign in with Apple works differently on each platform: iOS shows a native sheet, while Android and web have to go through Apple's web flow with a Services ID. This package puts those paths behind one call and one credential shape, so the code that talks to your backend is the same on iOS, Android and web. It also handles the nonce for you and ships adapters for the three common auth providers. The [comparison](https://exsi.smartsquad.io/comparison.html) shows how it relates to other Sign in with Apple packages for React Native and Expo.
 
 Google Sign-In is not this package. [react-native-nitro-google-signin](https://react-native-nitro-google-sign-in.github.io/) is the library to use for that, on Android Credential Manager and on iOS. If the app needs Sign in with Apple and cannot take Expo SDK 58, [@invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) is the one to use, including its Android module. Both are good libraries.
 
 ## Documentation
 
-The [documentation site](https://smartsquad.github.io/expo-apple-sign-in/) covers [requirements](https://smartsquad.github.io/expo-apple-sign-in/getting-started/requirements.html), the [Apple Developer setup](https://smartsquad.github.io/expo-apple-sign-in/setup/apple-developer.html) for each platform, [usage](https://smartsquad.github.io/expo-apple-sign-in/guides/usage.html), [backend verification](https://smartsquad.github.io/expo-apple-sign-in/guides/backend.html), the [API reference](https://smartsquad.github.io/expo-apple-sign-in/reference/api.html) and [troubleshooting](https://smartsquad.github.io/expo-apple-sign-in/reference/troubleshooting.html). The `example` folder contains a single-screen app that runs on all three platforms.
+The [documentation site](https://exsi.smartsquad.io/) covers [requirements](https://exsi.smartsquad.io/getting-started/requirements.html), the [Apple Developer setup](https://exsi.smartsquad.io/setup/apple-developer.html) for each platform, [usage](https://exsi.smartsquad.io/guides/usage.html), [backend verification](https://exsi.smartsquad.io/guides/backend.html), the [API reference](https://exsi.smartsquad.io/reference/api.html) and [troubleshooting](https://exsi.smartsquad.io/reference/troubleshooting.html). The `example` folder contains a single-screen app that runs on all three platforms.
 
 ## Contributing
 

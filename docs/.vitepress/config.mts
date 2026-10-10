@@ -8,8 +8,8 @@ import { version } from '../../package.json'
 
 const ERepoRoot = fileURLToPath(new URL('../..', import.meta.url))
 
-const ESiteOrigin = process.env.DOCS_ORIGIN ?? 'https://smartsquad.github.io/expo-apple-sign-in'
-const EBase = process.env.DOCS_BASE ?? (process.env.GITHUB_ACTIONS ? '/expo-apple-sign-in/' : '/')
+const ESiteOrigin = process.env.DOCS_ORIGIN ?? 'https://exsi.smartsquad.io'
+const EBase = process.env.DOCS_BASE ?? '/'
 const ELlmsDomain = EBase === '/' ? undefined : new URL(ESiteOrigin).origin
 const ESiteTitle = 'Expo Apple Sign In'
 const ESiteDescription =

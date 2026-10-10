@@ -90,7 +90,7 @@
   },
   "author": "Massimo De Luisa <massimodeluisa@me.com> (https://github.com/massimodeluisa)",
   "license": "MIT",
-  "homepage": "https://smartsquad.github.io/expo-apple-sign-in/",
+  "homepage": "https://exsi.smartsquad.io/",
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@e2e-dev/web": "^0.13.0",

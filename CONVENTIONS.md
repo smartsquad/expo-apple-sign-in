@@ -91,7 +91,7 @@ Every commit that changes user-visible or operational behaviour updates `[Unrele
 ## C-5. Docs
 
 - All documentation is English.
-- Docs are VitePress in `docs/`, same pattern as [images-in-motion](https://iim.smartsquad.io/). Local: `npm run docs:dev` at `http://127.0.0.1:43173/`. Publish: `.github/workflows/pages.yml` to GitHub Pages at `https://smartsquad.github.io/expo-apple-sign-in/`.
+- Docs are VitePress in `docs/`, same pattern as [images-in-motion](https://iim.smartsquad.io/). Local: `npm run docs:dev` at `http://127.0.0.1:43173/`. Publish: `.github/workflows/pages.yml` to GitHub Pages at `https://exsi.smartsquad.io/`.
 - Root policy files are `UPPERCASE.md` (`CONVENTIONS.md`, `AGENTS.md`, `CHANGELOG.md`, `README.md`).
 - No em dash (U+2014). Use commas, colons, or periods.
 - No filler: "seamless", "robust", "leverage".

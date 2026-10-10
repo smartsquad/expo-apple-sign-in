@@ -56,6 +56,9 @@ jobs:
       - name: Install
         run: npm ci
       - name: Build docs
+        env:
+          DOCS_BASE: /
+          DOCS_ORIGIN: https://exsi.smartsquad.io
         run: npm run docs:build
       - name: Upload Pages artifact
         if: steps.pages.outputs.enabled == 'true'

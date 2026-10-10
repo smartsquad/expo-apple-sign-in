@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://smartsquad.github.io/expo-apple-sign-in/sitemap.xml
+Sitemap: https://exsi.smartsquad.io/sitemap.xml

@@ -2,7 +2,7 @@
 
 ## Read the docs first
 
-Start with the [documentation site](https://smartsquad.github.io/expo-apple-sign-in/). The [Troubleshooting page](https://smartsquad.github.io/expo-apple-sign-in/reference/troubleshooting.html) lists known errors with their causes and fixes.
+Start with the [documentation site](https://exsi.smartsquad.io/). The [Troubleshooting page](https://exsi.smartsquad.io/reference/troubleshooting.html) lists known errors with their causes and fixes.
 
 ## Ask a question
 
