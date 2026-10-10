@@ -112,6 +112,12 @@
     "react": "*",
     "react-native": "*"
   },
+  "overrides": {
+    "@docsearch/react": {
+      "react": "$react",
+      "@types/react": "$@types/react"
+    }
+  },
   "jest": {
     "testEnvironment": "node",
     "roots": [

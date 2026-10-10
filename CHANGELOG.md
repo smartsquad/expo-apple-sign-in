@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- `package.json` overrides the optional React peers of `@docsearch/react` with the root React versions, so `npm ci` installs from the lock file with both npm 10 and npm 11.
+
 ## [1.0.1] - 2026-10-09
 
 ### Added
