@@ -17,34 +17,62 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      pages-enabled: ${{ steps.pages.outputs.enabled }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
       - name: Cache VitePress
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: docs/.vitepress/cache
           key: ${{ runner.os }}-vitepress-${{ hashFiles('docs/**', 'package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-vitepress-
+      # actions/configure-pages fails when Pages is disabled, so probe the Pages API first.
+      - name: Check whether GitHub Pages is enabled
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+          case "$status" in
+            200)
+              echo "enabled=true" >> "$GITHUB_OUTPUT"
+              ;;
+            404)
+              echo "enabled=false" >> "$GITHUB_OUTPUT"
+              echo "::warning::GitHub Pages is not enabled for ${{ github.repository }}. The docs were built but not deployed. Enable Pages (Settings, Pages, source GitHub Actions) and rerun this workflow."
+              ;;
+            *)
+              echo "::error::Unexpected status $status from the GitHub Pages API"
+              exit 1
+              ;;
+          esac
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/configure-pages@v6
       - name: Install
         run: npm ci
       - name: Build docs
         run: npm run docs:build
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/.vitepress/dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.pages-enabled == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -52,4 +80,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

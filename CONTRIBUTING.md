@@ -13,6 +13,7 @@ Rules live in [CONVENTIONS.md](./CONVENTIONS.md). Agent entrypoint: [AGENTS.md](
 ```bash
 npm test
 npm run typecheck
+npm run lint
 npm run build
 npm run docs:build
 ```

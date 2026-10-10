@@ -104,6 +104,7 @@ Every commit that changes user-visible or operational behaviour updates `[Unrele
 ```bash
 npm test
 npm run typecheck
+npm run lint
 npm run build
 npm run docs:build
 ```

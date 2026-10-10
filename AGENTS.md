@@ -30,6 +30,7 @@ House style is inherited from Inksquad-platform, callingyou-ai, clickrisorse-pla
 npm install
 npm test
 npm run typecheck
+npm run lint
 npm run build
 npm run docs:dev
 npm run docs:build
