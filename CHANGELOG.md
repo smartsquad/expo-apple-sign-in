@@ -20,6 +20,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `useAppleAuth` tracks `scopes` by value, keeps `isConfigured` current across `AppleAuth.configure` calls, passes options to `signIn`, and clears the credential when Apple revokes it.
 - The example app shows a message when Apple revokes the credential and carries test ids.
 - iOS maps every `ASAuthorizationError` code the installed SDK defines, including `matchedExcludedCredential`, the credential import and export codes, `preferSignInWithApple`, and `deviceNotConfiguredForPasskeyCreation`, and keeps `ERR_REQUEST_UNKNOWN` for codes added by future SDKs.
+- Android matches the redirect URI exactly, passes form fields as JSON, handles the back gesture through `OnBackPressedDispatcher`, keeps the WebView across configuration changes, and cancels a pending request when the activity is destroyed.
 
 ## [1.0.2] - 2026-10-10
 
