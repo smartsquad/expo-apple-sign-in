@@ -49,7 +49,7 @@ The table lists the JavaScript each package adds when its entry is bundled, plus
 
 | Package | Native minified (bytes) | Native gzip (bytes) | Web minified (bytes) | Web gzip (bytes) | Unpacked size (bytes) | Files | Runtime dependencies |
 |---|---|---|---|---|---|---|---|
-| expo-apple-sign-in 1.1.0 | 17,350 | 7,537 | 17,350 | 7,537 | 293,100 | 109 | 0 |
+| expo-apple-sign-in 1.1.0 | 17,372 | 7,546 | 17,372 | 7,546 | 293,100 | 109 | 0 |
 | expo-apple-authentication 58.0.2 | 2,961 | 1,046 | not supported | not supported | 97,227 | 55 | 0 |
 | @invertase/react-native-apple-authentication 2.5.1 | 4,365 | 1,879 | not supported | not supported | 131,661 | 40 | 0 |
 | react-apple-signin-auth 1.2.1 | not supported | not supported | 5,806 | 2,620 | 42,713 | 20 | 0 |
@@ -64,7 +64,7 @@ An app that signs in with Apple on all three platforms can use one package or co
 
 | Option | Packages | Runtime dependencies | Native gzip (bytes) | Web gzip (bytes) | iOS | Android | Web |
 |---|---|---|---|---|---|---|---|
-| a. expo-apple-sign-in | 1 | 0 | 7,537 | 7,537 | Yes | Yes | Yes |
+| a. expo-apple-sign-in | 1 | 0 | 7,546 | 7,546 | Yes | Yes | Yes |
 | b. expo-apple-authentication and react-apple-signin-auth | 2 | 0 | 1,046 | 2,620 | Yes | No | Yes |
 | c. Invertase, react-apple-signin-auth, uuid, and react-native-get-random-values | 4 | 1 | 3,487 | 2,620 | Yes | Yes | Yes |
 
