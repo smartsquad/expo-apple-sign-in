@@ -154,12 +154,13 @@ export const AppleAuth = {
       throw new AppleAuthError(EAppleAuthErrorCode.Canceled, 'The user canceled Apple sign-in.')
     }
 
-    throw new AppleAuthError(response.code, response.message)
+    throw new AppleAuthError(response.code, response.message, response.cause)
   },
 
   /**
    * Same flow as {@link AppleAuth.signIn}, but resolves with a `success`, `cancelled`, or `error`
-   * response instead of throwing. Mirrors the nitro-google-sign-in response helpers.
+   * response instead of throwing. Mirrors the nitro-google-sign-in response helpers. The error
+   * response carries the wrapped error as `cause`.
    */
   async request(options: TAppleSignInOptions = {}): Promise<TAppleAuthResponse> {
     try {
@@ -205,7 +206,12 @@ export const AppleAuth = {
       }
       const normalized = normalizeAppleError(error)
 
-      return { type: 'error', code: normalized.code, message: normalized.message }
+      return {
+        type: 'error',
+        code: normalized.code,
+        message: normalized.message,
+        cause: normalized.cause,
+      }
     }
   },
 

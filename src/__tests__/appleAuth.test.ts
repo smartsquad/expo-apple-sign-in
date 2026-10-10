@@ -225,6 +225,24 @@ describe('AppleAuth.request iOS', () => {
       expect(response.message).toMatch(/rebuild/i)
     }
   })
+
+  it('returns the native rejection as cause', async () => {
+    const native = Object.assign(
+      new Error('A Sign in with Apple request is already in progress.'),
+      { code: EAppleAuthErrorCode.Failed }
+    )
+    getNative.mockReturnValue(nativeModule({ signIn: jest.fn().mockRejectedValue(native) }))
+
+    const response = await AppleAuth.request()
+    expect(response).toMatchObject({
+      type: 'error',
+      code: EAppleAuthErrorCode.Failed,
+      message: 'A Sign in with Apple request is already in progress.',
+    })
+    if (response.type === 'error') {
+      expect(response.cause).toBe(native)
+    }
+  })
 })
 
 describe('AppleAuth.request Android', () => {
@@ -301,6 +319,31 @@ describe('AppleAuth.request web', () => {
     })
 
     await expect(AppleAuth.request()).resolves.toEqual({ type: 'cancelled' })
+  })
+
+  it('signIn rethrows the Apple JS error as cause', async () => {
+    Platform.OS = 'web'
+    AppleAuth.configure({
+      clientId: 'com.example.app.service',
+      redirectUri: 'https://app.example.com/callback',
+    })
+    const appleJsError = Object.assign(new Error('Apple JS reported popup_blocked_by_browser.'), {
+      code: EAppleAuthErrorCode.Failed,
+    })
+    webSign.mockRejectedValue(appleJsError)
+
+    const response = await AppleAuth.request()
+    expect(response).toMatchObject({ type: 'error', code: EAppleAuthErrorCode.Failed })
+    if (response.type === 'error') {
+      expect(response.cause).toBe(appleJsError)
+    }
+
+    await expect(AppleAuth.signIn()).rejects.toMatchObject({
+      name: 'AppleAuthError',
+      code: EAppleAuthErrorCode.Failed,
+      message: 'Apple JS reported popup_blocked_by_browser.',
+      cause: appleJsError,
+    })
   })
 })
 
