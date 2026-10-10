@@ -2,16 +2,21 @@ import { AppleAuth } from '../AppleAuth'
 import { AppleAuthError, EAppleAuthErrorCode } from '../errors'
 import type { TAppleCredential, TAppleSignInOptions } from '../types'
 
+/** Identity token and raw nonce for Firebase's `apple.com` provider. */
 export type TFirebaseAppleCredential = {
   providerId: 'apple.com'
   token: string
   rawNonce: string
 }
 
+/** Alias of {@link TFirebaseAppleCredential}. */
 export type FirebaseAppleCredential = TFirebaseAppleCredential
 
 /**
- * Shape expected by `OAuthProvider('apple.com').credential({ idToken, rawNonce })`.
+ * Maps an Apple credential to `{ providerId: 'apple.com', token, rawNonce }`, where `token` is
+ * the identity token and `rawNonce` the raw nonce. With the Firebase JS SDK pass them to
+ * `new OAuthProvider(providerId).credential({ idToken: token, rawNonce })`; with React Native
+ * Firebase pass them to `AppleAuthProvider.credential(token, rawNonce)`.
  */
 export function toFirebaseAppleCredential(credential: TAppleCredential): TFirebaseAppleCredential {
   return {
@@ -21,6 +26,11 @@ export function toFirebaseAppleCredential(credential: TAppleCredential): TFireba
   }
 }
 
+/**
+ * Signs in with Apple and passes the {@link toFirebaseAppleCredential} output to your
+ * `signInWithCredential` callback. Returns the Apple credential and the callback result as
+ * `data`. Throws `ERR_MISSING_IDENTITY_TOKEN` when there is no identity token.
+ */
 export async function signInWithFirebase(
   signInWithCredential: (credential: TFirebaseAppleCredential) => Promise<unknown>,
   options?: TAppleSignInOptions
