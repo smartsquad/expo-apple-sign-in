@@ -20,6 +20,8 @@ npm run docs:build
 
 Local docs: `npm run docs:dev` at `http://127.0.0.1:43173/`. VitePress in `docs/`, same GitHub Pages pattern as images-in-motion.
 
+End-to-end tests: install the browser once with `npx @e2e-dev/web install chromium`, then run `npm run test:e2e`. The config in `e2e.config.ts` starts the example web app on port 43180 and the docs site on port 43173 by itself.
+
 Example (Expo SDK 58, web):
 
 ```bash

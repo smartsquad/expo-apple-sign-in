@@ -11,6 +11,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `TUseAppleAuthResult` names the object returned by `useAppleAuth`.
 - `AppleButton` accepts the remaining `Pressable` props, `accessibilityHint`, and reports `accessibilityState`.
 - Security policy, support guide, code of conduct, issue forms, and a pull request template.
+- End-to-end tests with `e2e` for the example web app and the docs site (`npm run test:e2e`).
 
 ### Changed
 
