@@ -7,8 +7,7 @@
     "userInterfaceStyle": "light",
     "platforms": ["ios", "android", "web"],
     "ios": {
-      "bundleIdentifier": "com.example.expoapplesignin",
-      "usesAppleSignIn": true
+      "bundleIdentifier": "com.example.expoapplesignin"
     },
     "android": {
       "package": "com.example.expoapplesignin"
