@@ -1,10 +1,11 @@
-import { AppleAuth } from '../AppleAuth'
+import { Platform } from 'react-native'
+
+import { AppleAuth, subscribeToConfig } from '../AppleAuth'
 import { EAppleAuthErrorCode } from '../errors'
 import { getNativeAppleModule } from '../native-module'
 import { sha256Hex } from '../nonce'
-import { Platform } from 'react-native'
-import { isWebAppleAvailable, webSignIn } from '../web/appleJs'
 import type { TExpoAppleSignInNativeModule, TNativeSignInResult } from '../types'
+import { isWebAppleAvailable, webSignIn } from '../web/appleJs'
 
 jest.mock('../native-module', () => ({
   getNativeAppleModule: jest.fn(),
@@ -84,13 +85,33 @@ describe('AppleAuth.configure', () => {
   })
 
   it('keeps stored values when a field is undefined', () => {
-    AppleAuth.configure({ clientId: 'com.example.app.web', redirectUri: 'https://app.example.com/callback' })
+    AppleAuth.configure({
+      clientId: 'com.example.app.web',
+      redirectUri: 'https://app.example.com/callback',
+    })
     AppleAuth.configure({ clientId: undefined, redirectUri: undefined, scopes: ['email'] })
     expect(AppleAuth.getConfig()).toEqual({
       clientId: 'com.example.app.web',
       redirectUri: 'https://app.example.com/callback',
       scopes: ['email'],
     })
+  })
+})
+
+describe('subscribeToConfig', () => {
+  it('runs the listener once per configure call until it unsubscribes', () => {
+    const listener = jest.fn()
+    const unsubscribe = subscribeToConfig(listener)
+
+    AppleAuth.configure({ clientId: 'com.example.app.service' })
+    expect(listener).toHaveBeenCalledTimes(1)
+
+    AppleAuth.configure({ redirectUri: 'https://app.example.com/callback' })
+    expect(listener).toHaveBeenCalledTimes(2)
+
+    unsubscribe()
+    AppleAuth.configure({ scopes: ['email'] })
+    expect(listener).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -121,6 +142,46 @@ describe('AppleAuth.request iOS', () => {
     Platform.OS = 'ios'
     const response = await AppleAuth.request()
     expect(response.type).toBe('success')
+  })
+
+  it('passes the iOS-only name fields to credential.user', async () => {
+    getNative.mockReturnValue(
+      nativeModule({
+        signIn: jest.fn().mockResolvedValue({
+          ...nativeResult,
+          middleName: 'Byron',
+          namePrefix: 'Dr.',
+          nameSuffix: 'Jr.',
+          nickname: 'Ace',
+        }),
+      })
+    )
+
+    const credential = await AppleAuth.signIn()
+
+    expect(credential.user).toEqual({
+      id: 'user-1',
+      email: 'ada@example.com',
+      givenName: 'Ada',
+      familyName: 'Lovelace',
+      middleName: 'Byron',
+      namePrefix: 'Dr.',
+      nameSuffix: 'Jr.',
+      nickname: 'Ace',
+    })
+  })
+
+  it('sets the iOS-only name fields to null when the native result omits them', async () => {
+    getNative.mockReturnValue(nativeModule())
+
+    const credential = await AppleAuth.signIn()
+
+    expect(credential.user).toMatchObject({
+      middleName: null,
+      namePrefix: null,
+      nameSuffix: null,
+      nickname: null,
+    })
   })
 
   it('returns cancelled when the native module uses ERR_REQUEST_CANCELED', async () => {
@@ -287,19 +348,62 @@ describe('AppleAuth.getCredentialState', () => {
     await expect(AppleAuth.getCredentialState('u')).resolves.toBe('unknown')
   })
 
-  it('uses the in-memory credential on Android and web', async () => {
+  it('returns unknown on Android and web', async () => {
     Platform.OS = 'ios'
-    getNative.mockReturnValue(nativeModule())
+    const native = nativeModule()
+    getNative.mockReturnValue(native)
     await AppleAuth.signIn({ nonce: 'n' })
+    expect(AppleAuth.getCurrentCredential()?.user.id).toBe('user-1')
 
     Platform.OS = 'android'
-    await expect(AppleAuth.getCredentialState('user-1')).resolves.toBe('authorized')
+    await expect(AppleAuth.getCredentialState('user-1')).resolves.toBe('unknown')
     await expect(AppleAuth.getCredentialState('other')).resolves.toBe('unknown')
 
     Platform.OS = 'web'
-    await expect(AppleAuth.getCredentialState('user-1')).resolves.toBe('authorized')
-    await AppleAuth.signOut()
     await expect(AppleAuth.getCredentialState('user-1')).resolves.toBe('unknown')
+    await expect(AppleAuth.getCredentialState('other')).resolves.toBe('unknown')
+
+    await AppleAuth.signOut()
     expect(AppleAuth.getCurrentCredential()).toBeNull()
+    await expect(AppleAuth.getCredentialState('user-1')).resolves.toBe('unknown')
+
+    Platform.OS = 'android'
+    await expect(AppleAuth.getCredentialState('user-1')).resolves.toBe('unknown')
+    expect(native.getCredentialState).not.toHaveBeenCalled()
+  })
+})
+
+describe('AppleAuth.addRevokeListener', () => {
+  it('subscribes to credentialRevoked through the iOS native module', () => {
+    Platform.OS = 'ios'
+    const remove = jest.fn()
+    const addListener = jest.fn(() => ({ remove }))
+    getNative.mockReturnValue(nativeModule({ addListener }))
+    const listener = jest.fn()
+
+    const subscription = AppleAuth.addRevokeListener(listener)
+
+    expect(addListener).toHaveBeenCalledWith('credentialRevoked', listener)
+    expect(subscription).toBe(addListener.mock.results[0].value)
+    subscription.remove()
+    expect(remove).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns a no-op subscription when the native module has no addListener', () => {
+    Platform.OS = 'ios'
+    getNative.mockReturnValue(nativeModule())
+
+    const subscription = AppleAuth.addRevokeListener(jest.fn())
+
+    expect(() => subscription.remove()).not.toThrow()
+  })
+
+  it('returns a no-op subscription on web without a native module', () => {
+    Platform.OS = 'web'
+    getNative.mockReturnValue(null)
+
+    const subscription = AppleAuth.addRevokeListener(jest.fn())
+
+    expect(() => subscription.remove()).not.toThrow()
   })
 })

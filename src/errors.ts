@@ -1,3 +1,4 @@
+/** Error codes used by {@link AppleAuthError} on every platform. */
 export const EAppleAuthErrorCode = {
   Canceled: 'ERR_REQUEST_CANCELED',
   Failed: 'ERR_REQUEST_FAILED',
@@ -8,13 +9,20 @@ export const EAppleAuthErrorCode = {
   Unknown: 'ERR_REQUEST_UNKNOWN',
 } as const
 
+/** Alias of {@link EAppleAuthErrorCode}. */
 export const AppleAuthErrorCode = EAppleAuthErrorCode
 
+/** Union of the {@link EAppleAuthErrorCode} values. */
 export type TAppleAuthErrorCodeValue =
   (typeof EAppleAuthErrorCode)[keyof typeof EAppleAuthErrorCode]
 
+/** Alias of {@link TAppleAuthErrorCodeValue}. */
 export type AppleAuthErrorCodeValue = TAppleAuthErrorCodeValue
 
+/**
+ * Normalized Sign in with Apple error. `code` is an `ERR_*` string such as `ERR_REQUEST_CANCELED`,
+ * and `cause` keeps the original error when there is one.
+ */
 export class AppleAuthError extends Error {
   readonly code: string
   readonly cause?: unknown
@@ -27,10 +35,16 @@ export class AppleAuthError extends Error {
   }
 }
 
+/** Type guard for {@link AppleAuthError}. */
 export function isAppleAuthError(error: unknown): error is AppleAuthError {
   return error instanceof AppleAuthError
 }
 
+/**
+ * True for a user cancellation: an {@link AppleAuthError} with code `ERR_REQUEST_CANCELED`, or any
+ * object whose `code` is `ERR_REQUEST_CANCELED`, `ERR_CANCELED`, or `1001`
+ * (`ASAuthorizationError.canceled`).
+ */
 export function isCancelledError(error: unknown): boolean {
   if (isAppleAuthError(error)) {
     return error.code === EAppleAuthErrorCode.Canceled
@@ -48,6 +62,12 @@ export function isCancelledError(error: unknown): boolean {
   return false
 }
 
+/**
+ * Converts any thrown value into an {@link AppleAuthError}, returning an `AppleAuthError`
+ * unchanged. A `cancel` mention in `code`, `name`, or `message` maps to `ERR_REQUEST_CANCELED`, an
+ * `ERR_*` `code` is kept, and a `message` of the form `ERR_X: details` is split into code and
+ * message. Anything else becomes `ERR_REQUEST_UNKNOWN`.
+ */
 export function normalizeAppleError(error: unknown): AppleAuthError {
   if (error instanceof AppleAuthError) {
     return error

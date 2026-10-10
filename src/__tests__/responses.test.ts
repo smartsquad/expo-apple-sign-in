@@ -6,7 +6,16 @@ const credential = {
   authorizationCode: 'c',
   nonce: 'n',
   state: null,
-  user: { id: '1', email: null, givenName: null, familyName: null },
+  user: {
+    id: '1',
+    email: null,
+    givenName: null,
+    familyName: null,
+    middleName: null,
+    namePrefix: null,
+    nameSuffix: null,
+    nickname: null,
+  },
   realUserStatus: 'unknown',
 } satisfies TAppleCredential
 

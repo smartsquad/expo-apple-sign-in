@@ -38,8 +38,57 @@ describe('toAppleCredential', () => {
       email: 'ada@example.com',
       givenName: 'Ada',
       familyName: 'Lovelace',
+      middleName: null,
+      namePrefix: null,
+      nameSuffix: null,
+      nickname: null,
     })
     expect(credential.realUserStatus).toBe('likelyReal')
+  })
+
+  it('maps the iOS-only name fields', () => {
+    const credential = toAppleCredential(
+      {
+        identityToken: 't',
+        middleName: 'Byron',
+        namePrefix: 'Dr.',
+        nameSuffix: 'Jr.',
+        nickname: 'Ace',
+      },
+      'n'
+    )
+
+    expect(credential.user).toMatchObject({
+      middleName: 'Byron',
+      namePrefix: 'Dr.',
+      nameSuffix: 'Jr.',
+      nickname: 'Ace',
+    })
+  })
+
+  it('turns blank iOS-only name fields into null', () => {
+    const credential = toAppleCredential(
+      { identityToken: 't', middleName: '', namePrefix: '  ', nameSuffix: '', nickname: ' ' },
+      'n'
+    )
+
+    expect(credential.user).toMatchObject({
+      middleName: null,
+      namePrefix: null,
+      nameSuffix: null,
+      nickname: null,
+    })
+  })
+
+  it('turns missing iOS-only name fields into null', () => {
+    const credential = toAppleCredential({ identityToken: 't' }, 'n')
+
+    expect(credential.user).toMatchObject({
+      middleName: null,
+      namePrefix: null,
+      nameSuffix: null,
+      nickname: null,
+    })
   })
 
   it('maps native real-user status codes', () => {
@@ -63,6 +112,37 @@ describe('enrichUserFromToken', () => {
     )
     expect(credential.user.id).toBe('apple-user')
     expect(credential.user.email).toBe('hidden@privaterelay.appleid.com')
+  })
+
+  it('keeps the other user fields while filling id and email', () => {
+    const token = jwtWith({ sub: 'apple-user', email: 'hidden@privaterelay.appleid.com' })
+    const credential = enrichUserFromToken(
+      toAppleCredential(
+        {
+          identityToken: token,
+          user: null,
+          email: null,
+          givenName: 'Ada',
+          familyName: 'Lovelace',
+          middleName: 'Byron',
+          namePrefix: 'Dr.',
+          nameSuffix: 'Jr.',
+          nickname: 'Ace',
+        },
+        'n'
+      )
+    )
+
+    expect(credential.user).toEqual({
+      id: 'apple-user',
+      email: 'hidden@privaterelay.appleid.com',
+      givenName: 'Ada',
+      familyName: 'Lovelace',
+      middleName: 'Byron',
+      namePrefix: 'Dr.',
+      nameSuffix: 'Jr.',
+      nickname: 'Ace',
+    })
   })
 })
 

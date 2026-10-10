@@ -1,7 +1,7 @@
+import { AppleAuth } from '../AppleAuth'
 import { signInWithClerk } from '../adapters/clerk'
 import { signInWithFirebase, toFirebaseAppleCredential } from '../adapters/firebase'
 import { signInWithSupabase } from '../adapters/supabase'
-import { AppleAuth } from '../AppleAuth'
 import { EAppleAuthErrorCode } from '../errors'
 import type { TAppleCredential } from '../types'
 
@@ -10,7 +10,16 @@ const credential: TAppleCredential = {
   authorizationCode: 'code',
   nonce: 'raw-nonce',
   state: 'state',
-  user: { id: 'u1', email: 'a@b.c', givenName: 'Ada', familyName: 'Lovelace' },
+  user: {
+    id: 'u1',
+    email: 'a@b.c',
+    givenName: 'Ada',
+    familyName: 'Lovelace',
+    middleName: null,
+    namePrefix: null,
+    nameSuffix: null,
+    nickname: null,
+  },
   realUserStatus: 'likelyReal',
 }
 

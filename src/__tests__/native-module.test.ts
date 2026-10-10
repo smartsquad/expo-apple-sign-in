@@ -21,10 +21,11 @@ afterEach(() => {
 
 describe('getNativeAppleModule', () => {
   it('prefers the Expo Modules 2.0 global', () => {
-    ;(globalThis as { expo?: { modules?: { ExpoAppleSignIn?: TExpoAppleSignInNativeModule } } }).expo =
-      {
-        modules: { ExpoAppleSignIn: moduleStub },
-      }
+    ;(
+      globalThis as { expo?: { modules?: { ExpoAppleSignIn?: TExpoAppleSignInNativeModule } } }
+    ).expo = {
+      modules: { ExpoAppleSignIn: moduleStub },
+    }
 
     expect(getNativeAppleModule()).toBe(moduleStub)
     expect(requireOptional).not.toHaveBeenCalled()
