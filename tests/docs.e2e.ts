@@ -5,8 +5,8 @@ test('home page', async ({ app, screen, browser }) => {
   await app.open('/')
 
   await expect(browser).toHaveTitle(/Expo Apple Sign In/, { timeout: 30_000 })
-  await expect(screen.getByText('Sign in with Apple for Expo SDK 58')).toBeVisible()
-  await expect(screen.getByText('Requires Expo SDK 58.')).toBeVisible()
+  await expect(screen.getByText('Sign in with Apple for Expo SDK 58 (beta)')).toBeVisible()
+  await expect(screen.getByText('Requires Expo SDK 58 (beta).')).toBeVisible()
 })
 
 test('introduction page', async ({ app, screen, browser }) => {

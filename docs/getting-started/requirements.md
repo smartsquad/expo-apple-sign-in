@@ -1,12 +1,12 @@
 # Requirements
 
-`expo-apple-sign-in` needs an Expo SDK 58 project that runs as a development build, an Apple Developer Program membership, and the Apple identifiers for each platform you ship. Check the list below before you install the package, because a missing identifier only shows up later as a sign-in error.
+`expo-apple-sign-in` needs an Expo SDK 58 (beta) project that runs as a development build, an Apple Developer Program membership, and the Apple identifiers for each platform you ship. Check the list below before you install the package, because a missing identifier only shows up later as a sign-in error.
 
 ## Expo, React and React Native
 
-The library targets **Expo SDK 58** only. Its Swift and Kotlin modules are written with the Expo Modules 2.0 API, which earlier SDKs do not support, so the package cannot run on SDK 57 or older. The [Compatibility](/getting-started/compatibility) page lists the supported environments.
+The library targets **Expo SDK 58 (beta)** only. Its Swift and Kotlin modules are written with the Expo Modules 2.0 API, which earlier SDKs do not support, so the package cannot run on SDK 57 or older. The [Compatibility](/getting-started/compatibility) page lists the supported environments.
 
-The package declares `react` and `react-native` as peer dependencies without a version range, so it uses the versions your Expo SDK 58 project installs. The example app in the repository runs on these versions:
+The package declares `react` and `react-native` as peer dependencies without a version range, so it uses the versions your Expo SDK 58 (beta) project installs. The example app in the repository runs on these versions:
 
 | Package | Version in `example/package.json` |
 | --- | --- |
@@ -24,7 +24,7 @@ iOS and Android need a development build that includes the library's native modu
 | Platform | Minimum | Where it comes from |
 | --- | --- | --- |
 | iOS | iOS 16.4 | The deployment target in `ios/ExpoAppleSignIn.podspec`. |
-| Android | Set by your Expo SDK 58 project | `android/build.gradle` declares no `minSdkVersion`, `compileSdkVersion` or `targetSdkVersion`. It applies `expo-module-gradle-plugin`, so the module builds with the SDK levels of the app that includes it. |
+| Android | Set by your Expo SDK 58 (beta) project | `android/build.gradle` declares no `minSdkVersion`, `compileSdkVersion` or `targetSdkVersion`. It applies `expo-module-gradle-plugin`, so the module builds with the SDK levels of the app that includes it. |
 | Web | A browser page with a `document` | The library adds Apple's JavaScript SDK to the page with a `<script>` tag when sign-in starts. |
 
 ## Apple account and identifiers

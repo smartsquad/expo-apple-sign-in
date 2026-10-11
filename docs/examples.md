@@ -1,6 +1,6 @@
-# Examples
+# Demo
 
-The repository includes an example app in the `example` folder. It is a single-screen Expo SDK 58 app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
+The repository includes an example app in the [`example`](https://github.com/smartsquad/expo-apple-sign-in/tree/main/example) folder. It is a single-screen Expo SDK 58 (beta) app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
 
 ## What the example shows
 
@@ -15,15 +15,28 @@ The app uses the black button style, the `signIn` label, and a button that stret
 
 ## Run the example
 
-Install the library's dependencies at the repository root, then the example's own dependencies:
+iOS and Android need a development build. Expo Go cannot load the native module. From the repository root:
 
 ```bash
 npm install
 cd example
 npm install
+npx expo run:ios
 ```
 
-Then start the platform you want to test:
+`npx expo run:ios` compiles the development client and opens it on a simulator or a device. Android is the same kind of build:
+
+```bash
+npx expo run:android
+```
+
+Web needs no native build. From `example/`:
+
+```bash
+npx expo start --web --port 43180 --host lan
+```
+
+The `example/package.json` scripts call the same commands:
 
 | Script | Command | What it does |
 | --- | --- | --- |
@@ -31,8 +44,6 @@ Then start the platform you want to test:
 | `npm run android` | `expo run:android` | Builds the development client and runs it on an Android emulator or device. |
 | `npm run web` | `expo start --web --port 43180 --host lan` | Serves the web app on port 43180. |
 | `npm run start` | `expo start` | Starts the Expo dev server. |
-
-iOS and Android need a development build because Expo Go cannot load the native module. Web needs no native build.
 
 ## Configure Android and web
 

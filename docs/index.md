@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: expo-apple-sign-in
-  text: Sign in with Apple for Expo SDK 58
+  text: Sign in with Apple for Expo SDK 58 (beta)
   tagline: One API and one Apple-style button for iOS, Android and web, with adapters for Supabase, Clerk and Firebase.
   image:
     light: /logo-light.svg
@@ -36,11 +36,11 @@ features:
   <span class="platform-badge">iOS</span>
   <span class="platform-badge">Android</span>
   <span class="platform-badge">Web</span>
-  <span class="platform-badge">Expo SDK 58</span>
+  <span class="platform-badge">Expo SDK 58 (beta)</span>
   <span class="platform-badge">Modules 2.0</span>
 </div>
 
-<p class="sdk-notice"><strong>Requires Expo SDK 58.</strong> expo-apple-sign-in is built on Expo Modules 2.0, which earlier SDKs do not support, and Expo Go cannot load it, so iOS and Android need a development build.</p>
+<p class="sdk-notice"><strong>Requires Expo SDK 58 (beta).</strong> expo-apple-sign-in is built on Expo Modules 2.0, which earlier SDKs do not support, and Expo Go cannot load it, so iOS and Android need a development build.</p>
 
 ## Sign in with one component
 

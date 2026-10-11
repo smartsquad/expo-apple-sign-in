@@ -1,12 +1,12 @@
 # Compatibility
 
-`expo-apple-sign-in` runs on iOS, Android and web in Expo SDK 58 projects that use development builds or EAS Build. The table below shows which environments work and what each one needs, and the sections after it explain the SDK 58 limit and the browser behavior on web.
+`expo-apple-sign-in` runs on iOS, Android and web in Expo SDK 58 (beta) projects that use development builds or EAS Build. The table below shows which environments work and what each one needs, and the sections after it explain the SDK 58 (beta) limit and the browser behavior on web.
 
 ## Support table
 
 | Environment | Supported | Notes |
 | --- | --- | --- |
-| Expo SDK 58 | Yes | The only SDK the library targets. |
+| Expo SDK 58 (beta) | Yes | The only SDK the library targets. |
 | Expo SDK 57 and earlier | No | These SDKs lack the Expo Modules 2.0 API that the native code is written with. |
 | Expo Go | No | Expo Go cannot load the library's native module, `ExpoAppleSignIn`. |
 | Development builds | Yes | Build with `npx expo run:ios` or `npx expo run:android` after adding the config plugin. |
@@ -17,9 +17,9 @@
 
 Some behavior differs by platform. Only iOS reports a credential state and revocation: on Android and web, `AppleAuth.getCredentialState` always returns `'unknown'`, and `AppleAuth.addRevokeListener` returns a subscription whose listener never runs. Only iOS fills `middleName`, `namePrefix`, `nameSuffix`, and `nickname`, and the other platforms return `null` for them. iOS and Android run one sign-in at a time, so a second `signIn` call while the first is open rejects with `ERR_REQUEST_FAILED`.
 
-## Why only SDK 58
+## Why only SDK 58 (beta)
 
-The native modules are written with the Expo Modules 2.0 API that ships with SDK 58, and earlier SDKs do not support it. The Swift and Kotlin modules declare their functions with `@ExpoModule` and `@JS`, the Android build file turns on Modules 2.0 with `expoModule { v2 true }`, and Android registers the module through the Modules 2.0 generated module list. The iOS errors use the SDK 58 `Exception(name:description:code:)` initializer, which is how codes such as `ERR_REQUEST_CANCELED` reach JavaScript. The library has no code path for the older module API, so it cannot fall back on an earlier SDK.
+The native modules are written with the Expo Modules 2.0 API that ships with SDK 58 (beta), and earlier SDKs do not support it. The Swift and Kotlin modules declare their functions with `@ExpoModule` and `@JS`, the Android build file turns on Modules 2.0 with `expoModule { v2 true }`, and Android registers the module through the Modules 2.0 generated module list. The iOS errors use the SDK 58 (beta) `Exception(name:description:code:)` initializer, which is how codes such as `ERR_REQUEST_CANCELED` reach JavaScript. The library has no code path for the older module API, so it cannot fall back on an earlier SDK.
 
 ## Web browser notes
 
