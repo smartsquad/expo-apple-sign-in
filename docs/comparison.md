@@ -3,7 +3,7 @@
 This page compares `expo-apple-sign-in` 1.1.0 with three packages that React Native and React web apps use for Sign in with Apple: `expo-apple-authentication` 58.0.2, `@invertase/react-native-apple-authentication` 2.5.1, and `react-apple-signin-auth` 1.2.1. It covers platform support, native layers, nonce handling, the JavaScript each package adds to an app bundle, and what an app has to install to reach iOS, Android, and web. Every statement comes from the published package files or from a measurement described in [How we measured](#how-we-measured). The page also lists the cases where another package fits better.
 
 ::: info Versions
-All figures come from the package versions named above, including the `expo-apple-sign-in` size figures, which were measured on 1.1.0. `expo-apple-sign-in` 1.1.0 was built and packed from this repository because the package is not on npm yet. `expo-apple-authentication` 58.0.2 is the version bundled with Expo SDK 58.
+All figures come from the package versions named above, including the `expo-apple-sign-in` size figures, which were measured on 1.1.0. `expo-apple-sign-in` 1.1.0 is published on npm at [npmjs.com/package/expo-apple-sign-in](https://www.npmjs.com/package/expo-apple-sign-in). `expo-apple-authentication` 58.0.2 is the version bundled with Expo SDK 58.
 :::
 
 ## At a glance
@@ -26,7 +26,7 @@ All figures come from the package versions named above, including the `expo-appl
 | React hook | `useAppleAuth` | None | None | `useScript`, which loads Apple's script and does not sign in |
 | TypeScript types in the package | Yes | Yes | Yes | Yes |
 | License | MIT | MIT | Apache-2.0 | MIT |
-| Last npm publish | Not on npm yet | 2026-09-29 | 2026-01-09 | 2026-06-02 |
+| Last npm publish | [1.1.0](https://www.npmjs.com/package/expo-apple-sign-in), 2026-10-10 | 2026-09-29 | 2026-01-09 | 2026-06-02 |
 
 The six name components are `namePrefix`, `givenName`, `middleName`, `familyName`, `nameSuffix`, and `nickname`. Apple sends them only on the first authorization.
 
