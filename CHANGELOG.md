@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - Demo section in the README and the docs for the example app.
+- Sign-in recordings for iOS, Android, and web.
 
 ### Changed
 

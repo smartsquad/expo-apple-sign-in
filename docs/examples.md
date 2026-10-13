@@ -58,19 +58,21 @@ Without them, the example skips `AppleAuth.configure`, and sign-in on Android an
 
 The example's bundle identifier and Android package are `com.example.expoapplesignin`. To sign in on iOS, change `ios.bundleIdentifier` in `example/app.json` to an App ID in your team that has Sign in with Apple enabled, then rebuild.
 
-## Screenshots
+## Sign-in
+
+Each recording starts on the example, presses Sign in with Apple, shows Apple's sheet or page, and returns to a signed-in screen. The status line hides the email.
 
 <div class="example-shots">
   <figure>
-    <img src="/screenshots/example-ios.png" alt="The example app on an iPhone 17 Pro simulator, showing the platform, availability, the black Sign in with Apple button and the status line" width="736" height="1600">
-    <figcaption>The example on an iPhone 17 Pro simulator.</figcaption>
+    <img src="/screenshots/sign-in-ios.gif" alt="Sign in with Apple on an iPhone: the example, Apple's sheet, then a signed-in screen with the email hidden" width="390" height="848">
+    <figcaption>iPhone</figcaption>
   </figure>
   <figure>
-    <img src="/screenshots/example-android.png" alt="The example app on an Android emulator, showing the platform, availability, the black Sign in with Apple button and the status line" width="720" height="1600">
-    <figcaption>The example on an Android emulator.</figcaption>
+    <img src="/screenshots/sign-in-android.gif" alt="Sign in with Apple on an Android phone: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="390" height="846">
+    <figcaption>Android</figcaption>
   </figure>
   <figure>
-    <img src="/screenshots/example-web.png" alt="The example app in a browser, showing the platform, availability, the black Sign in with Apple button and the status line" width="739" height="1600">
-    <figcaption>The example in a browser.</figcaption>
+    <img src="/screenshots/sign-in-web.gif" alt="Sign in with Apple in a phone browser: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="390" height="846">
+    <figcaption>Web</figcaption>
   </figure>
 </div>

@@ -120,9 +120,9 @@ npx expo start --web --port 43180 --host lan
 Android and web read `EXPO_PUBLIC_APPLE_SERVICE_ID` and `EXPO_PUBLIC_APPLE_REDIRECT_URI`, either exported in the shell or written in `example/.env`. iOS signs in with the app's App ID. Set `ios.bundleIdentifier` in `example/app.json` to an App ID that has Sign in with Apple enabled, then rebuild. The same steps are on the [demo page](https://exsi.smartsquad.io/examples.html).
 
 <p align="center">
-  <img src="docs/public/screenshots/example-ios.png" alt="The example app on an iPhone 17 Pro simulator, showing the platform, availability, the black Sign in with Apple button and the status line" width="220" />
-  <img src="docs/public/screenshots/example-android.png" alt="The example app on an Android emulator, showing the platform, availability, the black Sign in with Apple button and the status line" width="220" />
-  <img src="docs/public/screenshots/example-web.png" alt="The example app in a browser, showing the platform, availability, the black Sign in with Apple button and the status line" width="220" />
+  <img src="docs/public/screenshots/sign-in-ios.gif" alt="Sign in with Apple on an iPhone: the example, Apple's sheet, then a signed-in screen with the email hidden" width="220" />
+  <img src="docs/public/screenshots/sign-in-android.gif" alt="Sign in with Apple on an Android phone: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="220" />
+  <img src="docs/public/screenshots/sign-in-web.gif" alt="Sign in with Apple in a phone browser: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="220" />
 </p>
 
 ## Providers
