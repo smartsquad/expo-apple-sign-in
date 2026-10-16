@@ -34,6 +34,15 @@ Serves `http://127.0.0.1:43180`.
 
 To test a change with real Sign in with Apple on web, Android, or an iPhone, follow the [local testing guide](https://exsi.smartsquad.io/guides/local-testing.html).
 
+## Release
+
+1. Update `version` in `package.json` with `npm version <x.y.z> --no-git-tag-version`, `version` and `versionName` in `android/build.gradle`, `metadata.version` in `skills/expo-apple-sign-in/SKILL.md`, and the library version sentence in `docs/reference/modules.md`.
+2. Move the `[Unreleased]` entries in `CHANGELOG.md` under a new `## [x.y.z] - YYYY-MM-DD` heading and update the compare links.
+3. Commit as `chore: release x.y.z` and merge into `main`.
+4. Tag the commit on `main` as `vx.y.z` and push the tag.
+
+The `release` workflow checks that the tag matches `package.json`, runs lint, tests, typecheck and build, and publishes to npm through trusted publishing from the `npm` environment, so no npm token is stored in the repository.
+
 ## Git
 
 - Subject only, lowercase English, form `type: summary`.

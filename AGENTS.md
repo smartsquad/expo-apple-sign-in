@@ -22,7 +22,7 @@ House style is inherited from Inksquad-platform, callingyou-ai, clickrisorse-pla
 6. Commits: `type: summary`, lowercase, subject only, no body, no `Co-authored-by`.
 7. Changelog sections: `Added`, `Changed`, `Removed` only.
 8. Docs are VitePress in `docs/`, published with GitHub Pages (images-in-motion pattern). Local: `npm run docs:dev` at `http://127.0.0.1:43173/`.
-9. Work on `develop`. GitHub Actions run only on `main` and on PRs into `main`.
+9. Work on `develop`. GitHub Actions run on `main`, on PRs into `main`, and on `v*` tags, which publish to npm.
 
 ## Commands
 
