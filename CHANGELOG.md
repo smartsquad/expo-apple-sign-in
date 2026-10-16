@@ -10,6 +10,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Sign-in recordings for iOS, Android, and web.
 - Added `webMode` (`'redirect'`, `'auto'`) for full-page web sign-in, `AppleAuth.hasWebRedirectResult()`, and the `expo-apple-sign-in/server` handler for Apple's POST.
 - Added `web:export` and `web:serve` to the example to test web sign-in through a tunnel.
+- Added a local testing guide for web, Android, and iPhone, and pointed the agent skill to it.
 
 ### Changed
 

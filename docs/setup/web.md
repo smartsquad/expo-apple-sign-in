@@ -179,42 +179,4 @@ Redirect mode does not load Apple JS. It needs the browser to load `https://appl
 
 ## Test locally through a tunnel
 
-Apple does not accept `localhost` or IP addresses as Services ID domains or Return URLs, so a dev server opened on `localhost` cannot complete sign-in. The example app serves a web export and answers Apple's POST, so a tunnel in front of it tests both modes. This walkthrough uses a Cloudflare quick tunnel.
-
-1. Build the library from the repository root, because the example's server imports `expo-apple-sign-in/server` from the built files.
-
-   ```bash
-   npm run build
-   ```
-
-2. Start the example's web server. It exports the app to `example/dist` and serves it at `http://127.0.0.1:43181` (set `PORT` to change the port).
-
-   ```bash
-   cd example
-   npm run web:serve
-   ```
-
-3. In another terminal, open the tunnel.
-
-   ```bash
-   cloudflared tunnel --url http://127.0.0.1:43181
-   ```
-
-   `cloudflared` reads `~/.cloudflared/config.yml` when it exists. If that file describes a named tunnel, start the quick tunnel with an empty home directory instead:
-
-   ```bash
-   HOME="$(mktemp -d)" cloudflared tunnel --url http://127.0.0.1:43181
-   ```
-
-4. In the Apple Developer portal, register the printed `*.trycloudflare.com` host under **Domains and Subdomains** of the Services ID, and `https://<host>/auth/callback` under **Return URLs**.
-5. Set both variables in `example/.env`, using the same host:
-
-   ```bash [example/.env]
-   EXPO_PUBLIC_APPLE_SERVICE_ID=com.example.app.web
-   EXPO_PUBLIC_APPLE_REDIRECT_URI=https://<host>/auth/callback
-   ```
-
-6. Stop `npm run web:serve` and start it again. Expo inlines `EXPO_PUBLIC_*` values when it exports, so the running server still has the old values.
-7. Open the tunnel URL in a desktop browser to try the popup and on a phone to try the redirect. The example sets `webMode: 'auto'`.
-
-A quick tunnel gets a new host every time it starts, so register the new host and Return URL each time. A deployed preview on an HTTPS domain works the same way, as long as it answers Apple's POST at the Return URL. `npm run web`, the Expo dev server, can only do popup sign-in, because it cannot answer the POST.
+Apple does not accept `localhost` or IP addresses as Services ID domains or Return URLs, so a dev server opened on `localhost` cannot complete sign-in. The example app's `npm run web:serve` serves a web export and answers Apple's POST, and a tunnel in front of it tests both modes. [Test locally](/guides/local-testing) walks through the tunnel, the Services ID, and the example on web, Android, and iPhone.

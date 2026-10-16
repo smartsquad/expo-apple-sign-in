@@ -60,6 +60,7 @@ const ESidebar = [
       { text: 'useAppleAuth hook', link: '/guides/hook' },
       { text: 'Errors', link: '/guides/errors' },
       { text: 'Backend verification', link: '/guides/backend' },
+      { text: 'Test locally', link: '/guides/local-testing' },
     ],
     collapsed: false,
   },

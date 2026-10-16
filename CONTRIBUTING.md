@@ -32,6 +32,8 @@ npm run web
 
 Serves `http://127.0.0.1:43180`.
 
+To test a change with real Sign in with Apple on web, Android, or an iPhone, follow the [local testing guide](https://exsi.smartsquad.io/guides/local-testing.html).
+
 ## Git
 
 - Subject only, lowercase English, form `type: summary`.

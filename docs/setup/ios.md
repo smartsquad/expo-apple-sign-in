@@ -62,6 +62,8 @@ To run on a connected iPhone instead, add `--device`:
 npx expo run:ios --device
 ```
 
+[Test locally](/guides/local-testing#test-on-an-iphone) walks through a Release build on an iPhone, including the bundle identifier and signing.
+
 ## Check the credential state
 
 The user can stop using Sign in with Apple for your app at any time from their Apple Account settings. `AppleAuth.getCredentialState(userId)` asks Apple for the current state of a user identifier you stored earlier, which lets your app react when access has been revoked:

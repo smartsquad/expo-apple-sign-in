@@ -42,7 +42,7 @@ The example configures `webMode: 'auto'`, so a phone or tablet uses redirect sig
 npm run web:serve
 ```
 
-`npm run web:serve` exports the app to `example/dist` and serves it at `http://127.0.0.1:43181` (`PORT` overrides the port). The server answers a POST on any path with `handleAppleWebRedirect`. Because Apple rejects `localhost`, put an HTTPS tunnel in front of it, as the [Web](/setup/web#test-locally-through-a-tunnel) page walks through. `EXPO_PUBLIC_*` values are inlined at export time, so run `npm run web:serve` again after you change `example/.env`.
+`npm run web:serve` exports the app to `example/dist` and serves it at `http://127.0.0.1:43181` (`PORT` overrides the port). The server answers a POST on any path with `handleAppleWebRedirect`. Because Apple rejects `localhost`, put an HTTPS tunnel in front of it, as [Test locally](/guides/local-testing) walks through. `EXPO_PUBLIC_*` values are inlined at export time, so run `npm run web:serve` again after you change `example/.env`.
 
 The `example/package.json` scripts call the same commands:
 

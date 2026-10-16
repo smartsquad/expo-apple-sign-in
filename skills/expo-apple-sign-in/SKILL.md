@@ -60,4 +60,15 @@ await signInWithClerk({ signIn, signUp, setActive })
 
 Use `useAppleAuth()` and render anything. It returns `signIn(options?)`, `signOut()`, `credential`, `isLoading`, `error`, `isAvailable`, and `isConfigured`, and clears `credential` when Apple revokes it on iOS. Use `<AppleButton />` for the HIG black/white button. Pass `onPress` to take over the press, or `children` to replace the Apple mark and the label. Other `Pressable` props, such as `testID`, pass through.
 
+## Test locally
+
+- Apple rejects `localhost` and IP addresses, so test web and Android through an HTTPS tunnel: `HOME="$(mktemp -d)" cloudflared tunnel --url http://127.0.0.1:<port>`.
+- Register the tunnel host and `https://<host>/<path>` on the Services ID, and pass that URL as `redirectUri`.
+- Quick-tunnel hosts change on every start, so register the new host and URL each time.
+- `EXPO_PUBLIC_*` values are inlined at bundle time. Rebuild or re-export after changing them.
+- Web redirect mode needs the app's server to answer Apple's POST. The example's `npm run web:serve` does.
+- Android only needs the Return URL registered. Nothing has to answer it.
+- iOS needs a physical device, or a simulator signed in to an Apple Account, and a bundle identifier whose App ID has Sign in with Apple.
+- Full steps: https://exsi.smartsquad.io/guides/local-testing.html
+
 Do **not** add `expo-crypto` or `expo-apple-authentication` for this flow.

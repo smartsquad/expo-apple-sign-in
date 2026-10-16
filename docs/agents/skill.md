@@ -11,6 +11,7 @@ The skill lives at `skills/expo-apple-sign-in/SKILL.md`. Its frontmatter names i
 - Supabase: `signInWithSupabase(supabase)` runs `AppleAuth.signIn()` and `supabase.auth.signInWithIdToken`. The skill warns against calling it from the `onSuccess` of `AppleButton`.
 - Clerk: `signInWithClerk({ signIn, signUp, setActive })` uses the `oauth_token_apple` strategy.
 - Custom UI: The section recommends `useAppleAuth()` for any interface, lists the values the hook returns, and notes that the hook clears `credential` when Apple revokes it on iOS. It names `AppleButton` for the black or white button, `onPress` to take over the press, and `children` to replace the Apple mark and the label, and it says that other `Pressable` props, such as `testID`, pass through.
+- Test locally: The section says that Apple rejects `localhost` and IP addresses, so web and Android sign-in goes through an HTTPS tunnel with the host and Return URL registered on the Services ID. It lists what a new tunnel host and a change to `EXPO_PUBLIC_*` values require, what web redirect mode and Android need from the server, what iOS needs, and links to the [local testing guide](/guides/local-testing).
 
 The skill also tells the agent not to add `expo-crypto` or `expo-apple-authentication` to this flow.
 
