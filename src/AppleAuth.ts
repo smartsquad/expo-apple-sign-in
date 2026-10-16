@@ -256,6 +256,10 @@ export const AppleAuth = {
    * subscription whose `remove` does nothing. Call `remove()` on unmount.
    */
   addRevokeListener(listener: () => void): TAppleEventSubscription {
+    if (Platform.OS !== 'ios') {
+      return { remove() {} }
+    }
+
     const native = getNativeAppleModule()
     if (native && typeof native.addListener === 'function') {
       return native.addListener('credentialRevoked', listener)

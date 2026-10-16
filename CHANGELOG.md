@@ -13,6 +13,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Marked Expo SDK 58 as beta in the README and the docs.
 - Dropped the Expo SDK 58 beta label. The library and the example app track the stable SDK (`expo@~58.0.12`, React Native 0.88.0).
+- `AppleAuth.addRevokeListener` stays a no-op on Android. The native module exposes `addListener` but declares no events, so subscribing threw before the first render.
 - Noted on the comparison page that 1.1.0 is published on npm.
 - Pointed the docs and README to react-native-nitro-google-signin for Google Sign-In and to Invertase for apps not on Expo SDK 58.
 - Serve the documentation at https://exsi.smartsquad.io/.

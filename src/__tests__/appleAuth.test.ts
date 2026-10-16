@@ -432,6 +432,17 @@ describe('AppleAuth.addRevokeListener', () => {
     expect(remove).toHaveBeenCalledTimes(1)
   })
 
+  it('returns a no-op subscription on Android even when addListener exists', () => {
+    Platform.OS = 'android'
+    const addListener = jest.fn()
+    getNative.mockReturnValue(nativeModule({ addListener }))
+
+    const subscription = AppleAuth.addRevokeListener(jest.fn())
+
+    expect(addListener).not.toHaveBeenCalled()
+    expect(() => subscription.remove()).not.toThrow()
+  })
+
   it('returns a no-op subscription when the native module has no addListener', () => {
     Platform.OS = 'ios'
     getNative.mockReturnValue(nativeModule())
