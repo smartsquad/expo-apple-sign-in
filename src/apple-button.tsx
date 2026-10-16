@@ -12,8 +12,8 @@ import {
   type ViewStyle,
 } from 'react-native'
 
-import { AppleAuth, claimWebRedirectReplay } from './AppleAuth'
-import { AppleLogo } from './AppleLogo'
+import { AppleAuth, claimWebRedirectReplay } from './apple-auth'
+import { AppleLogo } from './apple-logo'
 import { isCancelledError, normalizeAppleError, type AppleAuthError } from './errors'
 import type { TAppleButtonStyle, TAppleButtonType, TAppleCredential } from './types'
 

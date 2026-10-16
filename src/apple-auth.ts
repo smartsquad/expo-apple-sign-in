@@ -18,7 +18,7 @@ import type {
   TAppleScope,
   TAppleSignInOptions,
 } from './types'
-import { consumeWebRedirectResult, isWebAppleAvailable, webSignIn } from './web/appleJs'
+import { consumeWebRedirectResult, isWebAppleAvailable, webSignIn } from './web/apple-js'
 
 // MARK: - State
 

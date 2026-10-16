@@ -1,12 +1,12 @@
-export { AppleAuth } from './AppleAuth'
+export { AppleAuth } from './apple-auth'
 export {
   AppleButton,
   APPLE_BUTTON_HEIGHT,
   type IAppleButtonProps,
   type AppleButtonProps,
-} from './AppleButton'
-export { AppleLogo } from './AppleLogo'
-export { useAppleAuth } from './useAppleAuth'
+} from './apple-button'
+export { AppleLogo } from './apple-logo'
+export { useAppleAuth } from './use-apple-auth'
 export {
   AppleAuthError,
   AppleAuthErrorCode,

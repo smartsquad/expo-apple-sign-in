@@ -20,6 +20,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Pointed the docs and README to react-native-nitro-google-signin for Google Sign-In and to Invertase for apps not on Expo SDK 58.
 - Serve the documentation at https://exsi.smartsquad.io/.
 - Web popup sign-in sent the configured `redirectUri` to Apple unchanged instead of the current page URL.
+- Renamed the TypeScript source files and `internal/module-scripts` to kebab case, following Expo's file naming.
 
 ## [1.1.0] - 2026-10-10
 

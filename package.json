@@ -56,9 +56,9 @@
     "expo-module.config.json"
   ],
   "scripts": {
-    "build": "node internal/module_scripts/build.js && node internal/module_scripts/build.js plugin",
+    "build": "node internal/module-scripts/build.js && node internal/module-scripts/build.js plugin",
     "example:web": "npm run web --prefix example",
-    "clean": "node internal/module_scripts/clean.js && node internal/module_scripts/clean.js plugin",
+    "clean": "node internal/module-scripts/clean.js && node internal/module-scripts/clean.js plugin",
     "lint": "eslint src/ plugin/src/ tests/ e2e.config.ts",
     "test": "jest --testEnvironment=node",
     "test:e2e": "e2e run tests/example.e2e.ts --target example && e2e run tests/docs.e2e.ts --target docs",
@@ -68,9 +68,9 @@
     "docs:dev": "vitepress dev docs --host 127.0.0.1 --port 43173",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs --host 127.0.0.1 --port 43173",
-    "prepare": "node internal/module_scripts/prepare.js",
-    "open:ios": "node internal/module_scripts/open-ios.js",
-    "open:android": "node internal/module_scripts/open-android.js"
+    "prepare": "node internal/module-scripts/prepare.js",
+    "open:ios": "node internal/module-scripts/open-ios.js",
+    "open:android": "node internal/module-scripts/open-android.js"
   },
   "keywords": [
     "expo",

@@ -6,7 +6,7 @@ import {
   claimWebRedirectReplay,
   peekCurrentCredential,
   subscribeToConfig,
-} from './AppleAuth'
+} from './apple-auth'
 import { AppleAuthError, isCancelledError, normalizeAppleError } from './errors'
 import type {
   TAppleCredential,

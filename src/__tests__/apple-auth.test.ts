@@ -5,7 +5,7 @@ import {
   claimWebRedirectReplay,
   peekCurrentCredential,
   subscribeToConfig,
-} from '../AppleAuth'
+} from '../apple-auth'
 import { EAppleAuthErrorCode } from '../errors'
 import { getNativeAppleModule } from '../native-module'
 import { sha256Hex } from '../nonce'
@@ -14,13 +14,13 @@ import type {
   TExpoAppleSignInNativeModule,
   TNativeSignInResult,
 } from '../types'
-import { consumeWebRedirectResult, isWebAppleAvailable, webSignIn } from '../web/appleJs'
+import { consumeWebRedirectResult, isWebAppleAvailable, webSignIn } from '../web/apple-js'
 
 jest.mock('../native-module', () => ({
   getNativeAppleModule: jest.fn(),
 }))
 
-jest.mock('../web/appleJs', () => ({
+jest.mock('../web/apple-js', () => ({
   consumeWebRedirectResult: jest.fn(),
   isWebAppleAvailable: jest.fn(),
   webSignIn: jest.fn(),
@@ -525,13 +525,13 @@ describe('web redirect result', () => {
     let loaded: ReturnType<typeof require> | undefined
     jest.isolateModules(() => {
       loaded = {
-        mod: require('../AppleAuth'),
-        appleJs: require('../web/appleJs'),
+        mod: require('../apple-auth'),
+        appleJs: require('../web/apple-js'),
         rn: require('react-native'),
       }
     })
     const { mod, appleJs, rn } = loaded as {
-      mod: typeof import('../AppleAuth')
+      mod: typeof import('../apple-auth')
       appleJs: {
         consumeWebRedirectResult: jest.Mock
         webSignIn: jest.Mock

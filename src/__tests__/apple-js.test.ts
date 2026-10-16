@@ -24,7 +24,7 @@ type TBrowserStub = {
   attached: () => TScriptStub | null
 }
 
-type TAppleJsModule = typeof import('../web/appleJs')
+type TAppleJsModule = typeof import('../web/apple-js')
 
 type TWebParams = Parameters<TAppleJsModule['webSignIn']>[0]
 
@@ -104,7 +104,7 @@ function installBrowser(
 function loadAppleJs(): TAppleJsModule {
   jest.resetModules()
 
-  return require('../web/appleJs') as TAppleJsModule
+  return require('../web/apple-js') as TAppleJsModule
 }
 
 function rejectingAuth(rejection: unknown): TAppleJsAuth {
