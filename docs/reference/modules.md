@@ -93,7 +93,7 @@ With `form_post`, Apple sends the result as a POST request to the redirect URI. 
 
 The close button ends the flow as a cancel, and so does the system back action, which the activity handles through `OnBackPressedDispatcher`. If the activity is destroyed before a result arrives, the pending request is canceled as well. Only one request can be pending at a time. A second `signIn` call rejects with `ERR_REQUEST_FAILED` and a message that contains `A Sign in with Apple request is already in progress.`
 
-The library manifest declares `configChanges` for orientation, screen size, hardware keyboard availability, screen layout, and UI mode, so a rotation or a switch to dark mode keeps the activity, its WebView, and the page Apple is showing. The activity also uses `adjustResize`, so the page resizes when the keyboard opens. `android/build.gradle` sets the library version to `1.1.0`.
+The library manifest declares `configChanges` for orientation, screen size, hardware keyboard availability, screen layout, and UI mode, so a rotation or a switch to dark mode keeps the activity, its WebView, and the page Apple is showing. The activity also uses `adjustResize`, so the page resizes when the keyboard opens. `android/build.gradle` sets the library version to `1.2.0`.
 
 ## How errors reach JavaScript
 

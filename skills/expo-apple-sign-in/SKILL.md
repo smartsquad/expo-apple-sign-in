@@ -5,7 +5,7 @@ license: MIT
 compatibility: Expo SDK 58 apps built as development or release builds (Expo Go cannot load the native module). Android and web need an Apple Services ID and an HTTPS redirect URI.
 metadata:
   author: massimodeluisa
-  version: "1.1.0"
+  version: "1.2.0"
   website: https://exsi.smartsquad.io
   repository: https://github.com/smartsquad/expo-apple-sign-in
   npm: https://www.npmjs.com/package/expo-apple-sign-in

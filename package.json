@@ -1,6 +1,6 @@
 {
   "name": "expo-apple-sign-in",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Universal Sign in with Apple for Expo SDK 58 / Modules 2.0. One API, configurable button, iOS + Android + Web. Clerk, Supabase, and Firebase ready.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -52,6 +52,9 @@
     "plugin/src",
     "ios",
     "android",
+    "!android/build",
+    "!android/src/androidTest",
+    "!android/src/test",
     "app.plugin.js",
     "expo-module.config.json"
   ],

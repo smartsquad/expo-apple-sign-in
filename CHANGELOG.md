@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-16
+
 ### Added
 
 - Demo section in the README and the docs for the example app.
@@ -12,12 +14,11 @@ All notable changes to this project are documented here. The format follows [Kee
 - Added `web:export` and `web:serve` to the example to test web sign-in through a tunnel.
 - Added a local testing guide for web, Android, and iPhone, and pointed the agent skill to it.
 - Added a skills.sh badge and an agent skill section to the README.
+- Added a release workflow that publishes tagged versions to npm through trusted publishing, with provenance.
 
 ### Changed
 
-- Aligned the agent skill's Expo Router API route example with its configured Apple redirect URI.
-- Marked Expo SDK 58 as beta in the README and the docs.
-- Dropped the Expo SDK 58 beta label. The library and the example app track the stable SDK (`expo@~58.0.12`, React Native 0.88.0).
+- Moved the library and the example app to the stable Expo SDK 58 (`expo@~58.0.12`, React Native 0.88.0).
 - `AppleAuth.addRevokeListener` stays a no-op on Android. The native module exposes `addListener` but declares no events, so subscribing threw before the first render.
 - Noted on the comparison page that 1.1.0 is published on npm.
 - Pointed the docs and README to react-native-nitro-google-signin for Google Sign-In and to Invertase for apps not on Expo SDK 58.
@@ -25,6 +26,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Web popup sign-in sent the configured `redirectUri` to Apple unchanged instead of the current page URL.
 - Renamed the TypeScript source files and `internal/module-scripts` to kebab case, following Expo's file naming.
 - Rewrote the agent skill with Agent Skills frontmatter and full coverage of setup, adapters, web redirect, errors, and server verification.
+- The npm package leaves out local Android build output (`android/build`).
 
 ## [1.1.0] - 2026-10-10
 
@@ -125,7 +127,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - The config plugin loads `@expo/config-plugins` from the Expo process that requires it, so `file:` and sibling installs work.
 - The npm package ships `src` without tests, because the `react-native` and `browser` export conditions point at it.
 
-[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/smartsquad/expo-apple-sign-in/compare/v1.0.0...v1.0.1
