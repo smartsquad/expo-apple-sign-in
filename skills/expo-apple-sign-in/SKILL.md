@@ -195,7 +195,7 @@ const { credential, data } = await signInWithFirebase(signInWithApple)
 
 - Popup is the default (`webMode: 'popup'`). A blocked popup rejects with `ERR_REQUEST_FAILED`.
 - For phone browsers set `webMode: 'auto'` (redirect on Android, iPhone, iPad, and iPod browsers, popup elsewhere) or `'redirect'`.
-- Answer Apple's POST at the `redirectUri` path with `handleAppleWebRedirect` in an Expo Router route such as `app/auth/callback+api.ts`:
+- Answer Apple's POST at the `redirectUri` path with `handleAppleWebRedirect` in an Expo Router route such as `app/auth/apple+api.ts`:
 
 ```ts
 import { handleAppleWebRedirect } from 'expo-apple-sign-in/server'
