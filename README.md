@@ -14,6 +14,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/expo-apple-sign-in"><img src="https://img.shields.io/npm/v/expo-apple-sign-in?style=flat-square" alt="npm version" /></a>
+  <a href="https://skills.sh/smartsquad/expo-apple-sign-in"><img src="https://skills.sh/b/smartsquad/expo-apple-sign-in" alt="skills.sh" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT" /></a>
   <a href="https://expo.dev/"><img src="https://img.shields.io/badge/Expo%20SDK-58-000020?style=flat-square&logo=expo&logoColor=white" alt="Expo SDK 58" /></a>
   <img src="https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Web-4630EB?style=flat-square" alt="Platforms: iOS, Android, Web" />
@@ -142,6 +143,16 @@ Each adapter runs Sign in with Apple and hands the result to your auth service i
 Sign in with Apple works differently on each platform: iOS shows a native sheet, while Android and web have to go through Apple's web flow with a Services ID. This package puts those paths behind one call and one credential shape, so the code that talks to your backend is the same on iOS, Android and web. It also handles the nonce for you and ships adapters for the three common auth providers. The [comparison](https://exsi.smartsquad.io/comparison.html) shows how it relates to other Sign in with Apple packages for React Native and Expo.
 
 Google Sign-In is not this package. [react-native-nitro-google-signin](https://react-native-nitro-google-sign-in.github.io/) is the library to use for that, on Android Credential Manager and on iOS. If the app needs Sign in with Apple and cannot take Expo SDK 58, [@invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) is the one to use, including its Android module. Both are good libraries.
+
+## Agent skill
+
+The repository ships an Agent Skill that teaches coding agents the `expo-apple-sign-in` API, the nonce rule, the Apple Developer setup for each platform, and the Supabase, Clerk, and Firebase adapters. Install it with the `skills` CLI:
+
+```bash
+npx skills add smartsquad/expo-apple-sign-in
+```
+
+Add `-g` for a user-level install, or `-a claude-code` (or another agent) to target one agent. The [agent skill page](https://exsi.smartsquad.io/agents/skill.html) lists what the skill covers.
 
 ## Documentation
 

@@ -11,6 +11,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Added `webMode` (`'redirect'`, `'auto'`) for full-page web sign-in, `AppleAuth.hasWebRedirectResult()`, and the `expo-apple-sign-in/server` handler for Apple's POST.
 - Added `web:export` and `web:serve` to the example to test web sign-in through a tunnel.
 - Added a local testing guide for web, Android, and iPhone, and pointed the agent skill to it.
+- Added a skills.sh badge and an agent skill section to the README.
 
 ### Changed
 
@@ -22,6 +23,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Serve the documentation at https://exsi.smartsquad.io/.
 - Web popup sign-in sent the configured `redirectUri` to Apple unchanged instead of the current page URL.
 - Renamed the TypeScript source files and `internal/module-scripts` to kebab case, following Expo's file naming.
+- Rewrote the agent skill with Agent Skills frontmatter and full coverage of setup, adapters, web redirect, errors, and server verification.
 
 ## [1.1.0] - 2026-10-10
 

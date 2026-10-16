@@ -4,16 +4,24 @@ The repository includes an agent skill, a Markdown file that tells an AI coding 
 
 ## What the skill teaches
 
-The skill lives at `skills/expo-apple-sign-in/SKILL.md`. Its frontmatter names it `expo-apple-sign-in` and tells an agent to use it when adding Apple auth, replacing `expo-apple-authentication`, or wiring Clerk, Supabase, or Firebase. The body has these sections:
+The skill lives at `skills/expo-apple-sign-in/SKILL.md` and follows the Agent Skills format that the `skills` CLI and skills.sh read. Its frontmatter sets `name` to `expo-apple-sign-in`, which matches the directory name. The `description` says what the skill does (Sign in with Apple on Expo SDK 58 for iOS, Android, and web, with the adapters for Supabase, Clerk, and Firebase). It then lists the situations that should load it, such as replacing `expo-apple-authentication`, setting up the Services ID, passing the nonce to Supabase or Firebase, enabling web redirect sign-in on phones, verifying the identity token on a server, and testing through a tunnel. It also excludes Expo SDK 57 and older, Expo Go, and native apps without Expo, and ends with a trigger list of terms and error codes such as `invalid_client` and `ERR_REQUEST_CANCELED`. The `license` is MIT, `compatibility` states that the skill needs a development or release build and that Android and web need a Services ID and an HTTPS redirect URI, and `metadata` carries the author, the version (which matches the package version), the website, the repository, and the npm page.
 
-- Install: Run `npx expo install expo-apple-sign-in`, add `"expo-apple-sign-in"` to `expo.plugins`, and rebuild with `npx expo prebuild` and `npx expo run:ios` or `npx expo run:android`. The skill states that the library needs Expo SDK 58 and that Expo Go cannot load it.
-- API: The section shows the imports (`AppleAuth`, `AppleButton`, `useAppleAuth`, and the adapters) and the `AppleAuth.configure` call for Android and web. Its first rules say that iOS uses the native `AuthenticationServices` framework and needs no Services ID, that Android and web need a Services ID and an HTTPS redirect URI, and that the library hashes the nonce and returns the raw one. Further rules explain how a cancel surfaces from `signIn` and from `request`, what `isAvailable`, `toFirebaseAppleCredential`, `getCredentialState`, and `addRevokeListener` return, and that only iOS calls the revoke listener. The next rules cover the limit of one sign-in at a time on iOS and Android, the click handler that the web popup needs, the name fields that only iOS fills, and the web redirect setup: `webMode: 'auto'` with `export const POST = handleAppleWebRedirect` in an Expo Router `+api.ts` route at `redirectUri`, plus the way `AppleButton`, `useAppleAuth`, or `AppleAuth.hasWebRedirectResult()` picks up the result after the return.
-- Supabase: `signInWithSupabase(supabase)` runs `AppleAuth.signIn()` and `supabase.auth.signInWithIdToken`. The skill warns against calling it from the `onSuccess` of `AppleButton`.
-- Clerk: `signInWithClerk({ signIn, signUp, setActive })` uses the `oauth_token_apple` strategy.
-- Custom UI: The section recommends `useAppleAuth()` for any interface, lists the values the hook returns, and notes that the hook clears `credential` when Apple revokes it on iOS. It names `AppleButton` for the black or white button, `onPress` to take over the press, and `children` to replace the Apple mark and the label, and it says that other `Pressable` props, such as `testID`, pass through.
+The body is an agent reference with these sections:
+
+- Rules: Pass `credential.nonce` unchanged and never hash it again, do not add `expo-crypto`, `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, or `react-apple-signin-auth`, use a development or release build instead of Expo Go, never log tokens, codes, or nonces, never ship `.p8` keys, expect `ERR_REQUEST_FAILED` from a second concurrent sign-in on iOS and Android, and call `signIn` from a press or click handler on web.
+- Install: Run `npx expo install expo-apple-sign-in`, add the plugin to `expo.plugins`, remove `ios.usesAppleSignIn`, and rebuild with `npx expo prebuild --clean` and `npx expo run:ios` or `npx expo run:android`.
+- Apple Developer setup: iOS needs the Sign in with Apple capability on the App ID and no Services ID. Android and web need a Services ID with the domain and the exact Return URL, over HTTPS, and web needs a Return URL on the page's own origin.
+- Configure: `AppleAuth.configure({ clientId, redirectUri, scopes?, webMode? })` once at startup, what iOS ignores, what `isConfigured()` returns, a per-platform `redirectUri` snippet, and the accepted scopes.
+- Sign in: `AppleAuth.signIn` and `AppleAuth.request` with their outcomes and the response helpers, the options, the credential fields, the first-authorization rule for name and email, the fields only iOS fills, and what `isAvailable`, `getCurrentCredential`, `signOut`, `generateNonce`, and `sha256Hex` do.
+- Button and hook: The props of `AppleButton`, the rule that `onPress` takes over the press, why an adapter belongs in `onPress` and not in `onSuccess`, and the options and return values of `useAppleAuth`.
+- Providers: The `signInWithSupabase`, `signInWithClerk`, and `signInWithFirebase` calls with the shape each one returns, the Client IDs field in Supabase, the `@clerk/expo/legacy` hooks, the Firebase JS SDK snippet, `toFirebaseAppleCredential`, the React Native Firebase variant, and the `ERR_MISSING_IDENTITY_TOKEN` error that all three adapters throw.
+- Web: The popup default, `webMode: 'auto'` and `'redirect'`, the `handleAppleWebRedirect` route, the Expo Router settings that turn API routes on, how the result is replayed after the return, and the Content Security Policy entry for `https://appleid.apple.com`.
+- iOS credential state: `getCredentialState` and `addRevokeListener`, and the fact that Android and web return `'unknown'` and never call the listener.
+- Errors: A table of the seven error codes, with `isAppleAuthError`, `isCancelledError`, and `AppleAuthErrorCode`.
+- Verify on a server: The signature, issuer, audience, expiry, and nonce checks, and the advice to use `sub` as the account key.
 - Test locally: The section says that Apple rejects `localhost` and IP addresses, so web and Android sign-in goes through an HTTPS tunnel with the host and Return URL registered on the Services ID. It lists what a new tunnel host and a change to `EXPO_PUBLIC_*` values require, what web redirect mode and Android need from the server, what iOS needs, and links to the [local testing guide](/guides/local-testing).
-
-The skill also tells the agent not to add `expo-crypto` or `expo-apple-authentication` to this flow.
+- Troubleshooting: A symptom-to-fix list for `invalid_client`, `ERR_NOT_CONFIGURED`, a rejected Supabase nonce, the iOS Simulator, a blocked popup, Apple's error page in a phone browser, a 405 or 404 on Apple's POST, and a missing name or email.
+- Docs: Links to this site, the API reference, and `llms-full.txt`.
 
 ## Install the skill
 
@@ -22,6 +30,8 @@ Use the `skills` CLI to add it to a project:
 ```bash
 npx skills add smartsquad/expo-apple-sign-in
 ```
+
+Add `-g` for a user-level install, or `-a claude-code` (or another agent) to target one agent. The skill's listing lives at [skills.sh/smartsquad/expo-apple-sign-in](https://skills.sh/smartsquad/expo-apple-sign-in).
 
 To install it by hand, copy the `skills/expo-apple-sign-in/` directory from the [GitHub repository](https://github.com/smartsquad/expo-apple-sign-in) into your project as `.claude/skills/expo-apple-sign-in/` for Claude Code, or `.agents/skills/expo-apple-sign-in/` for agents that read that directory.
 
