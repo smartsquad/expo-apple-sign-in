@@ -66,7 +66,7 @@ AppleAuth.configure({
 
 Symptom: The Apple page in the Android WebView or the web popup reports `invalid_client`, or an error about the redirect URL, instead of the sign-in form.
 
-Cause: On Android the library sends `clientId` as `client_id` and `redirectUri` as `redirect_uri` to `https://appleid.apple.com/auth/authorize`, unchanged. Apple compares them with the Services ID and the Return URLs registered in the Developer portal. On web the library passes `redirectUri` to Apple JS, or the current page URL without its hash when `redirectUri` has the same origin and path as the page. A `clientId` that is not a registered Services ID, or a redirect URL that is not registered as a Return URL on that Services ID, fails this comparison.
+Cause: On Android the library sends `clientId` as `client_id` and `redirectUri` as `redirect_uri` to `https://appleid.apple.com/auth/authorize`, unchanged. Apple compares them with the Services ID and the Return URLs registered in the Developer portal. On web the library passes `redirectUri` to Apple JS, or to the authorize URL in redirect mode, unchanged. A `clientId` that is not a registered Services ID, or a redirect URL that is not registered as a Return URL on that Services ID, fails this comparison.
 
 Fix: Open the Services ID in the Apple Developer portal, open its Sign in with Apple configuration, and register the exact domain and Return URL that you pass as `redirectUri`. The values must match character by character, including the scheme and the path. Then compare the `clientId` in your code with the Services ID. See [Apple Developer](/setup/apple-developer).
 
@@ -74,13 +74,15 @@ Fix: Open the Services ID in the Apple Developer portal, open its Sign in with A
 
 Symptom: On web, sign-in fails before Apple opens with `ERR_NOT_CONFIGURED` and a message that the web `redirectUri` origin must match the page, or the popup lands on a different host than your app.
 
-Cause: In popup mode, Apple posts the result to the redirect URL, and that page must hand the result back to the page that opened the popup. The library checks that the origin of `redirectUri` equals the origin of the current page. An address on the main site, such as `example.com`, does not match an app served from a subdomain, such as `web.example.com`.
+Cause: Apple posts the result to the redirect URL, and that page must hand the result back to the page that started sign-in: to the opener in popup mode, and to the same tab in redirect mode. The library checks that the origin of `redirectUri` equals the origin of the current page in both modes. An address on the main site, such as `example.com`, does not match an app served from a subdomain, such as `web.example.com`. A Supabase callback URL such as `https://<project>.supabase.co/auth/v1/callback` is on another origin too, so the same check rejects it on web.
 
 Fix:
 
 1. Register `https://web.example.com/auth/apple`, the address on the host that serves your web app, as a Return URL on the Services ID.
 2. Pass that URL to `AppleAuth.configure` on web. Do not reuse the redirect that Android uses if it lives on another host.
 3. Reload the web app.
+
+The library signs in with the identity token, so web does not need Supabase's callback URL. Use a Return URL on the web app's origin instead.
 
 Because the value differs by platform, choose it per platform when you configure:
 
@@ -154,8 +156,47 @@ Fix: Allow scripts from `appleid.apple.com` and check the network tab for the SD
 
 ### The browser blocks the Apple popup
 
-Symptom: On web, `AppleAuth.signIn()` rejects with `ERR_REQUEST_FAILED` and the message `The browser blocked the Apple sign-in popup. Call signIn from a click handler.`
+Symptom: On web in popup mode, `AppleAuth.signIn()` rejects with `ERR_REQUEST_FAILED` and the message `The browser blocked the Apple sign-in popup. Call signIn from a click handler.`
 
 Cause: Browsers open a popup only in response to a user gesture such as a click. When `signIn` runs from an effect or a timer, the browser blocks the window and Apple JS rejects with `popup_blocked_by_browser`.
 
 Fix: Call `AppleAuth.signIn()`, or the `signIn` function from `useAppleAuth`, inside the press or click handler. Without an `onPress` prop, `AppleButton` calls `AppleAuth.signIn()` from its own press handler.
+
+### Apple's page stops with an error in a phone browser
+
+Symptom: In a phone browser, popup sign-in stops on Apple's confirm step with `Your request could not be completed because of an error.` This was seen in Brave on Android. Other phone browsers have not been tested.
+
+Cause: Not diagnosed. Apple's page shows only this generic message. The failure happens with the default `webMode`, `'popup'`, which opens Apple's page in a popup window, while redirect mode, which sends the whole tab to Apple, completed sign-in in the same browser.
+
+Fix: Set `webMode: 'auto'`, which uses redirect on phones and tablets and the popup elsewhere, and add a route that answers Apple's POST at `redirectUri`. See [Choose a web mode](/setup/web#choose-a-web-mode) and [Answer Apple's POST](/setup/web#answer-apple-s-post).
+
+```ts [lib/apple-auth.ts]
+import { AppleAuth } from 'expo-apple-sign-in'
+
+AppleAuth.configure({
+  clientId: 'com.example.app.web',
+  redirectUri: 'https://app.example.com/auth/callback',
+  webMode: 'auto',
+})
+```
+
+### Sign-in returns to the app but nothing happens
+
+Symptom: In redirect mode, Apple's page finishes and the browser returns to the app, but no credential arrives and no callback runs.
+
+Cause: One of these applies.
+
+- The page the user returns to renders neither `AppleButton` nor `useAppleAuth`, and it does not check `AppleAuth.hasWebRedirectResult()`, so nothing asks for the result.
+- The result came back in another tab. `sessionStorage` belongs to one tab, so the tab that started sign-in never receives it, and the other tab reports `ERR_REQUEST_FAILED` with `Apple sign-in returned to a tab with no pending sign-in. Start the sign-in again from this tab.`
+- The browser blocks `sessionStorage`, or the storage was cleared between the redirect and the return.
+- Something already took the result. The library delivers it once, and the first `AppleButton` or `useAppleAuth` to mount, or the first call to `signIn` or `request`, claims it.
+
+Fix: Render `AppleButton` or `useAppleAuth` on the page that starts sign-in, or check `AppleAuth.hasWebRedirectResult()` at startup and call `AppleAuth.signIn()` or your adapter when it is `true`, as [Usage](/guides/usage#pick-up-a-web-redirect-result) shows. Start sign-in again from the tab that should receive the result.
+
+### Apple's POST gets 405 or 404
+
+Symptom: After the person confirms on Apple's page, the browser shows a 405 or a 404 from your host instead of returning to the app.
+
+Cause: In redirect mode, Apple sends a POST to `redirectUri`, and the host has no route that answers it. A static host serves only GET requests, so it cannot answer the POST. A route at a different path than the registered Return URL gets a 404. In Expo Router, API routes are off unless `web.output` is `server`, or `web.output` is `static` with `["expo-router", { "apiRoutes": true }]` in `plugins`. `handleAppleWebRedirect` itself answers other methods with 405, so a GET to the route also returns 405.
+
+Fix: Deploy to a host that runs server code. Put the route at the path of `redirectUri`, for example `app/auth/callback+api.ts` for `https://app.example.com/auth/callback`, and set one of the two `app.json` options. See [Answer Apple's POST](/setup/web#answer-apple-s-post).

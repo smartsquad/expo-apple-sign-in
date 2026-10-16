@@ -119,6 +119,10 @@ Clerk verifies the identity token itself, so the adapter sends no nonce to Clerk
 Clerk documents `oauth_token_apple` for native iOS. On Android and web the token's audience is your Services ID, and Clerk does not document that case. The adapter runs on those platforms, but test sign-in against your own Clerk instance on each platform you ship before you rely on it. The [Android](/setup/android) and [Web](/setup/web) pages cover the platform setup.
 :::
 
+## Web redirect mode
+
+With `webMode: 'redirect'` or `'auto'`, web sign-in [leaves the page for Apple](/setup/web#how-redirect-sign-in-works) and returns through a server route. Keep `signInWithClerk` in the `onPress` of `AppleButton`. The button calls it again when the page loads after the return, and the adapter receives Apple's result without a second sheet. Without `AppleButton`, call `signInWithClerk` at startup when `AppleAuth.hasWebRedirectResult()` is `true`. [Usage](/guides/usage#pick-up-a-web-redirect-result) has a runnable example.
+
 ## Next steps
 
 - [Errors](/guides/errors) lists the codes `AppleAuthError` can carry.

@@ -25,7 +25,7 @@ iOS and Android need a development build that includes the library's native modu
 | --- | --- | --- |
 | iOS | iOS 16.4 | The deployment target in `ios/ExpoAppleSignIn.podspec`. |
 | Android | Set by your Expo SDK 58 project | `android/build.gradle` declares no `minSdkVersion`, `compileSdkVersion` or `targetSdkVersion`. It applies `expo-module-gradle-plugin`, so the module builds with the SDK levels of the app that includes it. |
-| Web | A browser page with a `document` | The library adds Apple's JavaScript SDK to the page with a `<script>` tag when sign-in starts. |
+| Web | A browser page with a `document` | In popup mode, the library adds Apple's JavaScript SDK to the page with a `<script>` tag when sign-in starts. Redirect mode (`webMode: 'redirect'` or `'auto'`) needs `sessionStorage` and a server route that accepts POST at `redirectUri`. |
 
 ## Apple account and identifiers
 
@@ -35,6 +35,6 @@ You need a membership in the Apple Developer Program to enable Sign in with Appl
 | --- | --- | --- |
 | iOS | The App ID that matches your bundle identifier, with Sign in with Apple enabled. | Nothing. iOS reads it from the signed app. |
 | Android | A Services ID with a domain and an HTTPS Return URL. | `clientId` (the Services ID) and `redirectUri` in `AppleAuth.configure`. |
-| Web | The same Services ID, with a Return URL on the same origin as your web app. | `clientId` and `redirectUri` in `AppleAuth.configure`. |
+| Web | The same Services ID, with a Return URL on the same origin as your web app. In redirect mode, the Return URL is a server route that accepts POST. | `clientId` and `redirectUri` in `AppleAuth.configure`. |
 
 Apple does not accept `localhost` or IP addresses as Services ID domains or Return URLs, so testing Android or web needs an HTTPS host that you can register. [Apple Developer](/setup/apple-developer) walks through creating the App ID setting, the Services ID and, if your server needs one, the Sign in with Apple key.

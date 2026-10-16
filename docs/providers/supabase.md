@@ -152,6 +152,10 @@ Apple returns the full name only the first time a person authorizes your app, an
 
 Apple's name and email facts are explained in [Usage](/guides/usage#what-the-credential-contains).
 
+## Web redirect mode
+
+With `webMode: 'redirect'` or `'auto'`, web sign-in [leaves the page for Apple](/setup/web#how-redirect-sign-in-works) and returns through a server route. Keep `signInWithSupabase` in the `onPress` of `AppleButton`. The button calls it again when the page loads after the return, and the adapter receives Apple's result without a second sheet. Without `AppleButton`, call `signInWithSupabase` at startup when `AppleAuth.hasWebRedirectResult()` is `true`. [Usage](/guides/usage#pick-up-a-web-redirect-result) has a runnable example.
+
 ## Next steps
 
 - [Backend verification](/guides/backend) for the checks Supabase performs on your behalf, if you also run your own server.

@@ -13,7 +13,13 @@ export default {
           executable: 'npm',
           args: ['run', 'web', '--prefix', 'example'],
           // The runner gives the app process only PATH, HOME and temp variables plus this env.
-          env: { NODE_ENV: 'development', CI: '1', EXPO_NO_TELEMETRY: '1', BROWSER: 'none' },
+          env: {
+            NODE_ENV: 'development',
+            CI: '1',
+            EXPO_NO_TELEMETRY: '1',
+            EXPO_NO_DOTENV: '1',
+            BROWSER: 'none',
+          },
           startupTimeout: 180_000,
           log: '.e2e/logs/example.log',
         },

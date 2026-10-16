@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Demo section in the README and the docs for the example app.
 - Sign-in recordings for iOS, Android, and web.
+- Added `webMode` (`'redirect'`, `'auto'`) for full-page web sign-in, `AppleAuth.hasWebRedirectResult()`, and the `expo-apple-sign-in/server` handler for Apple's POST.
+- Added `web:export` and `web:serve` to the example to test web sign-in through a tunnel.
 
 ### Changed
 
@@ -17,6 +19,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Noted on the comparison page that 1.1.0 is published on npm.
 - Pointed the docs and README to react-native-nitro-google-signin for Google Sign-In and to Invertase for apps not on Expo SDK 58.
 - Serve the documentation at https://exsi.smartsquad.io/.
+- Web popup sign-in sent the configured `redirectUri` to Apple unchanged instead of the current page URL.
 
 ## [1.1.0] - 2026-10-10
 

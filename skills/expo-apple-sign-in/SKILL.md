@@ -35,7 +35,9 @@ const { identityToken, nonce } = await AppleAuth.signIn()
 - `AppleAuth.getCredentialState(userId)` resolves `'authorized'`, `'revoked'`, `'notFound'`, `'transferred'`, or `'unknown'` on iOS, and always `'unknown'` on Android and web.
 - `AppleAuth.addRevokeListener(listener)` returns `{ remove() }`. Only iOS calls the listener. Call `remove()` on unmount.
 - iOS and Android run one sign-in at a time. A second `signIn` while one is pending rejects with `ERR_REQUEST_FAILED`.
-- Web opens Apple's popup, so call `signIn` from a click or press handler. A blocked popup rejects with `ERR_REQUEST_FAILED`.
+- Web uses Apple's popup by default, so call `signIn` from a click or press handler. A blocked popup rejects with `ERR_REQUEST_FAILED`.
+- For phone browsers, set `webMode: 'auto'` in `AppleAuth.configure` and add `export const POST = handleAppleWebRedirect` (from `expo-apple-sign-in/server`) in an Expo Router `+api.ts` route at `redirectUri`, for example `app/auth/callback+api.ts`. Redirect mode needs a deployed server.
+- After a web redirect, `AppleButton` and `useAppleAuth` replay the sign-in on mount. Without them, call `AppleAuth.signIn()` or the adapter at startup when `AppleAuth.hasWebRedirectResult()` is true.
 - On the first authorization, iOS also fills `middleName`, `namePrefix`, `nameSuffix`, and `nickname` on `credential.user`. Android and web return `null` for them.
 
 ## Supabase

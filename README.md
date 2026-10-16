@@ -117,6 +117,8 @@ Web does not need a native build. From `example/`:
 npx expo start --web --port 43180 --host lan
 ```
 
+That dev server can only do popup sign-in. To try the redirect mode as well, run `npm run build` at the repository root, then `npm run web:serve` in `example/`. Web sign-in needs an HTTPS host that Apple accepts, such as a tunnel, and the [Web setup page](https://exsi.smartsquad.io/setup/web.html) walks through it.
+
 Android and web read `EXPO_PUBLIC_APPLE_SERVICE_ID` and `EXPO_PUBLIC_APPLE_REDIRECT_URI`, either exported in the shell or written in `example/.env`. iOS signs in with the app's App ID. Set `ios.bundleIdentifier` in `example/app.json` to an App ID that has Sign in with Apple enabled, then rebuild. The same steps are on the [demo page](https://exsi.smartsquad.io/examples.html).
 
 <p align="center">
@@ -124,6 +126,8 @@ Android and web read `EXPO_PUBLIC_APPLE_SERVICE_ID` and `EXPO_PUBLIC_APPLE_REDIR
   <img src="docs/public/screenshots/sign-in-android.gif" alt="Sign in with Apple on an Android phone: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="220" />
   <img src="docs/public/screenshots/sign-in-web.gif" alt="Sign in with Apple in a phone browser: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="220" />
 </p>
+
+The web recording shows Brave on Android with the redirect mode.
 
 ## Providers
 

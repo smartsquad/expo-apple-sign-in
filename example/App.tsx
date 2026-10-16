@@ -12,7 +12,7 @@ export default function App() {
 
   useEffect(() => {
     if (clientId && redirectUri) {
-      AppleAuth.configure({ clientId, redirectUri })
+      AppleAuth.configure({ clientId, redirectUri, webMode: 'auto' })
     }
     void AppleAuth.isAvailable().then(setAvailable)
   }, [])

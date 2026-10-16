@@ -1,8 +1,23 @@
+import { enrichUserFromToken, toAppleCredential } from '../credential'
 import { AppleAuthError, EAppleAuthErrorCode } from '../errors'
-import type { TNativeSignInParams, TNativeSignInResult } from '../types'
+import { EWebRedirectStorage } from '../server'
+import type {
+  TAppleAuthResponse,
+  TAppleWebMode,
+  TNativeSignInParams,
+  TNativeSignInResult,
+} from '../types'
+
+// MARK: - Constants
 
 const APPLE_JS_SRC =
   'https://appleid.apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js'
+
+const APPLE_AUTHORIZE_URL = 'https://appleid.apple.com/auth/authorize'
+
+// MARK: - Types
+
+type TWebSignInParams = TNativeSignInParams & { rawNonce: string; mode: TAppleWebMode }
 
 type TAppleJsResponse = {
   authorization?: {
@@ -78,6 +93,13 @@ function loadAppleScript(): Promise<void> {
   return scriptPromise
 }
 
+function appleScope(scopes: string[]): string {
+  return scopes
+    .map((value) => (value === 'fullName' ? 'name' : value))
+    .filter((value, index, all) => all.indexOf(value) === index)
+    .join(' ')
+}
+
 function parseUser(
   raw: TAppleJsResponse['user']
 ): Pick<TNativeSignInResult, 'email' | 'givenName' | 'familyName'> {
@@ -135,12 +157,36 @@ export function assertWebRedirectUri(redirectUri: string): void {
 }
 
 /**
- * Runs Sign in with Apple through the Apple JS SDK in popup mode, loading the SDK script on first
- * use. Requires `clientId` and a same-origin `redirectUri`. A closed or canceled popup rejects with
- * `ERR_REQUEST_CANCELED`, a blocked popup with `ERR_REQUEST_FAILED`, and any other Apple JS
- * rejection with `ERR_REQUEST_UNKNOWN`.
+ * True for Android, iPhone, iPad, and iPod browsers, and for iPadOS Safari, which reports a Mac user
+ * agent with more than one touch point. Defaults to the current `navigator`.
  */
-export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSignInResult> {
+export function prefersWebRedirect(
+  userAgent: string | undefined = typeof navigator === 'undefined'
+    ? undefined
+    : navigator.userAgent,
+  maxTouchPoints: number | undefined = typeof navigator === 'undefined'
+    ? undefined
+    : navigator.maxTouchPoints
+): boolean {
+  if (!userAgent) {
+    return false
+  }
+  if (/Android|iPhone|iPad|iPod/i.test(userAgent)) {
+    return true
+  }
+
+  return /Macintosh/i.test(userAgent) && (maxTouchPoints ?? 0) > 1
+}
+
+/**
+ * Runs Sign in with Apple on web. In popup mode it uses the Apple JS SDK, loading the script on
+ * first use. A closed or canceled popup rejects with `ERR_REQUEST_CANCELED`, a blocked popup with
+ * `ERR_REQUEST_FAILED`, and any other Apple JS rejection with `ERR_REQUEST_UNKNOWN`. In redirect
+ * mode the page leaves for Apple and the returned promise never settles; read the result with
+ * {@link consumeWebRedirectResult} after Apple's POST brings the browser back. Requires `clientId`
+ * and a same-origin `redirectUri`.
+ */
+export async function webSignIn(params: TWebSignInParams): Promise<TNativeSignInResult> {
   if (!params.clientId) {
     throw new AppleAuthError(
       EAppleAuthErrorCode.NotConfigured,
@@ -156,26 +202,24 @@ export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSig
 
   assertWebRedirectUri(params.redirectUri)
 
+  if (params.mode === 'redirect' || (params.mode === 'auto' && prefersWebRedirect())) {
+    return startWebRedirect({
+      ...params,
+      clientId: params.clientId,
+      redirectUri: params.redirectUri,
+    })
+  }
+
   await loadAppleScript()
   const auth = getAppleAuth()
   if (!auth) {
     throw new AppleAuthError(EAppleAuthErrorCode.NotAvailable, 'Apple JS SDK did not initialize.')
   }
 
-  const scope = params.scopes
-    .map((value) => (value === 'fullName' ? 'name' : value))
-    .filter((value, index, all) => all.indexOf(value) === index)
-    .join(' ')
-
-  // Prefer the current page URL (same origin, already validated) so Apple's
-  // popup return lands on a document that loaded this SDK. Path must still be
-  // registered as a Return URL on the Services ID.
-  const redirectURI = resolvePopupRedirectUri(params.redirectUri)
-
   const config = {
     clientId: params.clientId,
-    redirectURI,
-    scope,
+    redirectURI: params.redirectUri,
+    scope: appleScope(params.scopes),
     state: params.state,
     nonce: params.nonce,
     usePopup: true,
@@ -232,30 +276,153 @@ export async function webSignIn(params: TNativeSignInParams): Promise<TNativeSig
   }
 }
 
-/**
- * For popup mode Apple loads `redirectURI` inside the popup after auth. Prefer
- * the configured URI when it already points at this exact page; otherwise keep
- * the configured same-origin URI (caller registered it). Never rewrite to a
- * different origin.
- */
-function resolvePopupRedirectUri(configured: string): string {
-  if (typeof window === 'undefined' || !window.location?.href) {
-    return configured
+// MARK: - Redirect mode
+
+function startWebRedirect(
+  params: TWebSignInParams & { clientId: string; redirectUri: string }
+): Promise<never> {
+  if (typeof sessionStorage === 'undefined' || typeof window === 'undefined') {
+    throw new AppleAuthError(
+      EAppleAuthErrorCode.NotAvailable,
+      'Web redirect sign-in needs sessionStorage and a browser window.'
+    )
   }
 
+  const { pathname, search, hash } = window.location
+  sessionStorage.setItem(
+    EWebRedirectStorage.pending,
+    JSON.stringify({
+      state: params.state,
+      rawNonce: params.rawNonce,
+      returnTo: pathname + search + hash,
+    })
+  )
+
+  const url = new URL(APPLE_AUTHORIZE_URL)
+  url.searchParams.set('client_id', params.clientId)
+  url.searchParams.set('redirect_uri', params.redirectUri)
+  url.searchParams.set('response_type', 'code id_token')
+  url.searchParams.set('response_mode', 'form_post')
+  const scope = appleScope(params.scopes)
+  if (scope) {
+    url.searchParams.set('scope', scope)
+  }
+  url.searchParams.set('state', params.state)
+  url.searchParams.set('nonce', params.nonce)
+  window.location.assign(url.toString())
+
+  return new Promise<never>(() => {})
+}
+
+type TPostedResult = {
+  id_token?: unknown
+  code?: unknown
+  state?: unknown
+  user?: unknown
+  error?: unknown
+}
+
+function readJsonObject(raw: string | null): Record<string, unknown> | null {
+  if (raw === null) {
+    return null
+  }
   try {
-    const configuredUrl = new URL(configured)
-    const pageUrl = new URL(window.location.href)
-    pageUrl.hash = ''
-    if (configuredUrl.origin === pageUrl.origin && configuredUrl.pathname === pageUrl.pathname) {
-      return pageUrl.toString()
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>
     }
   } catch {
-    return configured
+    return null
   }
 
-  return configured
+  return null
 }
+
+function failedResponse(
+  message: string,
+  code: string = EAppleAuthErrorCode.Failed
+): TAppleAuthResponse {
+  return { type: 'error', code, message }
+}
+
+function parsePostedUser(
+  raw: unknown
+): Pick<TNativeSignInResult, 'email' | 'givenName' | 'familyName'> {
+  const empty = { email: null, givenName: null, familyName: null }
+  if (typeof raw !== 'string') {
+    return empty
+  }
+  try {
+    const user = JSON.parse(raw) as TAppleJsResponse['user']
+
+    return parseUser(user)
+  } catch {
+    return empty
+  }
+}
+
+/**
+ * Reads and clears the result stored by the bridge page after Apple's `form_post` redirect. Returns
+ * null when there is no stored result. Both storage keys are removed before the result is checked,
+ * so a result is delivered at most once.
+ */
+export function consumeWebRedirectResult(): TAppleAuthResponse | null {
+  if (typeof sessionStorage === 'undefined') {
+    return null
+  }
+  const rawResult = sessionStorage.getItem(EWebRedirectStorage.result)
+  if (rawResult === null) {
+    return null
+  }
+  const rawPending = sessionStorage.getItem(EWebRedirectStorage.pending)
+  sessionStorage.removeItem(EWebRedirectStorage.result)
+  sessionStorage.removeItem(EWebRedirectStorage.pending)
+
+  const posted = readJsonObject(rawResult) as TPostedResult | null
+  if (!posted) {
+    return failedResponse('Apple sign-in returned a result that this page could not read.')
+  }
+
+  const pending = readJsonObject(rawPending)
+  if (!pending || typeof pending.state !== 'string' || typeof pending.rawNonce !== 'string') {
+    return failedResponse(
+      'Apple sign-in returned to a tab with no pending sign-in. Start the sign-in again from this tab.'
+    )
+  }
+  if (posted.state !== pending.state) {
+    return failedResponse('Apple sign-in returned a state that does not match this page.')
+  }
+
+  if (typeof posted.error === 'string' && posted.error) {
+    if (/cancel|closed|access_denied/i.test(posted.error)) {
+      return { type: 'cancelled' }
+    }
+
+    return failedResponse(`Apple sign-in failed: ${posted.error}`, EAppleAuthErrorCode.Unknown)
+  }
+
+  if (typeof posted.id_token !== 'string' || !posted.id_token) {
+    return failedResponse(
+      'Apple did not return an identity token.',
+      EAppleAuthErrorCode.MissingIdentityToken
+    )
+  }
+
+  const credential = toAppleCredential(
+    {
+      identityToken: posted.id_token,
+      authorizationCode: typeof posted.code === 'string' ? posted.code : null,
+      state: posted.state,
+      ...parsePostedUser(posted.user),
+      realUserStatus: 'unknown',
+    },
+    pending.rawNonce
+  )
+
+  return { type: 'success', data: enrichUserFromToken(credential) }
+}
+
+// MARK: - Availability
 
 /** True when a browser `document` exists. The Apple JS SDK itself loads on the first sign-in. */
 export function isWebAppleAvailable(): boolean {
