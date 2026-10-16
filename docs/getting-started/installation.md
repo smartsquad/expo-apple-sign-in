@@ -1,6 +1,6 @@
 # Installation
 
-**expo-apple-sign-in requires Expo SDK 58 (beta).** The native code is written with Expo Modules 2.0, which earlier SDKs do not support, and Expo Go cannot load it, so iOS and Android need a development build.
+**expo-apple-sign-in requires Expo SDK 58.** The native code is written with Expo Modules 2.0, which earlier SDKs do not support, and Expo Go cannot load it, so iOS and Android need a development build.
 
 Installing the library takes three steps: add the package, register its config plugin, and rebuild the native app so the new module and the Sign in with Apple entitlement are compiled in. Afterwards, `AppleAuth.isAvailable()` tells you whether the module loaded.
 

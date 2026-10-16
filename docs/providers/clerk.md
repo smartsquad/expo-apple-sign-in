@@ -29,7 +29,7 @@ bunx expo install @clerk/expo expo-secure-store
 :::
 
 ::: info Peer dependency range
-`@clerk/expo` 4.10.1 declares `expo` as `>=54 <58` in its peer dependencies, so npm reports a conflict on Expo SDK 58 (beta). The adapter does not call any Clerk native code. It only uses the `signIn`, `signUp`, and `setActive` objects from the JavaScript hooks, so `--legacy-peer-deps` lets npm install the package despite the range.
+`@clerk/expo` 4.10.1 declares `expo` as `>=54 <58` in its peer dependencies, so npm reports a conflict on Expo SDK 58. The adapter does not call any Clerk native code. It only uses the `signIn`, `signUp`, and `setActive` objects from the JavaScript hooks, so `--legacy-peer-deps` lets npm install the package despite the range.
 :::
 
 ## Configure the Clerk dashboard

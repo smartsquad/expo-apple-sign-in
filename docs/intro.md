@@ -2,8 +2,8 @@
 
 `expo-apple-sign-in` adds Sign in with Apple to an Expo app on iOS, Android and web through one JavaScript API. You call `AppleAuth.signIn()` or render `AppleButton`, and each platform resolves with the same credential: Apple's identity token, the authorization code, the raw nonce, the state and whatever user details Apple shared.
 
-::: warning Expo SDK 58 (beta) only
-**expo-apple-sign-in requires Expo SDK 58 (beta).** Its native code is written with the Expo Modules 2.0 API (`@ExpoModule` and `@JS`), which earlier SDKs do not support. Expo Go cannot load the native module either, so iOS and Android need a development build.
+::: warning Expo SDK 58 only
+**expo-apple-sign-in requires Expo SDK 58.** Its native code is written with the Expo Modules 2.0 API (`@ExpoModule` and `@JS`), which earlier SDKs do not support. Expo Go cannot load the native module either, so iOS and Android need a development build.
 :::
 
 ## Why the library exists
@@ -44,4 +44,4 @@ The package also exports its TypeScript types, such as `AppleCredential`, `Apple
 
 Start with [Requirements](/getting-started/requirements) and [Installation](/getting-started/installation), then follow the [Quick start](/getting-started/quick-start) to get a first credential on screen. If you are deciding between Sign in with Apple libraries, the [Comparison](/comparison) page sets `expo-apple-sign-in` beside `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
 
-Google Sign-In is a different package. The comparison page names [`react-native-nitro-google-signin`](/comparison#google-sign-in-and-apple-without-expo-58) for that, and names Invertase's Apple library for apps that are not on Expo SDK 58 (beta). Both are good libraries.
+Google Sign-In is a different package. The comparison page names [`react-native-nitro-google-signin`](/comparison#google-sign-in-and-apple-without-expo-58) for that, and names Invertase's Apple library for apps that are not on Expo SDK 58. Both are good libraries.

@@ -1,6 +1,6 @@
 # Demo
 
-The repository includes an example app in the [`example`](https://github.com/smartsquad/expo-apple-sign-in/tree/main/example) folder. It is a single-screen Expo SDK 58 (beta) app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
+The repository includes an example app in the [`example`](https://github.com/smartsquad/expo-apple-sign-in/tree/main/example) folder. It is a single-screen Expo SDK 58 app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
 
 ## What the example shows
 
