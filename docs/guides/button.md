@@ -116,6 +116,15 @@ export function SignInWithSupabase(): ReactElement {
 }
 ```
 
+## After a web redirect
+
+With `webMode: 'redirect'` or `'auto'`, [web sign-in](/setup/web#how-redirect-sign-in-works) leaves the page for Apple and returns to it through a server route. When the page loads again, the button runs its press handler once on mount, so the result that Apple sent back reaches your code:
+
+- With an `onPress` prop, the button calls `onPress`. An adapter inside it, such as `signInWithSupabase`, runs again and receives Apple's result without a second Apple sheet.
+- Without `onPress`, the button runs the built-in flow, so `onSuccess`, `onCancel` or `onError` fires.
+
+The replay ignores `disabled`, because the person already pressed the button before they left. The button has to render on the page the user returns to, which is the page that started sign-in. Only one `AppleButton` or [`useAppleAuth`](/guides/hook#after-a-web-redirect) replays a given result, the first one to mount, and a result is delivered once. A page that renders neither follows [Usage](/guides/usage#pick-up-a-web-redirect-result).
+
 ## Custom label and content
 
 `label` changes only the text. Keep the official wording unless you have a reason to change it.

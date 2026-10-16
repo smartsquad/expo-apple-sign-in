@@ -3,7 +3,7 @@
 This page compares `expo-apple-sign-in` 1.1.0 with three packages that React Native and React web apps use for Sign in with Apple: `expo-apple-authentication` 58.0.2, `@invertase/react-native-apple-authentication` 2.5.1, and `react-apple-signin-auth` 1.2.1. It covers platform support, native layers, nonce handling, the JavaScript each package adds to an app bundle, and what an app has to install to reach iOS, Android, and web. Every statement comes from the published package files or from a measurement described in [How we measured](#how-we-measured). The page also lists the cases where another package fits better.
 
 ::: info Versions
-All figures come from the package versions named above, including the `expo-apple-sign-in` size figures, which were measured on 1.1.0. `expo-apple-sign-in` 1.1.0 is published on npm at [npmjs.com/package/expo-apple-sign-in](https://www.npmjs.com/package/expo-apple-sign-in). `expo-apple-authentication` 58.0.2 is the version bundled with Expo SDK 58 (beta).
+All figures come from the package versions named above, including the `expo-apple-sign-in` size figures, which were measured on 1.1.0. `expo-apple-sign-in` 1.1.0 is published on npm at [npmjs.com/package/expo-apple-sign-in](https://www.npmjs.com/package/expo-apple-sign-in). `expo-apple-authentication` 58.0.2 is the version bundled with Expo SDK 58.
 :::
 
 ## At a glance
@@ -86,7 +86,7 @@ The sums count each package once for the target it serves. The native figure for
 - A web-only React app. `react-apple-signin-auth` needs `react` and `react-dom` as its only peer dependencies, adds 2,620 bytes gzipped in the web bundle, and loads Apple's script from Apple's CDN.
 - An iOS-only app that already works. If it hashes its own nonce and uses the system button, a move adds no platform coverage. The [migration page](/migration/expo-apple-authentication) lists what changes.
 
-## Google Sign-In, and Apple without Expo 58 (beta) {#google-sign-in-and-apple-without-expo-58}
+## Google Sign-In, and Apple without Expo 58 {#google-sign-in-and-apple-without-expo-58}
 
 This package already signs in with Apple on Android. A Kotlin activity opens Apple's authorize page in a WebView. It does not sign in with Google, and it does not run on Expo SDK 57 or on React Native without Expo.
 
@@ -94,7 +94,7 @@ Two other libraries cover those jobs, and both are good.
 
 [`react-native-nitro-google-signin`](https://react-native-nitro-google-sign-in.github.io/) is Google Sign-In on Nitro Modules. Version 2.3.0 is MIT licensed. Android uses Credential Manager, and iOS uses the Google Sign-In SDK. It is the Google library to install next to this one.
 
-[`@invertase/react-native-apple-authentication`](https://github.com/invertase/react-native-apple-authentication) is Sign in with Apple for React Native, including a separate Android module, `appleAuthAndroid`. Version 2.5.1 is Apache-2.0, copyright Invertase Limited. Use it when the app cannot take Expo SDK 58 (beta). The [migration page](/migration/invertase) is for apps that are leaving it.
+[`@invertase/react-native-apple-authentication`](https://github.com/invertase/react-native-apple-authentication) is Sign in with Apple for React Native, including a separate Android module, `appleAuthAndroid`. Version 2.5.1 is Apache-2.0, copyright Invertase Limited. Use it when the app cannot take Expo SDK 58. The [migration page](/migration/invertase) is for apps that are leaving it.
 
 ## How we measured
 

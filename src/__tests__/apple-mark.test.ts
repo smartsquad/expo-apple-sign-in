@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { APPLE_MARK_PATH, APPLE_MARK_VIEW_BOX, appleMarkSvg } from '../appleMark'
+import { APPLE_MARK_PATH, APPLE_MARK_VIEW_BOX, appleMarkSvg } from '../apple-mark'
 
 describe('apple mark', () => {
   it('uses a 24x24 view box so the bitten apple is not clipped', () => {
@@ -22,7 +22,7 @@ describe('apple mark', () => {
       join(__dirname, '../../docs/.vitepress/theme/components/AppleButtonPlayground.vue'),
       'utf8'
     )
-    expect(vue).toContain("from '../../../../src/appleMark'")
+    expect(vue).toContain("from '../../../../src/apple-mark'")
     expect(vue).toContain('APPLE_MARK_PATH')
     expect(vue).toContain('APPLE_MARK_VIEW_BOX')
   })

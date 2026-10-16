@@ -19,7 +19,7 @@ Without both values, `AppleAuth.signIn()` rejects with `ERR_NOT_CONFIGURED` and 
 
 ## Register the redirect URI
 
-Apple only redirects to Return URLs registered on the Services ID, so the exact string you pass as `redirectUri` must be listed under **Return URLs**, and its host must be listed under **Domains and Subdomains**. The URL must use HTTPS, and Apple rejects `localhost` and IP addresses. A Services ID can list several Return URLs, so Android may use a different one from web.
+Apple only redirects to Return URLs registered on the Services ID, so the exact string you pass as `redirectUri` must be listed under **Return URLs**, and its host must be listed under **Domains and Subdomains**. The URL must use HTTPS, and Apple rejects `localhost` and IP addresses. A Services ID can list several Return URLs, so Android may use a different one from web. [Test locally](/guides/local-testing#test-on-an-android-device) shows how to try a Return URL on a device through a tunnel.
 
 ## How the sign-in screen works
 

@@ -1,4 +1,4 @@
-import { AppleAuth } from '../AppleAuth'
+import { AppleAuth } from '../apple-auth'
 import { AppleAuthError, EAppleAuthErrorCode } from '../errors'
 import type { TAppleCredential, TAppleSignInOptions } from '../types'
 

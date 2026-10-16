@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   ActivityIndicator,
   Platform,
@@ -12,8 +12,8 @@ import {
   type ViewStyle,
 } from 'react-native'
 
-import { AppleAuth } from './AppleAuth'
-import { AppleLogo } from './AppleLogo'
+import { AppleAuth, claimWebRedirectReplay } from './apple-auth'
+import { AppleLogo } from './apple-logo'
 import { isCancelledError, normalizeAppleError, type AppleAuthError } from './errors'
 import type { TAppleButtonStyle, TAppleButtonType, TAppleCredential } from './types'
 
@@ -73,7 +73,9 @@ export const APPLE_BUTTON_HEIGHT = 48
 /**
  * Sign in with Apple button with the HIG labels and colors on iOS, Android, and web. Pressing it
  * runs `AppleAuth.signIn()`, shows a spinner while it runs, and reports the outcome through
- * `onSuccess`, `onCancel`, or `onError`. Passing `onPress` replaces the built-in sign-in.
+ * `onSuccess`, `onCancel`, or `onError`. Passing `onPress` replaces the built-in sign-in. After a
+ * web redirect returns to the page, the button runs its handler again on mount, so `onSuccess`
+ * fires, or `onPress` (and an adapter inside it) receives Apple's result.
  */
 export function AppleButton({
   onPress,
@@ -98,10 +100,7 @@ export function AppleButton({
   const palette = useMemo(() => paletteFor(buttonStyle), [buttonStyle])
   const title = label ?? ELabels[buttonType]
 
-  const handlePress = useCallback(async () => {
-    if (disabled || busy) {
-      return
-    }
+  const runSignIn = useCallback(async () => {
     if (onPress) {
       onPress()
       return
@@ -120,7 +119,26 @@ export function AppleButton({
     } finally {
       setBusy(false)
     }
-  }, [busy, disabled, onCancel, onError, onPress, onSuccess])
+  }, [onCancel, onError, onPress, onSuccess])
+
+  const runSignInRef = useRef(runSignIn)
+
+  useEffect(() => {
+    runSignInRef.current = runSignIn
+  })
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && claimWebRedirectReplay()) {
+      runSignInRef.current()
+    }
+  }, [])
+
+  const handlePress = useCallback(async () => {
+    if (disabled || busy) {
+      return
+    }
+    await runSignIn()
+  }, [busy, disabled, runSignIn])
 
   return (
     <Pressable

@@ -1,7 +1,7 @@
 {
   "name": "Expo Apple Sign In",
   "short_name": "Apple Sign In",
-  "description": "Sign in with Apple for Expo SDK 58 (beta) on iOS, Android and web.",
+  "description": "Sign in with Apple for Expo SDK 58 on iOS, Android and web.",
   "start_url": "/expo-apple-sign-in/",
   "scope": "/expo-apple-sign-in/",
   "display": "standalone",

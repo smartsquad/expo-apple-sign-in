@@ -8,13 +8,23 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Demo section in the README and the docs for the example app.
 - Sign-in recordings for iOS, Android, and web.
+- Added `webMode` (`'redirect'`, `'auto'`) for full-page web sign-in, `AppleAuth.hasWebRedirectResult()`, and the `expo-apple-sign-in/server` handler for Apple's POST.
+- Added `web:export` and `web:serve` to the example to test web sign-in through a tunnel.
+- Added a local testing guide for web, Android, and iPhone, and pointed the agent skill to it.
+- Added a skills.sh badge and an agent skill section to the README.
 
 ### Changed
 
+- Aligned the agent skill's Expo Router API route example with its configured Apple redirect URI.
 - Marked Expo SDK 58 as beta in the README and the docs.
+- Dropped the Expo SDK 58 beta label. The library and the example app track the stable SDK (`expo@~58.0.12`, React Native 0.88.0).
+- `AppleAuth.addRevokeListener` stays a no-op on Android. The native module exposes `addListener` but declares no events, so subscribing threw before the first render.
 - Noted on the comparison page that 1.1.0 is published on npm.
 - Pointed the docs and README to react-native-nitro-google-signin for Google Sign-In and to Invertase for apps not on Expo SDK 58.
 - Serve the documentation at https://exsi.smartsquad.io/.
+- Web popup sign-in sent the configured `redirectUri` to Apple unchanged instead of the current page URL.
+- Renamed the TypeScript source files and `internal/module-scripts` to kebab case, following Expo's file naming.
+- Rewrote the agent skill with Agent Skills frontmatter and full coverage of setup, adapters, web redirect, errors, and server verification.
 
 ## [1.1.0] - 2026-10-10
 

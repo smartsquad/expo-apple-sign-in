@@ -29,7 +29,7 @@ bunx expo install @clerk/expo expo-secure-store
 :::
 
 ::: info Peer dependency range
-`@clerk/expo` 4.10.1 declares `expo` as `>=54 <58` in its peer dependencies, so npm reports a conflict on Expo SDK 58 (beta). The adapter does not call any Clerk native code. It only uses the `signIn`, `signUp`, and `setActive` objects from the JavaScript hooks, so `--legacy-peer-deps` lets npm install the package despite the range.
+`@clerk/expo` 4.10.1 declares `expo` as `>=54 <58` in its peer dependencies, so npm reports a conflict on Expo SDK 58. The adapter does not call any Clerk native code. It only uses the `signIn`, `signUp`, and `setActive` objects from the JavaScript hooks, so `--legacy-peer-deps` lets npm install the package despite the range.
 :::
 
 ## Configure the Clerk dashboard
@@ -118,6 +118,10 @@ Clerk verifies the identity token itself, so the adapter sends no nonce to Clerk
 ::: warning Android and web
 Clerk documents `oauth_token_apple` for native iOS. On Android and web the token's audience is your Services ID, and Clerk does not document that case. The adapter runs on those platforms, but test sign-in against your own Clerk instance on each platform you ship before you rely on it. The [Android](/setup/android) and [Web](/setup/web) pages cover the platform setup.
 :::
+
+## Web redirect mode
+
+With `webMode: 'redirect'` or `'auto'`, web sign-in [leaves the page for Apple](/setup/web#how-redirect-sign-in-works) and returns through a server route. Keep `signInWithClerk` in the `onPress` of `AppleButton`. The button calls it again when the page loads after the return, and the adapter receives Apple's result without a second sheet. Without `AppleButton`, call `signInWithClerk` at startup when `AppleAuth.hasWebRedirectResult()` is `true`. [Usage](/guides/usage#pick-up-a-web-redirect-result) has a runnable example.
 
 ## Next steps
 

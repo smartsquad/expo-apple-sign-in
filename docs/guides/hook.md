@@ -15,9 +15,10 @@ The `options` object accepts the same fields as [`AppleAuth.configure`](/guides/
 | `clientId` | `string` | none | Services ID. Required on Android and web, ignored on iOS. |
 | `redirectUri` | `string` | none | HTTPS redirect URI registered for the Services ID. Required on Android and web, ignored on iOS. |
 | `scopes` | `AppleScope[]` | `['name', 'email']` | Default scopes for sign-ins started by the hook. |
+| `webMode` | `'popup' \| 'redirect' \| 'auto'` | `'popup'` | Web only. How web sign-in reaches Apple. `'redirect'` and `'auto'` need a server route that answers Apple's POST. See [Web](/setup/web#choose-a-web-mode). |
 | `treatCancelAsError` | `boolean` | `false` | When `true`, a cancel is stored in `error` and thrown like any other failure. |
 
-When any of `clientId`, `redirectUri`, or `scopes` is set, an effect passes the three options to `AppleAuth.configure`. `configure` skips `undefined` values, so an option you leave out of the hook keeps the value from an earlier `configure` call. The effect compares `scopes` by value, so an inline array such as `scopes: ['name', 'email']` does not trigger a new `configure` call on every render.
+When any of `clientId`, `redirectUri`, `scopes`, or `webMode` is set, an effect passes the four options to `AppleAuth.configure`. `configure` skips `undefined` values, so an option you leave out of the hook keeps the value from an earlier `configure` call. The effect compares `scopes` by value, so an inline array such as `scopes: ['name', 'email']` does not trigger a new `configure` call on every render.
 
 ## Returned values
 
@@ -42,6 +43,10 @@ A dismissed Apple sheet is a normal outcome, so by default `signIn` resolves wit
 Every other failure is normalized into an [`AppleAuthError`](/guides/errors), stored in `error`, and thrown. Catch it at the call site or read it from state.
 
 Set `treatCancelAsError: true` when a cancel must follow the same path as a failure. The hook then stores the cancel error (`ERR_REQUEST_CANCELED`) in `error` and throws it.
+
+## After a web redirect
+
+With `webMode: 'redirect'` or `'auto'`, [web sign-in](/setup/web#how-redirect-sign-in-works) leaves the page for Apple and returns to it through a server route. When a component that uses the hook mounts on the page the user returns to, the hook calls its own `signIn` once and sets `credential` on success or `error` on failure. A cancel leaves `error` as `null`, unless `treatCancelAsError` is `true`. The call does not need a press. Only one `useAppleAuth` or [`AppleButton`](/guides/button#after-a-web-redirect) replays a given result, the first one to mount, and a result is delivered once.
 
 ## Revocation
 

@@ -1,23 +1,36 @@
 import { Platform } from 'react-native'
 
-import { AppleAuth, subscribeToConfig } from '../AppleAuth'
+import {
+  AppleAuth,
+  claimWebRedirectReplay,
+  peekCurrentCredential,
+  subscribeToConfig,
+} from '../apple-auth'
 import { EAppleAuthErrorCode } from '../errors'
 import { getNativeAppleModule } from '../native-module'
 import { sha256Hex } from '../nonce'
-import type { TExpoAppleSignInNativeModule, TNativeSignInResult } from '../types'
-import { isWebAppleAvailable, webSignIn } from '../web/appleJs'
+import type {
+  TAppleAuthResponse,
+  TExpoAppleSignInNativeModule,
+  TNativeSignInResult,
+} from '../types'
+import { consumeWebRedirectResult, isWebAppleAvailable, webSignIn } from '../web/apple-js'
 
 jest.mock('../native-module', () => ({
   getNativeAppleModule: jest.fn(),
 }))
 
-jest.mock('../web/appleJs', () => ({
+jest.mock('../web/apple-js', () => ({
+  consumeWebRedirectResult: jest.fn(),
   isWebAppleAvailable: jest.fn(),
   webSignIn: jest.fn(),
 }))
 
 const getNative = getNativeAppleModule as jest.MockedFunction<typeof getNativeAppleModule>
 const webAvailable = isWebAppleAvailable as jest.MockedFunction<typeof isWebAppleAvailable>
+const consumeRedirect = consumeWebRedirectResult as jest.MockedFunction<
+  typeof consumeWebRedirectResult
+>
 const webSign = webSignIn as jest.MockedFunction<typeof webSignIn>
 
 const nativeResult: TNativeSignInResult = {
@@ -56,6 +69,7 @@ beforeEach(async () => {
   getNative.mockReset()
   webAvailable.mockReset()
   webSign.mockReset()
+  consumeRedirect.mockReset()
   webAvailable.mockReturnValue(true)
   await resetAuth()
 })
@@ -303,8 +317,25 @@ describe('AppleAuth.request web', () => {
       scopes: ['name', 'email'],
       clientId: 'com.example.app.service',
       redirectUri: 'https://app.example.com/callback',
+      rawNonce: 'web-nonce',
+      mode: 'popup',
     })
     expect(getNative).not.toHaveBeenCalled()
+  })
+
+  it('passes the configured webMode to the web adapter', async () => {
+    Platform.OS = 'web'
+    AppleAuth.configure({
+      clientId: 'com.example.app.service',
+      redirectUri: 'https://app.example.com/callback',
+      webMode: 'redirect',
+    })
+    webSign.mockResolvedValue(nativeResult)
+
+    await AppleAuth.request()
+
+    expect(webSign).toHaveBeenCalledWith(expect.objectContaining({ mode: 'redirect' }))
+    AppleAuth.configure({ webMode: 'popup' })
   })
 
   it('returns cancelled when Apple JS reports a popup close', async () => {
@@ -432,6 +463,17 @@ describe('AppleAuth.addRevokeListener', () => {
     expect(remove).toHaveBeenCalledTimes(1)
   })
 
+  it('returns a no-op subscription on Android even when addListener exists', () => {
+    Platform.OS = 'android'
+    const addListener = jest.fn()
+    getNative.mockReturnValue(nativeModule({ addListener }))
+
+    const subscription = AppleAuth.addRevokeListener(jest.fn())
+
+    expect(addListener).not.toHaveBeenCalled()
+    expect(() => subscription.remove()).not.toThrow()
+  })
+
   it('returns a no-op subscription when the native module has no addListener', () => {
     Platform.OS = 'ios'
     getNative.mockReturnValue(nativeModule())
@@ -448,5 +490,154 @@ describe('AppleAuth.addRevokeListener', () => {
     const subscription = AppleAuth.addRevokeListener(jest.fn())
 
     expect(() => subscription.remove()).not.toThrow()
+  })
+})
+
+describe('web redirect result', () => {
+  const ESuccess: TAppleAuthResponse = {
+    type: 'success',
+    data: {
+      identityToken: 'redirect.jwt.token',
+      authorizationCode: 'code',
+      nonce: 'raw-nonce',
+      state: 'state-1',
+      user: {
+        id: 'user-1',
+        email: 'ada@example.com',
+        givenName: 'Ada',
+        familyName: 'Lovelace',
+        middleName: null,
+        namePrefix: null,
+        nameSuffix: null,
+        nickname: null,
+      },
+      realUserStatus: 'unknown',
+    },
+  }
+
+  function freshAppleAuth(platform = 'web'): {
+    auth: typeof AppleAuth
+    claim: typeof claimWebRedirectReplay
+    peek: typeof peekCurrentCredential
+    consume: jest.Mock
+    web: jest.Mock
+  } {
+    let loaded: ReturnType<typeof require> | undefined
+    jest.isolateModules(() => {
+      loaded = {
+        mod: require('../apple-auth'),
+        appleJs: require('../web/apple-js'),
+        rn: require('react-native'),
+      }
+    })
+    const { mod, appleJs, rn } = loaded as {
+      mod: typeof import('../apple-auth')
+      appleJs: {
+        consumeWebRedirectResult: jest.Mock
+        webSignIn: jest.Mock
+        isWebAppleAvailable: jest.Mock
+      }
+      rn: { Platform: { OS: string } }
+    }
+    rn.Platform.OS = platform
+    appleJs.isWebAppleAvailable.mockReturnValue(true)
+
+    return {
+      auth: mod.AppleAuth,
+      claim: mod.claimWebRedirectReplay,
+      peek: mod.peekCurrentCredential,
+      consume: appleJs.consumeWebRedirectResult,
+      web: appleJs.webSignIn,
+    }
+  }
+
+  afterEach(() => {
+    delete (globalThis as { sessionStorage?: unknown }).sessionStorage
+  })
+
+  it('returns the stored result once from request before config checks', async () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, consume, web } = freshAppleAuth()
+    consume.mockReturnValue(ESuccess)
+
+    await expect(auth.request()).resolves.toBe(ESuccess)
+
+    const next = await auth.request()
+    expect(next).toMatchObject({ type: 'error', code: EAppleAuthErrorCode.NotConfigured })
+    expect(web).not.toHaveBeenCalled()
+    expect(consume).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns a stored error response from signIn', async () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, consume } = freshAppleAuth()
+    consume.mockReturnValue({ type: 'error', code: EAppleAuthErrorCode.Failed, message: 'boom' })
+
+    await expect(auth.signIn()).rejects.toMatchObject({
+      code: EAppleAuthErrorCode.Failed,
+      message: 'boom',
+    })
+  })
+
+  it('exposes the redirected credential through getCurrentCredential', () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, consume } = freshAppleAuth()
+    consume.mockReturnValue(ESuccess)
+
+    expect(auth.getCurrentCredential()).toBe(ESuccess.type === 'success' ? ESuccess.data : null)
+  })
+
+  it('peeks the credential without loading the redirect result', () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, peek, consume } = freshAppleAuth()
+    consume.mockReturnValue(ESuccess)
+
+    expect(peek()).toBeNull()
+    expect(consume).not.toHaveBeenCalled()
+    expect(auth.getCurrentCredential()).toBe(ESuccess.type === 'success' ? ESuccess.data : null)
+    expect(peek()).toBe(ESuccess.type === 'success' ? ESuccess.data : null)
+  })
+
+  it('reports and claims the replay once', () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, claim, consume } = freshAppleAuth()
+    consume.mockReturnValue(ESuccess)
+
+    expect(auth.hasWebRedirectResult()).toBe(true)
+    expect(claim()).toBe(true)
+    expect(auth.hasWebRedirectResult()).toBe(false)
+    expect(claim()).toBe(false)
+  })
+
+  it('reports no result when none is stored', () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, claim, consume } = freshAppleAuth()
+    consume.mockReturnValue(null)
+
+    expect(auth.hasWebRedirectResult()).toBe(false)
+    expect(claim()).toBe(false)
+  })
+
+  it('loads nothing when the platform is not web', () => {
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    const { auth, claim, consume } = freshAppleAuth('ios')
+    consume.mockReturnValue(ESuccess)
+
+    expect(auth.hasWebRedirectResult()).toBe(false)
+    expect(claim()).toBe(false)
+    expect(auth.getCurrentCredential()).toBeNull()
+    expect(consume).not.toHaveBeenCalled()
+  })
+
+  it('does not mark the result loaded while sessionStorage is undefined', () => {
+    const { auth, consume } = freshAppleAuth()
+    consume.mockReturnValue(ESuccess)
+
+    expect(auth.hasWebRedirectResult()).toBe(false)
+    expect(consume).not.toHaveBeenCalled()
+
+    ;(globalThis as { sessionStorage?: unknown }).sessionStorage = {}
+    expect(auth.hasWebRedirectResult()).toBe(true)
+    expect(consume).toHaveBeenCalledTimes(1)
   })
 })

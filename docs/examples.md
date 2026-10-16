@@ -1,6 +1,6 @@
 # Demo
 
-The repository includes an example app in the [`example`](https://github.com/smartsquad/expo-apple-sign-in/tree/main/example) folder. It is a single-screen Expo SDK 58 (beta) app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
+The repository includes an example app in the [`example`](https://github.com/smartsquad/expo-apple-sign-in/tree/main/example) folder. It is a single-screen Expo SDK 58 app that installs `expo-apple-sign-in` from the parent folder (`file:..`), so it always runs against the library source in the same checkout. The screen shows the platform, the result of `AppleAuth.isAvailable()`, an `AppleButton`, and a status line that reports the outcome of each sign-in. The platform line, the button, and the status line carry the test IDs `platform-meta`, `sign-in-button`, and `status-message`, so end-to-end tests can find them.
 
 ## What the example shows
 
@@ -30,11 +30,19 @@ npx expo run:ios
 npx expo run:android
 ```
 
-Web needs no native build. From `example/`:
+Web needs no native build. The Expo dev server serves the web app and can only do popup sign-in, because it cannot answer the POST that Apple sends in redirect mode. From `example/`:
 
 ```bash
 npx expo start --web --port 43180 --host lan
 ```
+
+The example configures `webMode: 'auto'`, so a phone or tablet uses redirect sign-in and a desktop browser uses the popup. To try both, export the web app and serve it with a server that answers Apple's POST. Run `npm run build` at the repository root first, because the server script imports `expo-apple-sign-in/server` from the built files. Then, from `example/`:
+
+```bash
+npm run web:serve
+```
+
+`npm run web:serve` exports the app to `example/dist` and serves it at `http://127.0.0.1:43181` (`PORT` overrides the port). The server answers a POST on any path with `handleAppleWebRedirect`. Because Apple rejects `localhost`, put an HTTPS tunnel in front of it, as [Test locally](/guides/local-testing) walks through. `EXPO_PUBLIC_*` values are inlined at export time, so run `npm run web:serve` again after you change `example/.env`.
 
 The `example/package.json` scripts call the same commands:
 
@@ -43,6 +51,8 @@ The `example/package.json` scripts call the same commands:
 | `npm run ios` | `expo run:ios` | Builds the development client and runs it on an iOS simulator or device. |
 | `npm run android` | `expo run:android` | Builds the development client and runs it on an Android emulator or device. |
 | `npm run web` | `expo start --web --port 43180 --host lan` | Serves the web app on port 43180. |
+| `npm run web:export` | `expo export --platform web` | Exports the web app to `example/dist`. |
+| `npm run web:serve` | `npm run web:export && node scripts/serve-web.mjs` | Exports the web app and serves `example/dist` at `http://127.0.0.1:43181`, answering Apple's POST on any path. Run `npm run build` at the repository root first. |
 | `npm run start` | `expo start` | Starts the Expo dev server. |
 
 ## Configure Android and web
@@ -76,3 +86,5 @@ Each recording starts on the example, presses Sign in with Apple, shows Apple's 
     <figcaption>Web</figcaption>
   </figure>
 </div>
+
+The web recording shows Brave on Android with the redirect mode.

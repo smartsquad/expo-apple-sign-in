@@ -26,7 +26,7 @@ Android and web use Apple's web flow, which identifies the app by a Services ID 
 6. Under **Return URLs**, enter the full HTTPS URL that you will pass as `redirectUri`, for example `https://app.example.com/auth/callback`.
 7. Confirm the dialog, then save the Services ID.
 
-The Return URL must match `redirectUri` exactly. A Services ID can hold several Return URLs, so Android and web can use different ones. On web, the Return URL must also have the same origin as the page that starts sign-in; [Web](/setup/web) explains the rule.
+The Return URL must match `redirectUri` exactly. A Services ID can hold several Return URLs, so Android and web can use different ones. On web, the Return URL must also have the same origin as the page that starts sign-in; [Web](/setup/web) explains the rule. For web redirect mode (`webMode: 'redirect'` or `'auto'`), the Return URL is the route that answers Apple's POST, for example `https://app.example.com/auth/callback`, so that path must exist on your server. See [Answer Apple's POST](/setup/web#answer-apple-s-post).
 
 ::: warning No localhost
 Apple does not accept `localhost` or IP addresses as Services ID domains or Return URLs. To test Android or web sign-in during development, register the host of an HTTPS tunnel or of a deployed preview.

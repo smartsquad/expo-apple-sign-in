@@ -1,7 +1,7 @@
 import { createElement, type ReactElement } from 'react'
 import { Image, Platform, type ImageStyle, type StyleProp } from 'react-native'
 
-import { APPLE_MARK_PATH, APPLE_MARK_PNG_DATA_URI, APPLE_MARK_VIEW_BOX } from './appleMark'
+import { APPLE_MARK_PATH, APPLE_MARK_PNG_DATA_URI, APPLE_MARK_VIEW_BOX } from './apple-mark'
 
 interface IAppleLogoProps {
   color: string

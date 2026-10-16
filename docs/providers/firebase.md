@@ -148,6 +148,10 @@ export async function getFirebaseAppleCredential(): Promise<TFirebaseAppleCreden
 
 Apple sends the user's name only on the first authorization. Apple never puts it inside the identity token, so save `credential.user.givenName` and `credential.user.familyName` in your own profile right after the first sign-in. The [Usage](/guides/usage#what-the-credential-contains) page lists every credential field.
 
+## Web redirect mode
+
+With `webMode: 'redirect'` or `'auto'`, web sign-in [leaves the page for Apple](/setup/web#how-redirect-sign-in-works) and returns through a server route. Keep `signInWithFirebase` in the `onPress` of `AppleButton`. The button calls it again when the page loads after the return, and the adapter receives Apple's result without a second sheet. Without `AppleButton`, call `signInWithFirebase` at startup when `AppleAuth.hasWebRedirectResult()` is `true`. [Usage](/guides/usage#pick-up-a-web-redirect-result) has a runnable example.
+
 ## Next steps
 
 - [Errors](/guides/errors) lists the codes `AppleAuthError` can carry.

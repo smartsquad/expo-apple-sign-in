@@ -45,9 +45,9 @@ The plugin makes two changes to the iOS project and nothing else:
 
 The plugin adds no other key to the Expo config. If prebuild prints a warning that asks you to install `expo-apple-authentication`, see [Troubleshooting](/reference/troubleshooting#prebuild-warns-about-expo-apple-authentication).
 
-Android and web need no native configuration. The Android sign-in activity is declared in the library's own manifest and merges into your app at build time, and web loads Apple JS at runtime.
+Android and web need no native configuration. The Android sign-in activity is declared in the library's own manifest and merges into your app at build time, and web loads Apple JS at runtime in popup mode. Web redirect mode needs a server route instead, as [Web](/setup/web#answer-apple-s-post) explains.
 
-The plugin's source is `plugin/src/withExpoAppleSignIn.ts`. The package ships it compiled in `plugin/build`, and `app.plugin.js` at the package root loads it from there. It is wrapped in `createRunOncePlugin` under the package name, so it runs once per prebuild even when the config lists it twice.
+The plugin's source is `plugin/src/with-expo-apple-sign-in.ts`. The package ships it compiled in `plugin/build`, and `app.plugin.js` at the package root loads it from there. It is wrapped in `createRunOncePlugin` under the package name, so it runs once per prebuild even when the config lists it twice.
 
 The plugin only runs when Expo generates the native projects. After you add it, or after any change to the iOS part of the config, regenerate the projects:
 

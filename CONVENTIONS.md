@@ -28,10 +28,11 @@ User-facing Apple button labels stay the official English HIG strings (`Sign in 
 |-------|------|------|
 | JS API | `src/` | `AppleAuth`, `useAppleAuth`, `AppleButton`, nonce, errors |
 | Adapters | `src/adapters/` | Thin Clerk / Supabase / Firebase wrappers over `AppleAuth.signIn` |
-| Web | `src/web/` | Apple JS SDK (`usePopup: true`) |
+| Web | `src/web/` | Apple JS SDK popup (default) or a full-page `form_post` redirect (`webMode`) |
+| Server | `src/server.ts` | `expo-apple-sign-in/server`: answers Apple's web POST. No runtime imports, so Node can load the built file. |
 | iOS | `ios/` | AuthenticationServices via `@ExpoModule` / `@JS` |
 | Android | `android/` | Services ID WebView via `@ExpoModule` / `@JS` |
-| Config plugin | `plugin/src/withExpoAppleSignIn.ts`, built to `plugin/build` and loaded by `app.plugin.js` | the Sign in with Apple entitlement and `CFBundleAllowMixedLocalizations` |
+| Config plugin | `plugin/src/with-expo-apple-sign-in.ts`, built to `plugin/build` and loaded by `app.plugin.js` | the Sign in with Apple entitlement and `CFBundleAllowMixedLocalizations` |
 | Docs | `docs/` | VitePress site, GitHub Pages (images-in-motion pattern) |
 | Example | `example/` | Compact Expo SDK 58 app (expo/examples shape) with `AppleButton` |
 
@@ -76,6 +77,7 @@ Every commit that changes user-visible or operational behaviour updates `[Unrele
 
 - **Types** `T` (`TAppleCredential`). **Interfaces** `I` (`IAppleButtonProps`). **Const enums / constant maps** `E` (`EAppleAuthErrorCode`). Prefer `as const` plus a union over `enum`.
 - Public runtime names stay unprefixed (`AppleAuth`, `AppleButton`). Public type aliases without a prefix (`AppleCredential`) are allowed so the package matches Apple terminology. Canonical declarations still use T / I / E.
+- File names are lowercase kebab case (`apple-auth.ts`, `use-apple-auth.ts`), following Expo. Swift and Kotlin sources, Vue components, `example/App.tsx`, and the UPPERCASE root policy files keep their conventional names.
 - No `any`. Use `unknown` and narrow.
 - Always braces on `if` / `else` / `for` / `while`.
 - Do not put `return`, `throw`, `break`, or `continue` on the same line as `if`.

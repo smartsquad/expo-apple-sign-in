@@ -13,11 +13,11 @@ const EBase = process.env.DOCS_BASE ?? '/'
 const ELlmsDomain = EBase === '/' ? undefined : new URL(ESiteOrigin).origin
 const ESiteTitle = 'Expo Apple Sign In'
 const ESiteDescription =
-  'Sign in with Apple for Expo SDK 58 (beta) on iOS, Android and web, with one API, an Apple-style button and adapters for Supabase, Clerk and Firebase.'
+  'Sign in with Apple for Expo SDK 58 on iOS, Android and web, with one API, an Apple-style button and adapters for Supabase, Clerk and Firebase.'
 const ERepo = 'https://github.com/smartsquad/expo-apple-sign-in'
 const EOgImage = `${ESiteOrigin}/og.jpg`
 const EOgImageAlt =
-  'Expo Apple Sign In: Sign in with Apple for Expo SDK 58 (beta) on iOS, Android and web.'
+  'Expo Apple Sign In: Sign in with Apple for Expo SDK 58 on iOS, Android and web.'
 
 function publicAsset(file: string): string {
   return `${EBase}${file.replace(/^\//, '')}`
@@ -60,6 +60,7 @@ const ESidebar = [
       { text: 'useAppleAuth hook', link: '/guides/hook' },
       { text: 'Errors', link: '/guides/errors' },
       { text: 'Backend verification', link: '/guides/backend' },
+      { text: 'Test locally', link: '/guides/local-testing' },
     ],
     collapsed: false,
   },

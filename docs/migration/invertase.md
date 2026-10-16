@@ -58,7 +58,7 @@ The Invertase Android example imports `react-native-get-random-values` and `uuid
 
 ### Replace the web package
 
-On web, remove `react-apple-signin-auth`. `AppleAuth.signIn()` loads Apple JS in popup mode and returns the same credential as on native. Set `clientId` and `redirectUri` through `AppleAuth.configure`, and keep `redirectUri` on the same origin as the page. See [Web](/setup/web). Delete the manual `sha256` call on the nonce, because the library hashes it. Call `AppleAuth.signIn()` from a click or press handler, because browsers block a popup that no user gesture opened.
+On web, remove `react-apple-signin-auth`. `AppleAuth.signIn()` loads Apple JS in popup mode by default and returns the same credential as on native. Set `webMode: 'auto'` to use a full-page redirect on phones, which needs a server route at `redirectUri`. Set `clientId` and `redirectUri` through `AppleAuth.configure`, and keep `redirectUri` on the same origin as the page. See [Web](/setup/web). Delete the manual `sha256` call on the nonce, because the library hashes it. In popup mode, call `AppleAuth.signIn()` from a click or press handler, because browsers block a popup that no user gesture opened.
 
 ### Rename the calls
 

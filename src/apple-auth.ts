@@ -18,12 +18,15 @@ import type {
   TAppleScope,
   TAppleSignInOptions,
 } from './types'
-import { isWebAppleAvailable, webSignIn } from './web/appleJs'
+import { consumeWebRedirectResult, isWebAppleAvailable, webSignIn } from './web/apple-js'
 
 // MARK: - State
 
 let config: TAppleAuthConfig = {}
 let lastCredential: TAppleCredential | null = null
+let webRedirect: { response: TAppleAuthResponse; taken: boolean; replayClaimed: boolean } | null =
+  null
+let webRedirectLoaded = false
 const configListeners = new Set<() => void>()
 
 const EDefaultScopes: TAppleScope[] = ['name', 'email']
@@ -71,6 +74,40 @@ async function performNativeSignIn(params: {
   })
 }
 
+function loadWebRedirect(): void {
+  if (Platform.OS !== 'web' || webRedirectLoaded || typeof sessionStorage === 'undefined') {
+    return
+  }
+  webRedirectLoaded = true
+  const response = consumeWebRedirectResult()
+  if (!response) {
+    return
+  }
+  webRedirect = { response, taken: false, replayClaimed: false }
+  if (response.type === 'success') {
+    lastCredential = response.data
+  }
+}
+
+/** Returns the last credential without reading a pending web redirect result. */
+export function peekCurrentCredential(): TAppleCredential | null {
+  return lastCredential
+}
+
+/**
+ * Returns true once when a web redirect result is waiting and no replay has claimed it. Used by
+ * `AppleButton` and `useAppleAuth` on mount; not part of the public API.
+ */
+export function claimWebRedirectReplay(): boolean {
+  loadWebRedirect()
+  if (!webRedirect || webRedirect.taken || webRedirect.replayClaimed) {
+    return false
+  }
+  webRedirect.replayClaimed = true
+
+  return true
+}
+
 /** Subscribes to `AppleAuth.configure` calls. Used by `useAppleAuth`; not part of the public API. */
 export function subscribeToConfig(listener: () => void): () => void {
   configListeners.add(listener)
@@ -85,14 +122,17 @@ export function subscribeToConfig(listener: () => void): () => void {
 /**
  * Sign in with Apple on iOS, Android, and web through one API. iOS uses
  * `AuthenticationServices`, Android opens Apple's web flow in a WebView, and web
- * loads Apple's JS SDK. Every platform returns the same credential shape. The
+ * loads Apple's JS SDK, in a popup or, with `webMode`, through a full-page redirect. Every
+ * platform returns the same credential shape. The
  * library SHA-256-hashes the nonce it sends to Apple and returns the raw nonce
  * on the credential, so callers must not hash it again.
  */
 export const AppleAuth = {
   /**
    * Call once at app start. iOS works without this. Android and web need a
-   * Services ID and an HTTPS redirect URI from the Apple Developer portal.
+   * Services ID and an HTTPS redirect URI from the Apple Developer portal. On web, `webMode`
+   * selects `'popup'` (default), `'redirect'`, or `'auto'`; redirect needs a server route that
+   * answers Apple's POST (see `expo-apple-sign-in/server`).
    */
   configure(next: TAppleAuthConfig): void {
     const defined = Object.fromEntries(
@@ -116,6 +156,17 @@ export const AppleAuth = {
     }
 
     return Boolean(config.clientId && config.redirectUri)
+  },
+
+  /**
+   * Web only. True after Apple's redirect returns to this tab, until `AppleButton`,
+   * `useAppleAuth`, or a sign-in call picks the result up. Call `AppleAuth.signIn()` or an adapter
+   * when it is true to receive the result.
+   */
+  hasWebRedirectResult(): boolean {
+    loadWebRedirect()
+
+    return Boolean(webRedirect && !webRedirect.taken && !webRedirect.replayClaimed)
   },
 
   /**
@@ -163,6 +214,13 @@ export const AppleAuth = {
    * response carries the wrapped error as `cause`.
    */
   async request(options: TAppleSignInOptions = {}): Promise<TAppleAuthResponse> {
+    loadWebRedirect()
+    if (Platform.OS === 'web' && webRedirect && !webRedirect.taken) {
+      webRedirect.taken = true
+
+      return webRedirect.response
+    }
+
     try {
       if (Platform.OS === 'android' || Platform.OS === 'web') {
         requireClientConfig(Platform.OS)
@@ -193,6 +251,8 @@ export const AppleAuth = {
               scopes,
               clientId: config.clientId,
               redirectUri: config.redirectUri,
+              rawNonce,
+              mode: config.webMode ?? 'popup',
             })
           : await performNativeSignIn({ hashedNonce, state, scopes })
 
@@ -217,6 +277,8 @@ export const AppleAuth = {
 
   /** Returns the credential from the last successful sign-in, kept in memory only, or null. */
   getCurrentCredential(): TAppleCredential | null {
+    loadWebRedirect()
+
     return lastCredential
   },
 
@@ -256,6 +318,10 @@ export const AppleAuth = {
    * subscription whose `remove` does nothing. Call `remove()` on unmount.
    */
   addRevokeListener(listener: () => void): TAppleEventSubscription {
+    if (Platform.OS !== 'ios') {
+      return { remove() {} }
+    }
+
     const native = getNativeAppleModule()
     if (native && typeof native.addListener === 'function') {
       return native.addListener('credentialRevoked', listener)

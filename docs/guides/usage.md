@@ -13,10 +13,11 @@ AppleAuth.configure({
   clientId: 'com.example.app.web',
   redirectUri: 'https://app.example.com/auth/apple',
   scopes: ['name', 'email'],
+  webMode: 'auto',
 })
 ```
 
-`configure` merges the values you pass into the stored configuration and skips `undefined` values, so you can call it again later to change a single field. `scopes` defaults to `['name', 'email']` when you never set it. `AppleAuth.getConfig()` returns a copy of the stored configuration, and `AppleAuth.isConfigured()` returns `true` on iOS and, on Android and web, only when both `clientId` and `redirectUri` are set. The [Apple Developer](/setup/apple-developer), [Android](/setup/android), and [Web](/setup/web) setup pages explain where each value comes from.
+`configure` merges the values you pass into the stored configuration and skips `undefined` values, so you can call it again later to change a single field. `scopes` defaults to `['name', 'email']` when you never set it. `AppleAuth.getConfig()` returns a copy of the stored configuration, and `AppleAuth.isConfigured()` returns `true` on iOS and, on Android and web, only when both `clientId` and `redirectUri` are set. `webMode` applies on web only. It is `'popup'` by default, which opens Apple's page in a popup and needs no server. `'redirect'` sends the whole tab to Apple, and `'auto'` does that on phones and tablets and uses the popup elsewhere. Both need a server route at `redirectUri` that answers Apple's POST, as [Web](/setup/web#choose-a-web-mode) explains. The [Apple Developer](/setup/apple-developer), [Android](/setup/android), and [Web](/setup/web) setup pages explain where each value comes from.
 
 ::: warning Web redirect URI
 On web, `redirectUri` must have the same origin as the page that starts the sign-in. A different origin makes the call fail with `ERR_NOT_CONFIGURED` before Apple opens. See [Troubleshooting](/reference/troubleshooting#web-redirect-uri-points-at-another-origin).
@@ -38,7 +39,7 @@ export async function canShowAppleSignIn(): Promise<boolean> {
 
 ## Sign in
 
-`AppleAuth.signIn(options?)` opens the Apple sheet on iOS, an in-app WebView on Android, and the Apple JS popup on web. It resolves with an `AppleCredential` and rejects with an [`AppleAuthError`](/guides/errors) otherwise.
+`AppleAuth.signIn(options?)` opens the Apple sheet on iOS, an in-app WebView on Android, and on web the Apple JS popup or, with `webMode: 'redirect'`, a full-page redirect. It resolves with an `AppleCredential` and rejects with an [`AppleAuthError`](/guides/errors) otherwise.
 
 ```ts [lib/sign-in.ts]
 import { AppleAuth, generateNonce } from 'expo-apple-sign-in'
@@ -65,7 +66,7 @@ All three options are optional.
 
 When you omit `nonce`, the library generates one with `generateNonce()` (32 bytes from a secure random source, as 64 hex characters) and still returns it on the credential. Pass your own nonce when your server issues it and wants to check it later. The Android flow compares the returned `state` with the one it sent and fails with `ERR_INVALID_RESPONSE` when they differ.
 
-On iOS and Android only one sign-in runs at a time. A call made while another one is pending rejects with `ERR_REQUEST_FAILED`, and its message says that a Sign in with Apple request is already in progress. On web, call `signIn` from a click or press handler. Browsers block popups that no user gesture opened, and a blocked Apple popup rejects with `ERR_REQUEST_FAILED` and a message that asks for a click handler.
+On iOS and Android only one sign-in runs at a time. A call made while another one is pending rejects with `ERR_REQUEST_FAILED`, and its message says that a Sign in with Apple request is already in progress. In popup mode on web, call `signIn` from a click or press handler. Browsers block popups that no user gesture opened, and a blocked Apple popup rejects with `ERR_REQUEST_FAILED` and a message that asks for a click handler. In redirect mode the promise never settles, because the page leaves for Apple, and no user gesture is needed.
 
 ### What the credential contains
 
@@ -139,9 +140,43 @@ export async function requestAppleCredential(): Promise<TAppleCredential | null>
 }
 ```
 
+## Pick up a web redirect result
+
+With `webMode: 'redirect'` or `'auto'`, web sign-in [leaves the page for Apple](/setup/web#how-redirect-sign-in-works) and returns through your server route. `AppleButton` and `useAppleAuth` replay the sign-in when they mount, so they need no extra code. Code that renders neither one on the page the user returns to has to check for the result itself. `AppleAuth.hasWebRedirectResult()` is `true` while a result waits and nothing has claimed it, and `AppleAuth.signIn()` then returns it without leaving the page.
+
+```tsx [components/AppleRedirectResult.tsx]
+import { useEffect } from 'react'
+import { AppleAuth, isCancelledError } from 'expo-apple-sign-in'
+import type { TAppleCredential } from 'expo-apple-sign-in'
+
+type TAppleRedirectResultProps = {
+  onCredential: (credential: TAppleCredential) => void
+}
+
+export function AppleRedirectResult({ onCredential }: TAppleRedirectResultProps) {
+  useEffect(() => {
+    if (!AppleAuth.hasWebRedirectResult()) {
+      return
+    }
+
+    AppleAuth.signIn()
+      .then(onCredential)
+      .catch((error: unknown) => {
+        if (!isCancelledError(error)) {
+          console.warn('Apple sign-in failed', error)
+        }
+      })
+  }, [onCredential])
+
+  return null
+}
+```
+
+The same check works in an async startup function, outside React. If you use an adapter, call it instead of `AppleAuth.signIn()`, because the adapter calls `AppleAuth.signIn()` itself and receives Apple's result. The result is delivered once, and it reaches only the tab that started sign-in. A call to `signIn` or `request` returns the stored result even before `AppleAuth.configure` runs.
+
 ## Read the last credential
 
-`AppleAuth.getCurrentCredential()` returns the credential from the most recent successful sign-in, or `null`. It lives in memory only, so it is `null` after an app restart and after `signOut()`. Persist what you need (your own session, the Apple user id) yourself.
+`AppleAuth.getCurrentCredential()` returns the credential from the most recent successful sign-in, or `null`. After a web redirect it also returns the credential that came back from Apple. It lives in memory only, so it is `null` after an app restart and after `signOut()`. Persist what you need (your own session, the Apple user id) yourself.
 
 ## Check the credential state
 
