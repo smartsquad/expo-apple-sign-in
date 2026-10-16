@@ -2,8 +2,8 @@
 
 `expo-apple-sign-in` adds Sign in with Apple to an Expo app on iOS, Android and web through one JavaScript API. You call `AppleAuth.signIn()` or render `AppleButton`, and each platform resolves with the same credential: Apple's identity token, the authorization code, the raw nonce, the state and whatever user details Apple shared.
 
-::: warning Expo SDK 58 (beta) only
-**expo-apple-sign-in requires Expo SDK 58 (beta).** Its native code is written with the Expo Modules 2.0 API (`@ExpoModule` and `@JS`), which earlier SDKs do not support. Expo Go cannot load the native module either, so iOS and Android need a development build.
+::: warning Expo SDK 58 only
+**expo-apple-sign-in requires Expo SDK 58.** Its native code is written with the Expo Modules 2.0 API (`@ExpoModule` and `@JS`), which earlier SDKs do not support. Expo Go cannot load the native module either, so iOS and Android need a development build.
 :::
 
 ## Why the library exists
@@ -22,7 +22,7 @@ The adapters cover the last step. `signInWithSupabase`, `signInWithClerk` and `s
 | --- | --- | --- |
 | iOS | A Swift module calls Apple's AuthenticationServices framework, and the system shows Apple's native sign-in sheet. | An App ID with Sign in with Apple enabled. The config plugin adds the entitlement and lets the sheet follow the device language. |
 | Android | A Kotlin activity opens Apple's authorize page in a WebView with `response_mode=form_post` and reads the identity token from the form Apple posts back. | A Services ID, passed as `clientId`, and an HTTPS `redirectUri` registered on it. |
-| Web | The library loads Apple's JavaScript SDK (Apple JS) from `appleid.apple.com` and signs in with a popup window. | The same Services ID and a `redirectUri` on the same origin as the page. |
+| Web | By default the library loads Apple's JavaScript SDK (Apple JS) from `appleid.apple.com` and signs in with a popup window. With `webMode: 'redirect'` or `'auto'` the tab goes to Apple and a server route answers Apple's POST. | The same Services ID and a `redirectUri` on the same origin as the page. Redirect mode also needs a server route that accepts POST at `redirectUri`. |
 
 Because Android and web go through Apple's web flow, both need the Services ID and redirect URI from [Apple Developer](/setup/apple-developer) and a call to `AppleAuth.configure`. iOS uses the App ID and ignores those values. The [iOS](/setup/ios), [Android](/setup/android) and [Web](/setup/web) setup pages describe each flow in detail.
 
@@ -44,4 +44,4 @@ The package also exports its TypeScript types, such as `AppleCredential`, `Apple
 
 Start with [Requirements](/getting-started/requirements) and [Installation](/getting-started/installation), then follow the [Quick start](/getting-started/quick-start) to get a first credential on screen. If you are deciding between Sign in with Apple libraries, the [Comparison](/comparison) page sets `expo-apple-sign-in` beside `expo-apple-authentication`, `@invertase/react-native-apple-authentication`, and `react-apple-signin-auth`.
 
-Google Sign-In is a different package. The comparison page names [`react-native-nitro-google-signin`](/comparison#google-sign-in-and-apple-without-expo-58) for that, and names Invertase's Apple library for apps that are not on Expo SDK 58 (beta). Both are good libraries.
+Google Sign-In is a different package. The comparison page names [`react-native-nitro-google-signin`](/comparison#google-sign-in-and-apple-without-expo-58) for that, and names Invertase's Apple library for apps that are not on Expo SDK 58. Both are good libraries.

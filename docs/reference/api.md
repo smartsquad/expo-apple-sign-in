@@ -1,6 +1,6 @@
 # API
 
-This page lists every export of `expo-apple-sign-in` with its exact signature, grouped by purpose. The package has one entry point, three adapter subpaths, and a config plugin. For explanations and examples, follow the links to the [guides](/guides/usage).
+This page lists every export of `expo-apple-sign-in` with its exact signature, grouped by purpose. The package has one entry point, three adapter subpaths, a server subpath, and a config plugin. For explanations and examples, follow the links to the [guides](/guides/usage).
 
 ## Entry points
 
@@ -10,6 +10,7 @@ This page lists every export of `expo-apple-sign-in` with its exact signature, g
 | `expo-apple-sign-in/supabase` | `signInWithSupabase`, `TSupabaseAuthLike`, `SupabaseAuthLike`. |
 | `expo-apple-sign-in/clerk` | `signInWithClerk`. |
 | `expo-apple-sign-in/firebase` | `signInWithFirebase`, `toFirebaseAppleCredential`, `TFirebaseAppleCredential`, `FirebaseAppleCredential`. |
+| `expo-apple-sign-in/server` | `handleAppleWebRedirect`, `webRedirectBridgeDocument`, `EWebRedirectStorage`. Answers Apple's web POST in redirect mode. It has no runtime imports and no React or React Native code, so server code can load it. See [Server](#server). |
 | `expo-apple-sign-in/app.plugin` | The Expo config plugin. Add `"expo-apple-sign-in"` to `plugins` instead of importing it. |
 
 The main entry exports the adapters as well. The subpaths expose the same functions on their own, so a file that talks to one provider imports only that provider's code.
@@ -23,6 +24,7 @@ AppleAuth.configure(next: TAppleAuthConfig): void
 AppleAuth.getConfig(): TAppleAuthConfig
 AppleAuth.isConfigured(): boolean
 AppleAuth.isAvailable(): Promise<boolean>
+AppleAuth.hasWebRedirectResult(): boolean
 AppleAuth.signIn(options?: TAppleSignInOptions): Promise<TAppleCredential>
 AppleAuth.request(options?: TAppleSignInOptions): Promise<TAppleAuthResponse>
 AppleAuth.getCurrentCredential(): TAppleCredential | null
@@ -33,13 +35,14 @@ AppleAuth.signOut(): Promise<void>
 
 | Method | Description |
 |---|---|
-| `configure` | Merges `next` into the stored configuration and skips `undefined` values. Call once at startup. Required on Android and web. |
+| `configure` | Merges `next` into the stored configuration and skips `undefined` values. Call once at startup. Required on Android and web. On web, `webMode` selects `'popup'` (default), `'redirect'`, or `'auto'`. |
 | `getConfig` | Returns a copy of the stored configuration. |
 | `isConfigured` | `true` on iOS. On Android and web, `true` when `clientId` and `redirectUri` are both set. |
 | `isAvailable` | On iOS and Android, asks the native module, which answers `true` whenever it is linked, and resolves `false` when the module is missing or the call throws. On web, resolves `true` when a browser document exists. |
 | `signIn` | Runs the flow. Resolves with the credential. Rejects with `AppleAuthError`, using `ERR_REQUEST_CANCELED` for a cancel. On iOS and Android, a call made while another sign-in is pending rejects with `ERR_REQUEST_FAILED`. |
 | `request` | Runs the same flow and never rejects. Resolves with a `TAppleAuthResponse`. |
-| `getCurrentCredential` | Returns the credential of the last successful sign-in from memory, or `null`. |
+| `hasWebRedirectResult` | Web only. `true` while a result from Apple's redirect waits and nothing has claimed it. `AppleButton`, `useAppleAuth`, `signIn` and `request` claim it. Call `AppleAuth.signIn()` or an adapter when it is `true` and the page renders neither `AppleButton` nor `useAppleAuth`. |
+| `getCurrentCredential` | Returns the credential of the last successful sign-in from memory, or `null`. After a web redirect it also returns the credential that came back from Apple. |
 | `getCredentialState` | On iOS, asks Apple and resolves `'authorized'`, `'revoked'`, `'notFound'`, `'transferred'`, or `'unknown'`. Resolves `'unknown'` on Android and web, and on iOS when the native module is missing. |
 | `addRevokeListener` | Calls `listener` when the person revokes Sign in with Apple for your app. iOS only. On Android and web it returns a subscription whose `remove` does nothing. Call `remove()` on unmount. |
 | `signOut` | Clears the in-memory credential. Apple has no sign-out API. |
@@ -60,7 +63,7 @@ type TUseAppleAuthResult = {
 }
 ```
 
-`signIn` passes its `options` to `AppleAuth.signIn` and resolves with `null` when the person cancels, unless the hook's `treatCancelAsError` option is `true`. On iOS the hook also clears `credential` when Apple revokes it. See [useAppleAuth hook](/guides/hook).
+`signIn` passes its `options` to `AppleAuth.signIn` and resolves with `null` when the person cancels, unless the hook's `treatCancelAsError` option is `true`. On iOS the hook also clears `credential` when Apple revokes it. After a web redirect returns to the page, the hook calls `signIn` once on mount and sets `credential` or `error`. See [useAppleAuth hook](/guides/hook).
 
 ## Components
 
@@ -199,6 +202,24 @@ type TClerkResource = {
 
 Each adapter has its own page: [Supabase](/providers/supabase), [Clerk](/providers/clerk), [Firebase](/providers/firebase).
 
+## Server
+
+`expo-apple-sign-in/server` answers the POST that Apple sends to `redirectUri` in web redirect mode. Import it in server code only.
+
+```ts
+function handleAppleWebRedirect(request: Request): Promise<Response>
+function webRedirectBridgeDocument(formBody: string): string
+
+const EWebRedirectStorage: {
+  readonly pending: 'expo-apple-sign-in.web-pending'
+  readonly result: 'expo-apple-sign-in.web-result'
+}
+```
+
+`handleAppleWebRedirect` returns `405` with `Allow: POST` for any other method. For a POST it returns an HTML page with `Cache-Control: no-store`, `Referrer-Policy: no-referrer` and `X-Content-Type-Options: nosniff`. The page stores `id_token`, `code`, `state`, `user` and `error` in `sessionStorage` under `EWebRedirectStorage.result` and calls `location.replace` with the stored `returnTo`. It accepts `returnTo` only when it starts with `/` and the second character is not `/` or `\`. Otherwise it goes to `/`.
+
+`webRedirectBridgeDocument` returns the same HTML for servers that do not use Fetch `Request` and `Response`. Pass it the raw `application/x-www-form-urlencoded` body and send the result as `text/html` with `Cache-Control: no-store`. Nothing in the entry logs, and the route must not log the body either, because it carries the identity token and the authorization code. [Web](/setup/web#answer-apple-s-post) shows an Expo Router route.
+
 ## Types
 
 All types are exported from `expo-apple-sign-in`. Each `T`-prefixed type has an unprefixed public alias that follows Apple terminology.
@@ -214,10 +235,13 @@ type TAppleRealUserStatus = 'unknown' | 'likelyReal' | 'unsupported'
 
 type TAppleCredentialState = 'revoked' | 'authorized' | 'notFound' | 'transferred' | 'unknown'
 
+type TAppleWebMode = 'popup' | 'redirect' | 'auto'
+
 type TAppleAuthConfig = {
   clientId?: string
   redirectUri?: string
   scopes?: TAppleScope[]
+  webMode?: TAppleWebMode
 }
 
 type TAppleSignInOptions = {
@@ -309,6 +333,7 @@ type TExpoAppleSignInNativeModule = {
 | `AppleButtonType` | `TAppleButtonType` |
 | `AppleRealUserStatus` | `TAppleRealUserStatus` |
 | `AppleCredentialState` | `TAppleCredentialState` |
+| `AppleWebMode` | `TAppleWebMode` |
 | `AppleAuthConfig` | `TAppleAuthConfig` |
 | `AppleSignInOptions` | `TAppleSignInOptions` |
 | `AppleUser` | `TAppleUser` |
@@ -331,6 +356,7 @@ type TExpoAppleSignInNativeModule = {
 Field notes:
 
 - `clientId` is the Services ID. `redirectUri` is an HTTPS URL registered for it. Both are ignored on iOS.
+- `webMode` applies on web only and defaults to `'popup'`. `'redirect'` sends the tab to Apple and needs a server route that answers Apple's POST at `redirectUri`. `'auto'` uses redirect on Android, iPhone, iPad and iPod browsers and on iPadOS Safari, and popup elsewhere. See [Web](/setup/web#choose-a-web-mode).
 - `nonce` on `TAppleSignInOptions` is raw. The library hashes it and returns the raw value on `TAppleCredential.nonce`.
 - `TAppleUser.id` is a stable identifier shared by the apps of one team.
 - Apple sends name fields on the first authorization only. `middleName`, `namePrefix`, `nameSuffix`, and `nickname` come from iOS alone. Android and web return `null` for them because Apple's web flow sends only the first and last name.

@@ -17,6 +17,14 @@ export type TAppleCredentialState =
   'revoked' | 'authorized' | 'notFound' | 'transferred' | 'unknown'
 
 /**
+ * How web sign-in reaches Apple. `'popup'` uses the Apple JS popup (default). `'redirect'` sends
+ * the page to Apple, and Apple POSTs the result to `redirectUri`, which needs a server route (see
+ * `expo-apple-sign-in/server`). `'auto'` redirects on Android, iPhone, iPad, and iPod browsers and
+ * uses the popup elsewhere.
+ */
+export type TAppleWebMode = 'popup' | 'redirect' | 'auto'
+
+/**
  * Configuration shared by every platform. iOS uses the app's bundle identifier, so `clientId` is
  * ignored there. Android and web use a Services ID (`clientId`) and an HTTPS `redirectUri`
  * registered under that Services ID in the Apple Developer portal. On web the `redirectUri` origin
@@ -35,6 +43,8 @@ export type TAppleAuthConfig = {
   redirectUri?: string
   /** Default scopes requested at sign-in. Apple may still omit values. */
   scopes?: TAppleScope[]
+  /** Web only. Default `'popup'`. */
+  webMode?: TAppleWebMode
 }
 
 /** Per-call options for `AppleAuth.signIn` and `AppleAuth.request`. */
@@ -193,6 +203,9 @@ export type AppleRealUserStatus = TAppleRealUserStatus
 
 /** Alias of {@link TAppleCredentialState}. */
 export type AppleCredentialState = TAppleCredentialState
+
+/** Alias of {@link TAppleWebMode}. */
+export type AppleWebMode = TAppleWebMode
 
 /** Alias of {@link TAppleAuthConfig}. */
 export type AppleAuthConfig = TAppleAuthConfig

@@ -5,7 +5,7 @@ Rules live in [CONVENTIONS.md](./CONVENTIONS.md). Agent entrypoint: [AGENTS.md](
 ## Before you start
 
 1. Read CONVENTIONS.md.
-2. Confirm Node 22 and npm. The example app needs Expo SDK 58 (`expo@~58.0.6`).
+2. Confirm Node 22 and npm. The example app needs Expo SDK 58 (`expo@~58.0.12`).
 3. Work on `develop`. `main` is release and GitHub Pages only.
 
 ## Verify
@@ -31,6 +31,8 @@ npm run web
 ```
 
 Serves `http://127.0.0.1:43180`.
+
+To test a change with real Sign in with Apple on web, Android, or an iPhone, follow the [local testing guide](https://exsi.smartsquad.io/guides/local-testing.html).
 
 ## Git
 

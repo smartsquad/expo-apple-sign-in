@@ -1,7 +1,7 @@
-import { AppleAuth } from '../AppleAuth'
 import { signInWithClerk } from '../adapters/clerk'
 import { signInWithFirebase, toFirebaseAppleCredential } from '../adapters/firebase'
 import { signInWithSupabase } from '../adapters/supabase'
+import { AppleAuth } from '../apple-auth'
 import { EAppleAuthErrorCode } from '../errors'
 import type { TAppleCredential } from '../types'
 
@@ -23,7 +23,7 @@ const credential: TAppleCredential = {
   realUserStatus: 'likelyReal',
 }
 
-jest.mock('../AppleAuth', () => ({
+jest.mock('../apple-auth', () => ({
   AppleAuth: {
     signIn: jest.fn(),
   },

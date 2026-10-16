@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { APPLE_MARK_PATH, APPLE_MARK_VIEW_BOX } from '../../../../src/appleMark'
+import { APPLE_MARK_PATH, APPLE_MARK_VIEW_BOX } from '../../../../src/apple-mark'
 
 const EStyles = ['black', 'white', 'whiteOutline'] as const
 const ETypes = ['signIn', 'continue', 'signUp'] as const

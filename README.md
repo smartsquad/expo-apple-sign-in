@@ -8,14 +8,15 @@
 <h1 align="center">expo-apple-sign-in</h1>
 
 <p align="center">
-  <strong>Sign in with Apple for Expo SDK 58 (beta).</strong><br />
+  <strong>Sign in with Apple for Expo SDK 58.</strong><br />
   One API and one Apple-style button for iOS, Android and web, with adapters for Supabase, Clerk and Firebase
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/expo-apple-sign-in"><img src="https://img.shields.io/npm/v/expo-apple-sign-in?style=flat-square" alt="npm version" /></a>
+  <a href="https://skills.sh/smartsquad/expo-apple-sign-in"><img src="https://skills.sh/b/smartsquad/expo-apple-sign-in" alt="skills.sh" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT" /></a>
-  <a href="https://expo.dev/"><img src="https://img.shields.io/badge/Expo%20SDK-58%20%28beta%29-000020?style=flat-square&logo=expo&logoColor=white" alt="Expo SDK 58 (beta)" /></a>
+  <a href="https://expo.dev/"><img src="https://img.shields.io/badge/Expo%20SDK-58-000020?style=flat-square&logo=expo&logoColor=white" alt="Expo SDK 58" /></a>
   <img src="https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Web-4630EB?style=flat-square" alt="Platforms: iOS, Android, Web" />
 </p>
 
@@ -29,13 +30,13 @@
 </p>
 
 <p align="center">
-  <img src="docs/public/og.png" alt="expo-apple-sign-in. Sign in with Apple for Expo SDK 58 (beta)." width="800" />
+  <img src="docs/public/og.png" alt="expo-apple-sign-in. Sign in with Apple for Expo SDK 58." width="800" />
 </p>
 
 ---
 
 > [!IMPORTANT]
-> **Expo SDK 58 (beta) only.** The native code is written with Expo Modules 2.0 (`@ExpoModule` and `@JS`), which earlier SDKs do not support. Expo Go cannot load the native module, so iOS and Android need a development build.
+> **Expo SDK 58 only.** The native code is written with Expo Modules 2.0 (`@ExpoModule` and `@JS`), which earlier SDKs do not support. Expo Go cannot load the native module, so iOS and Android need a development build.
 
 ## Install
 
@@ -94,7 +95,7 @@ export default function App(): ReactElement {
 
 ## Demo
 
-The [`example`](example/) folder is a single-screen Expo SDK 58 (beta) app that installs this package from the parent folder (`file:..`) and shows `AppleButton`. iOS and Android need a development build. Expo Go cannot load the native module.
+The [`example`](example/) folder is a single-screen Expo SDK 58 app that installs this package from the parent folder (`file:..`) and shows `AppleButton`. iOS and Android need a development build. Expo Go cannot load the native module.
 
 From the repository root:
 
@@ -117,6 +118,8 @@ Web does not need a native build. From `example/`:
 npx expo start --web --port 43180 --host lan
 ```
 
+That dev server can only do popup sign-in. To try the redirect mode as well, run `npm run build` at the repository root, then `npm run web:serve` in `example/`. Web sign-in needs an HTTPS host that Apple accepts, such as a tunnel, and the [local testing guide](https://exsi.smartsquad.io/guides/local-testing.html) walks through it.
+
 Android and web read `EXPO_PUBLIC_APPLE_SERVICE_ID` and `EXPO_PUBLIC_APPLE_REDIRECT_URI`, either exported in the shell or written in `example/.env`. iOS signs in with the app's App ID. Set `ios.bundleIdentifier` in `example/app.json` to an App ID that has Sign in with Apple enabled, then rebuild. The same steps are on the [demo page](https://exsi.smartsquad.io/examples.html).
 
 <p align="center">
@@ -124,6 +127,8 @@ Android and web read `EXPO_PUBLIC_APPLE_SERVICE_ID` and `EXPO_PUBLIC_APPLE_REDIR
   <img src="docs/public/screenshots/sign-in-android.gif" alt="Sign in with Apple on an Android phone: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="220" />
   <img src="docs/public/screenshots/sign-in-web.gif" alt="Sign in with Apple in a phone browser: the example, Apple's page, the confirm step, then a signed-in screen with the email hidden" width="220" />
 </p>
+
+The web recording shows Brave on Android with the redirect mode.
 
 ## Providers
 
@@ -137,7 +142,17 @@ Each adapter runs Sign in with Apple and hands the result to your auth service i
 
 Sign in with Apple works differently on each platform: iOS shows a native sheet, while Android and web have to go through Apple's web flow with a Services ID. This package puts those paths behind one call and one credential shape, so the code that talks to your backend is the same on iOS, Android and web. It also handles the nonce for you and ships adapters for the three common auth providers. The [comparison](https://exsi.smartsquad.io/comparison.html) shows how it relates to other Sign in with Apple packages for React Native and Expo.
 
-Google Sign-In is not this package. [react-native-nitro-google-signin](https://react-native-nitro-google-sign-in.github.io/) is the library to use for that, on Android Credential Manager and on iOS. If the app needs Sign in with Apple and cannot take Expo SDK 58 (beta), [@invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) is the one to use, including its Android module. Both are good libraries.
+Google Sign-In is not this package. [react-native-nitro-google-signin](https://react-native-nitro-google-sign-in.github.io/) is the library to use for that, on Android Credential Manager and on iOS. If the app needs Sign in with Apple and cannot take Expo SDK 58, [@invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) is the one to use, including its Android module. Both are good libraries.
+
+## Agent skill
+
+The repository ships an Agent Skill that teaches coding agents the `expo-apple-sign-in` API, the nonce rule, the Apple Developer setup for each platform, and the Supabase, Clerk, and Firebase adapters. Install it with the `skills` CLI:
+
+```bash
+npx skills add smartsquad/expo-apple-sign-in
+```
+
+Add `-g` for a user-level install, or `-a claude-code` (or another agent) to target one agent. The [agent skill page](https://exsi.smartsquad.io/agents/skill.html) lists what the skill covers.
 
 ## Documentation
 

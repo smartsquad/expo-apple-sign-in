@@ -1,6 +1,12 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { Platform } from 'react-native'
 
-import { AppleAuth, subscribeToConfig } from './AppleAuth'
+import {
+  AppleAuth,
+  claimWebRedirectReplay,
+  peekCurrentCredential,
+  subscribeToConfig,
+} from './apple-auth'
 import { AppleAuthError, isCancelledError, normalizeAppleError } from './errors'
 import type {
   TAppleCredential,
@@ -15,17 +21,18 @@ function getIsConfigured(): boolean {
 }
 
 /**
- * React hook around {@link AppleAuth}. Passes `clientId`, `redirectUri`, and `scopes` to
+ * React hook around {@link AppleAuth}. Passes `clientId`, `redirectUri`, `scopes`, and `webMode` to
  * `AppleAuth.configure` when any of them is set, and clears the credential when Apple revokes it
- * (iOS only).
+ * (iOS only). After Apple's web redirect returns to the page, the hook delivers the result once
+ * through its normal state (`credential`, `error`).
  *
  * Returns a {@link TUseAppleAuthResult}.
  */
 export function useAppleAuth(options: TUseAppleAuthOptions = {}): TUseAppleAuthResult {
-  const { treatCancelAsError = false, clientId, redirectUri, scopes } = options
+  const { treatCancelAsError = false, clientId, redirectUri, scopes, webMode } = options
   const scopesKey = scopes ? scopes.join(',') : undefined
   const [credential, setCredential] = useState<TAppleCredential | null>(() =>
-    AppleAuth.getCurrentCredential()
+    peekCurrentCredential()
   )
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<AppleAuthError | null>(null)
@@ -37,10 +44,10 @@ export function useAppleAuth(options: TUseAppleAuthOptions = {}): TUseAppleAuthR
     if (scopesKey !== undefined) {
       nextScopes = scopesKey === '' ? [] : (scopesKey.split(',') as TAppleScope[])
     }
-    if (clientId || redirectUri || nextScopes) {
-      AppleAuth.configure({ clientId, redirectUri, scopes: nextScopes })
+    if (clientId || redirectUri || nextScopes || webMode) {
+      AppleAuth.configure({ clientId, redirectUri, scopes: nextScopes, webMode })
     }
-  }, [clientId, redirectUri, scopesKey])
+  }, [clientId, redirectUri, scopesKey, webMode])
 
   useEffect(() => {
     let cancelled = false
@@ -92,6 +99,18 @@ export function useAppleAuth(options: TUseAppleAuthOptions = {}): TUseAppleAuthR
     },
     [treatCancelAsError]
   )
+
+  const signInRef = useRef(signIn)
+
+  useEffect(() => {
+    signInRef.current = signIn
+  })
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && claimWebRedirectReplay()) {
+      signInRef.current().catch(() => {})
+    }
+  }, [])
 
   const signOut = useCallback(async () => {
     await AppleAuth.signOut()
